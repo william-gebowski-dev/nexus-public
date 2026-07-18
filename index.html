@@ -1,128 +1,542 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nexus — Status</title><meta name="description" content="Status em tempo quase real da plataforma de agentes Nexus."><meta property="og:title" content="Nexus — Status"><meta property="og:description" content="Status em tempo quase real da plataforma de agentes Nexus."><meta property="og:type" content="website"><meta name="twitter:card" content="summary"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f9f9f7"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0d0d"><link rel="canonical" href="https://nexus-public-mu.vercel.app"><meta property="og:url" content="https://nexus-public-mu.vercel.app"><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z' fill='%232a78d6'/><path d='M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z' fill='white'/></svg>"><script>try{var m=localStorage.getItem('nexus-theme');if(m&&m!=='auto')document.documentElement.setAttribute('data-theme',m)}catch(e){}</script><style>
-  :root { color-scheme: light;
-    --plane:#f9f9f7; --card:#ffffff; --border:#e4e3df;
-    --hairline:rgba(11,11,11,.10); --grid:#e1e0d9; --baseline:#c3c2b7;
-    --t1:#0b0b0b; --t2:#52514e; --t3:#8b8a85; --muted:#898781;
-    --good:#0ca30c; --good-t:#006300; --warn:#b26a00; --warn-b:#d99a2b;
-    --bad:#d03b3b; --accent:#2a78d6; --bad-bg:#d03b3b14; --spark:#9ec5f4;
-    --shadow:0 1px 2px rgba(0,0,0,.04); }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) {
-    color-scheme: dark;
-    --plane:#0d0d0d; --card:#1e2026; --border:#33363e;
-    --hairline:rgba(255,255,255,.10); --grid:#2c2c2a; --baseline:#383835;
-    --t1:#f2f2f0; --t2:#c3c2b7; --t3:#9b9a94; --muted:#898781;
-    --good-t:#35c435; --warn:#e5a44a; --warn-b:#a97728;
-    --accent:#3987e5; --bad-bg:#d03b3b22; --spark:#1c5cab;
-    --shadow:0 1px 2px rgba(0,0,0,.35);
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nexus Status — Disponibilidade e incidentes</title><meta name="description" content="Acompanhe a disponibilidade, o desempenho e o histórico de incidentes da plataforma Nexus."><meta property="og:title" content="Nexus Status — Disponibilidade e incidentes"><meta property="og:description" content="Acompanhe a disponibilidade, o desempenho e o histórico de incidentes da plataforma Nexus."><meta property="og:type" content="website"><meta property="og:site_name" content="Nexus Status"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Nexus Status — Disponibilidade e incidentes"><meta name="twitter:description" content="Acompanhe a disponibilidade, o desempenho e o histórico de incidentes da plataforma Nexus."><meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F7F9"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090B10"><link rel="canonical" href="https://nexus-public-mu.vercel.app"><meta property="og:url" content="https://nexus-public-mu.vercel.app"><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z' fill='%233B82F6'/><path d='M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z' fill='white'/></svg>"><script>try{var m=localStorage.getItem('nexus-theme');if(m&&m!=='auto')document.documentElement.setAttribute('data-theme',m)}catch(e){}</script><style>
+  :root { color-scheme: dark;
+    --bg:#090B10; --surface:#11151D; --surface-2:#161B25; --surface-h:#1B2130;
+    --border:#252C3A; --border-2:#323B4D;
+    --t1:#F5F7FA; --t2:#A0A9B8; --t3:#697386;
+    --blue:#3B82F6; --green:#22C55E; --yellow:#F59E0B; --red:#EF4444;
+    --purple:#8B5CF6;
+    --blue-bg:#3B82F61F; --green-bg:#22C55E1C; --yellow-bg:#F59E0B1C;
+    --red-bg:#EF44441A; --shadow:0 1px 3px rgba(0,0,0,.35); }
+  @media (prefers-color-scheme: light) {
+    :root:where(:not([data-theme="dark"])) {
+    color-scheme: light;
+    --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F6; --surface-h:#E9EDF3;
+    --border:#E2E6EE; --border-2:#CBD2DE;
+    --t1:#10141C; --t2:#4B5568; --t3:#79839A;
+    --blue:#2563EB; --green:#188A42; --yellow:#B45309; --red:#DC2626;
+    --purple:#7C3AED;
+    --blue-bg:#2563EB14; --green-bg:#188A4214; --yellow-bg:#B4530916;
+    --red-bg:#DC262612; --shadow:0 1px 2px rgba(15,20,30,.06);
 } }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --plane:#0d0d0d; --card:#1e2026; --border:#33363e;
-    --hairline:rgba(255,255,255,.10); --grid:#2c2c2a; --baseline:#383835;
-    --t1:#f2f2f0; --t2:#c3c2b7; --t3:#9b9a94; --muted:#898781;
-    --good-t:#35c435; --warn:#e5a44a; --warn-b:#a97728;
-    --accent:#3987e5; --bad-bg:#d03b3b22; --spark:#1c5cab;
-    --shadow:0 1px 2px rgba(0,0,0,.35);
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#F0F2F6; --surface-h:#E9EDF3;
+    --border:#E2E6EE; --border-2:#CBD2DE;
+    --t1:#10141C; --t2:#4B5568; --t3:#79839A;
+    --blue:#2563EB; --green:#188A42; --yellow:#B45309; --red:#DC2626;
+    --purple:#7C3AED;
+    --blue-bg:#2563EB14; --green-bg:#188A4214; --yellow-bg:#B4530916;
+    --red-bg:#DC262612; --shadow:0 1px 2px rgba(15,20,30,.06);
 }
   *{box-sizing:border-box;margin:0}
   @media (prefers-reduced-motion: no-preference) {
-    body,.tile,.panel,.badge,.thm,a{transition:background-color .12s ease,
-      border-color .12s ease,color .12s ease} }
-  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  body{font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;
-    background:var(--plane);color:var(--t1);max-width:1180px;margin:0 auto;
-    padding:44px clamp(16px,4vw,48px) 40px}
+    html{scroll-behavior:smooth}
+    body,.card,.panel,.badge,.btn,.thm,a,.svc,.bar i{transition:
+      background-color .15s ease,border-color .15s ease,color .15s ease,
+      width .2s ease}
+    .drawer{transition:transform .2s ease} }
+  :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  html{scroll-padding-top:64px}
+  body{font:16px/1.55 Geist,Inter,system-ui,-apple-system,"Segoe UI",
+    sans-serif;background:var(--bg);color:var(--t1);margin:0}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap}
+  .skip{position:absolute;left:-999px;top:0;background:var(--surface);
+    color:var(--t1);padding:8px 14px;border-radius:0 0 8px 0;z-index:30}
+  .skip:focus{left:0}
   .strip{position:fixed;top:0;left:0;right:0;height:3px;
-    background:var(--good);z-index:9}
-  .strip.warn{background:var(--warn-b)}
-  .strip.down{background:var(--bad)}
-  .hero{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .mark{width:26px;height:26px;flex:none}
-  h1{font-size:30px;font-weight:650;letter-spacing:-.01em}
+    background:var(--green);z-index:20}
+  .strip.warn{background:var(--yellow)}
+  .strip.down{background:var(--red)}
+
+  /* Navegação */
+  .nav{position:sticky;top:0;z-index:15;background:var(--bg);
+    border-bottom:1px solid var(--border)}
+  .nav .wrap{display:flex;align-items:center;gap:10px;min-height:52px}
+  .nav .brand{display:flex;align-items:center;gap:9px;font-weight:700;
+    font-size:15px;letter-spacing:.02em;color:var(--t1);text-decoration:none}
+  .nav .links{display:flex;gap:2px;margin-left:14px}
+  .nav .links a{color:var(--t2);text-decoration:none;font-size:13.5px;
+    padding:7px 11px;border-radius:8px}
+  .nav .links a:hover{color:var(--t1);background:var(--surface-h)}
+  .nav .menu{display:none;margin-left:auto;position:relative}
+  .nav .menu summary{list-style:none;cursor:pointer;padding:7px 12px;
+    border:1px solid var(--border);border-radius:8px;color:var(--t2);
+    font-size:13.5px}
+  .nav .menu summary::-webkit-details-marker{display:none}
+  .nav .menu[open] summary{background:var(--surface-h);color:var(--t1)}
+  .nav .menu .sheet{position:absolute;right:0;top:calc(100% + 6px);
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:12px;box-shadow:var(--shadow);padding:6px;min-width:180px;
+    display:flex;flex-direction:column;z-index:25}
+  .nav .menu .sheet a{color:var(--t1);text-decoration:none;font-size:14px;
+    padding:9px 12px;border-radius:8px}
+  .nav .menu .sheet a:hover{background:var(--surface-h)}
   .thm{margin-left:auto;width:36px;height:32px;border-radius:8px;
-    border:1px solid var(--border);background:var(--card);color:var(--t2);
-    font-size:15px;cursor:pointer;box-shadow:var(--shadow)}
-  .thm:hover{border-color:var(--accent);color:var(--t1)}
+    border:1px solid var(--border);background:var(--surface);color:var(--t2);
+    font-size:15px;cursor:pointer}
+  .thm:hover{border-color:var(--blue);color:var(--t1)}
+  .nav .menu ~ .thm, .nav .menu + .thm{margin-left:0}
+  @media (max-width:860px){
+    .nav .links{display:none}
+    .nav .menu{display:block} }
+
+  /* Cabeçalho */
+  .hero{margin:28px 0 8px;padding:22px 24px;background:var(--surface);
+    border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);
+    border-left:3px solid var(--green);position:relative}
+  .hero.warn{border-left-color:var(--yellow)}
+  .hero.down{border-left-color:var(--red)}
+  .hero .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  h1{font-size:32px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+  .hero .sub{color:var(--t3);font-size:14px;margin-top:2px}
+  .pill{font-size:12px;font-weight:650;color:var(--t2);
+    border:1px solid var(--border-2);border-radius:999px;padding:3px 10px;
+    letter-spacing:.03em}
+  .state{font-size:27px;font-weight:700;margin:16px 0 4px;
+    display:flex;align-items:center;gap:10px}
+  .state .ic{width:12px;height:12px;border-radius:50%;flex:none;
+    background:var(--green)}
+  .state.warn .ic{background:var(--yellow)}
+  .state.down .ic{background:var(--red)}
+  .state.down{color:var(--red)}
+  .lede{color:var(--t2);font-size:15.5px;max-width:70ch}
+  .meta-line{display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;
+    color:var(--t3);font-size:13.5px;margin-top:14px}
+  .meta-line .late{color:var(--yellow);font-weight:650}
+  .btn{font:inherit;font-size:13.5px;font-weight:600;color:var(--t1);
+    background:var(--surface-2);border:1px solid var(--border-2);
+    border-radius:9px;padding:7px 14px;cursor:pointer}
+  .btn:hover{border-color:var(--blue);background:var(--surface-h)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .badge{display:inline-flex;align-items:center;gap:7px;font-size:13px;
-    font-weight:650;padding:5px 13px;border-radius:999px;background:var(--card);
-    border:1px solid var(--border);color:var(--good-t);box-shadow:var(--shadow)}
+    font-weight:650;padding:5px 12px;border-radius:999px;
+    background:var(--surface-2);border:1px solid var(--border);
+    color:var(--green)}
   .badge::before{content:"";width:8px;height:8px;border-radius:50%;
-    background:var(--good);flex:none}
-  .badge.warn{color:var(--warn)}  .badge.warn::before{background:var(--warn-b)}
-  .badge.down{color:var(--bad)}  .badge.down::before{background:var(--bad)}
-  .lede{color:var(--t2);font-size:15px;margin:10px 0 2px}
-  .sub{color:var(--t3);font-size:13px;margin-bottom:28px}
-  .sub .late{color:var(--bad);font-weight:600}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-    gap:12px;margin:20px 0 4px}
-  .tile{background:var(--card);border:1px solid var(--border);
-    border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
-  .tile:hover{border-color:var(--accent)}
-  .tile .k{font-size:13px;color:var(--t2)}
-  .tile .v{font-size:28px;font-weight:600;margin-top:2px;letter-spacing:-.01em}
-  .tile .v small{font-size:14px;color:var(--t3);font-weight:500}
-  .tile .v.ok{color:var(--good-t)}
-  .tile .v.warn{color:var(--warn)}
-  .tile .v.down{color:var(--bad)}
-  .spark{display:block;width:100%;max-width:130px;height:26px;margin-top:8px}
-  h2{font-size:13.5px;font-weight:650;text-transform:uppercase;
-    letter-spacing:.05em;color:var(--t2);margin:28px 0 10px}
-  .panel{background:var(--card);border:1px solid var(--border);
-    border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
-  @media (min-width:1000px){.duo{display:grid;
-    grid-template-columns:1fr 1fr;gap:0 22px;align-items:start}}
-  .svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:4px 22px}
-  .row{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:15px}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--good);flex:none}
-  .down .dot{background:var(--bad)}
-  .row .d{color:var(--t3);font-size:13px}
-  .state{margin-left:auto;font-weight:600;color:var(--good-t);font-size:13px}
-  .down .state{color:var(--bad)}
-  .chart-sum{color:var(--t3);font-size:13px;margin-top:8px}
-  .kv{display:flex;flex-wrap:wrap;gap:6px 26px;font-size:15px}
-  .kv span b{font-weight:650}
-  .tblwrap{overflow:auto;max-height:440px}
+    background:var(--green);flex:none}
+  .badge.warn{color:var(--yellow)}
+  .badge.warn::before{background:var(--yellow)}
+  .badge.down{color:var(--red)}
+  .badge.down::before{background:var(--red)}
+  .badge.mut{color:var(--t2)}
+  .badge.mut::before{background:var(--t3)}
+
+  /* Cards de métrica */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));
+    gap:14px;margin:20px 0 6px}
+  .card{background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+  .card:hover{border-color:var(--border-2)}
+  .card .k{font-size:12.5px;font-weight:650;color:var(--t2);
+    text-transform:uppercase;letter-spacing:.05em;display:flex;gap:7px;
+    align-items:center}
+  .card .k svg{width:14px;height:14px;flex:none;opacity:.8}
+  .card .v{font-size:29px;font-weight:700;margin-top:6px;
+    letter-spacing:-.01em;line-height:1.15}
+  .card .v small{font-size:15px;color:var(--t3);font-weight:550}
+  .card .v.ok{color:var(--green)}
+  .card .v.warn{color:var(--yellow)}
+  .card .v.down{color:var(--red)}
+  .card .d{font-size:13px;color:var(--t3);margin-top:5px}
+  .card .d b{color:var(--t2);font-weight:600}
+  .card .d .up{color:var(--green)}
+  .card .d .dn{color:var(--red)}
+
+  h2{font-size:16px;font-weight:700;letter-spacing:.01em;color:var(--t1);
+    margin:34px 0 12px}
+  h2 small{font-size:13px;color:var(--t3);font-weight:500;margin-left:8px}
+  .panel{background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+
+  /* Linha gráfico + saúde */
+  .main-grid{display:grid;gap:18px;align-items:start}
+  .main-grid>*,.duo>*{min-width:0}
+  @media (min-width:1000px){
+    .main-grid{grid-template-columns:minmax(0,65fr) minmax(280px,35fr)} }
+  .chart-ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+    margin-bottom:12px}
+  .chart-ctl .grp{display:flex;flex-wrap:wrap;gap:4px;
+    background:var(--surface-2);border:1px solid var(--border);
+    border-radius:9px;padding:3px}
+  .chip{font:inherit;font-size:12.5px;font-weight:600;color:var(--t2);
+    background:transparent;border:0;border-radius:7px;padding:5px 10px;
+    cursor:pointer}
+  .chip:hover{color:var(--t1)}
+  .chip[aria-pressed="true"]{background:var(--blue);color:#fff}
+  .chip[disabled]{opacity:.4;cursor:not-allowed}
+  .chart-sum{color:var(--t2);font-size:14px;margin:4px 0 10px}
+  .chart-sum b{font-weight:700}
+  .chart-note{color:var(--t3);font-size:12.5px;margin-top:8px}
+  .empty{color:var(--t3);font-size:14px;text-align:center;padding:34px 0}
+  .hlist{display:flex;flex-direction:column}
+  .hrow{display:flex;align-items:baseline;gap:10px;padding:9px 0;
+    border-bottom:1px solid var(--border);font-size:14.5px}
+  .hrow:last-child{border-bottom:0}
+  .hrow .hk{color:var(--t2)}
+  .hrow .hv{margin-left:auto;font-weight:650;text-align:right}
+  .hrow .hv.ok{color:var(--green)}
+  .hrow .hv.warn{color:var(--yellow)}
+  .hrow .hv.down{color:var(--red)}
+  .hrow .hv small{color:var(--t3);font-weight:500}
+
+  /* Serviços */
+  .svcs{display:grid;grid-template-columns:repeat(auto-fill,
+    minmax(240px,1fr));gap:14px}
+  .svc{background:var(--surface);border:1px solid var(--border);
+    border-radius:14px;padding:15px 17px;box-shadow:var(--shadow)}
+  .svc:hover{border-color:var(--border-2)}
+  .svc .n{font-weight:650;font-size:15px;display:flex;align-items:center;
+    gap:9px}
+  .svc .n .dot{width:9px;height:9px;border-radius:50%;
+    background:var(--green);flex:none}
+  .svc.down .n .dot{background:var(--red)}
+  .svc .r{color:var(--t3);font-size:12.5px;margin:3px 0 8px 18px}
+  .svc .s{font-size:13px;font-weight:650;color:var(--green);margin-left:18px}
+  .svc.down .s{color:var(--red)}
+  .svc .c{color:var(--t3);font-size:12.5px;margin-left:18px;margin-top:3px}
+
+  /* Modelos + causas */
+  .duo{display:grid;gap:18px;align-items:start}
+  @media (min-width:1000px){
+    .duo{grid-template-columns:minmax(0,3fr) minmax(260px,2fr)} }
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .bar{font:inherit;text-align:left;background:none;border:0;padding:0;
+    cursor:pointer;color:var(--t1);width:100%}
+  .bar .lbl{display:flex;justify-content:space-between;font-size:13.5px;
+    margin-bottom:4px}
+  .bar .lbl b{font-weight:650}
+  .bar .lbl span{color:var(--t3)}
+  .bar .trk{height:8px;border-radius:5px;background:var(--surface-2);
+    overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--red);border-radius:5px}
+  .bar:hover .trk{background:var(--surface-h)}
+  .bar:hover .lbl b{color:var(--blue)}
+
+  /* Tabelas */
+  .tblwrap{overflow:auto;max-height:520px}
   table.tbl{width:100%;border-collapse:collapse;font-size:14px;
     font-variant-numeric:tabular-nums;white-space:nowrap}
   .tbl th{font-size:12.5px;font-weight:650;color:var(--t2);text-align:left;
-    padding:6px 14px 8px 0;border-bottom:1px solid var(--border);
-    position:sticky;top:0;background:var(--card);z-index:1}
-  .tbl td{padding:8px 14px 8px 0;border-bottom:1px solid var(--grid)}
-  .tbl tr:last-child td{border-bottom:0}
-  .tbl tbody tr:hover td{background:color-mix(in srgb,
-    var(--accent) 5%, transparent)}
+    padding:7px 14px 9px 0;border-bottom:1px solid var(--border-2);
+    position:sticky;top:0;background:var(--surface);z-index:1}
   .tbl th.num,.tbl td.num{text-align:right}
-  .tbl tr.err td{background:var(--bad-bg)}
+  .tbl th button{font:inherit;color:inherit;background:none;border:0;
+    padding:0;cursor:pointer}
+  .tbl th button:hover{color:var(--t1)}
+  .tbl td{padding:9px 14px 9px 0;border-bottom:1px solid var(--border)}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tbody tr:hover td{background:var(--surface-h)}
+  .tbl td small{color:var(--t3)}
+  .tbl tr.err td{background:var(--red-bg)}
+  .tbl tr[tabindex]{cursor:pointer}
   .st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
-    font-weight:650;color:var(--good-t)}
+    font-weight:650;color:var(--green);background:var(--green-bg);
+    border-radius:999px;padding:2px 10px}
   .st::before{content:"";width:7px;height:7px;border-radius:50%;
-    background:var(--good);flex:none}
-  .st.err{color:var(--bad)}  .st.err::before{background:var(--bad)}
-  .inc{display:flex;gap:12px;align-items:baseline;padding:7px 0;font-size:15px;
-    flex-wrap:wrap}
-  .inc .d{color:var(--t3);font-size:13px;flex:none}
+    background:var(--green);flex:none}
+  .st.err{color:var(--red);background:var(--red-bg)}
+  .st.err::before{background:var(--red)}
+
+  /* Filtros da tabela */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+    margin-bottom:12px}
+  .filters select,.filters input{font:inherit;font-size:13.5px;
+    color:var(--t1);background:var(--surface-2);border:1px solid var(--border);
+    border-radius:9px;padding:6px 10px}
+  .filters input{min-width:170px}
+  .filters .count{color:var(--t3);font-size:13px;margin-left:auto}
+  .fchip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;
+    font-weight:600;color:var(--blue);background:var(--blue-bg);
+    border:1px solid var(--blue);border-radius:999px;padding:3px 10px;
+    cursor:pointer}
+
+  /* Cards no celular */
+  @media (max-width:640px){
+    .tblwrap{max-height:none;overflow:visible}
+    table.tbl,.tbl tbody{display:block;white-space:normal}
+    .tbl thead{display:none}
+    .tbl tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;
+      background:var(--surface-2);border:1px solid var(--border);
+      border-radius:12px;padding:12px 14px;margin-bottom:10px}
+    .tbl tbody tr td{display:block;border:0;padding:2px 0;text-align:left}
+    .tbl td.num{text-align:left}
+    .tbl td[data-l]::before{content:attr(data-l);display:block;
+      font-size:11px;color:var(--t3);text-transform:uppercase;
+      letter-spacing:.04em}
+    .tbl tr.err{border-color:var(--red)} }
+
+  /* Incidentes */
+  .tl{list-style:none;padding:0;position:relative}
+  .tl::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;
+    width:2px;background:var(--border-2)}
+  .tl li{position:relative;padding:0 0 18px 26px}
+  .tl li:last-child{padding-bottom:0}
+  .tl li::before{content:"";position:absolute;left:0;top:6px;width:12px;
+    height:12px;border-radius:50%;background:var(--t3);
+    border:2px solid var(--surface)}
+  .tl li.warn::before{background:var(--yellow)}
+  .tl li.down::before{background:var(--red)}
+  @media (prefers-reduced-motion: no-preference){
+    .tl li.live::before{animation:pulse 2s ease-in-out infinite} }
+  @keyframes pulse{50%{box-shadow:0 0 0 5px var(--yellow-bg)}}
+  .tl .ti{font-weight:650;font-size:15px;display:flex;gap:10px;
+    align-items:center;flex-wrap:wrap}
+  .tl .dt{color:var(--t3);font-size:13px;margin-top:2px}
+  .tl .nt{color:var(--t2);font-size:14px;margin-top:4px;max-width:75ch}
+
+  /* Drawer */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:28}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,94vw);
+    background:var(--surface);border-left:1px solid var(--border-2);
+    z-index:29;padding:22px 24px;overflow:auto;box-shadow:var(--shadow)}
+  .drawer h3{font-size:18px;font-weight:700;margin:0 0 2px}
+  .drawer .x{position:absolute;top:14px;right:14px}
+  .drawer dl{margin:16px 0 0}
+  .drawer dt{font-size:12px;color:var(--t3);text-transform:uppercase;
+    letter-spacing:.05em;margin-top:14px}
+  .drawer dd{margin:2px 0 0;font-size:15.5px;font-weight:600}
+  .drawer dd small{color:var(--t3);font-weight:500}
+
   svg{display:block;width:100%;height:auto}
-  footer{display:flex;justify-content:center;align-items:center;gap:8px;
-    color:var(--t3);font-size:13px;margin-top:36px}
+  footer{border-top:1px solid var(--border);margin-top:44px;
+    padding:22px 0 30px;color:var(--t3);font-size:13px}
+  footer .wrap{display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap}
+  footer a{color:var(--t2);text-decoration:none}
+  footer a:hover{color:var(--blue)}
   footer .mark{width:15px;height:15px}
-  footer a{color:var(--accent);text-decoration:none}
-</style></head><body><div class="strip warn" aria-hidden="true"></div><div class="hero"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z" fill="var(--accent)"/><path d="M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z" fill="var(--card)"/></svg><h1>Nexus — Status</h1><span class="badge">Infra operacional</span><span class="badge warn">⚠ Execuções degradadas</span><button id="thm" class="thm" type="button" aria-label="Tema">◐</button></div><div class="lede">Serviços no ar (9/9) · taxa de erro de 15% nas tarefas (14d)</div><div class="sub" aria-live="polite">Plataforma pessoal de agentes do William Gebowski · atualizado <time id="upd" datetime="2026-07-18T03:29:04.775389+00:00">18/07/2026 03:29 UTC</time><span id="ago"></span></div><div class="tiles"><div class="tile"><div class="k">Servidor</div><div class="v ">no ar há 2 dias</div></div><div class="tile"><div class="k">Tarefas (14d)</div><div class="v ">131</div><svg class="spark" viewBox="0 0 100 26" aria-hidden="true" preserveAspectRatio="none"><polyline points="5.0,19.9 13.2,5.0 21.4,13.5 29.5,6.1 37.7,11.4 45.9,18.9 54.1,16.7 62.3,18.9 70.5,9.3 78.6,21.0 86.8,12.5 95.0,13.5" fill="none" stroke="var(--spark)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="95.0" cy="13.5" r="4" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg></div><div class="tile"><div class="k">Sucesso (14d)</div><div class="v down">85<small>%</small></div><svg class="spark" viewBox="0 0 100 26" aria-hidden="true" preserveAspectRatio="none"><polyline points="5.0,5.0 13.2,5.0 21.4,6.5 29.5,11.3 37.7,8.1 45.9,5.0 54.1,16.0 62.3,10.5 70.5,5.0 78.6,21.0 86.8,7.7 95.0,8.1" fill="none" stroke="var(--spark)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="95.0" cy="8.1" r="4" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg></div><div class="tile"><div class="k">Tokens (14d)</div><div class="v ">20.2<small>M · 20.2→0.07</small></div></div><div class="tile"><div class="k">Duração — mediana · p95</div><div class="v ">46<small>s</small> <small>· 415s</small></div></div><div class="tile"><div class="k">Custo estimado (14d)</div><div class="v ">$105</div><svg class="spark" viewBox="0 0 100 26" aria-hidden="true" preserveAspectRatio="none"><polyline points="5.0,21.0 13.2,18.1 21.4,16.8 29.5,6.7 37.7,5.3 45.9,20.6 54.1,17.0 62.3,18.0 70.5,14.5 78.6,21.0 86.8,5.0 95.0,12.7" fill="none" stroke="var(--spark)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="95.0" cy="12.7" r="4" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/></svg></div><div class="tile"><div class="k">Agentes ativos</div><div class="v ">5</div></div></div><h2>Atividade — tarefas por hora (últimas 24h, UTC)</h2><div class="panel"><svg viewBox="0 0 720 130" role="img" aria-label="Atividade de tarefas"><style>.num{font:600 11px system-ui;fill:var(--t2)}.lbl{font:10px system-ui;fill:var(--muted)}</style><line x1="0" y1="96" x2="720" y2="96" stroke="var(--baseline)" stroke-width="1"/><g><title>04h: 0 tarefas</title><rect x="-0.9" y="0" width="28.0" height="96" fill="transparent"/></g><g><title>05h: 0 tarefas</title><rect x="29.2" y="0" width="28.0" height="96" fill="transparent"/></g><g><title>06h: 0 tarefas</title><rect x="59.4" y="0" width="28.0" height="96" fill="transparent"/><text x="73.4" y="110.0" text-anchor="middle" class="lbl">06h</text></g><g><title>07h: 1 tarefas</title><rect x="89.6" y="0" width="28.0" height="96" fill="transparent"/><path d="M91.6 96.0v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="var(--accent)"/><text x="103.6" y="85.5" text-anchor="middle" class="num">1</text></g><g><title>08h: 0 tarefas</title><rect x="119.8" y="0" width="28.0" height="96" fill="transparent"/></g><g><title>09h: 0 tarefas</title><rect x="149.9" y="0" width="28.0" height="96" fill="transparent"/><text x="163.9" y="110.0" text-anchor="middle" class="lbl">09h</text></g><g><title>10h: 3 tarefas</title><rect x="180.1" y="0" width="28.0" height="96" fill="transparent"/><path d="M182.1 96.0v-13.4q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v13.4z" fill="var(--accent)"/><text x="194.1" y="74.6" text-anchor="middle" class="num">3</text></g><g><title>11h: 13 tarefas, 1 erros</title><rect x="210.3" y="0" width="28.0" height="96" fill="transparent"/><path d="M212.3 30.4v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="212.3" y="32.4" width="24.0" height="63.6" fill="var(--accent)"/><text x="224.3" y="19.9" text-anchor="middle" class="num">13</text></g><g><title>12h: 1 tarefas</title><rect x="240.4" y="0" width="28.0" height="96" fill="transparent"/><path d="M242.4 96.0v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="var(--accent)"/><text x="254.4" y="85.5" text-anchor="middle" class="num">1</text><text x="254.4" y="110.0" text-anchor="middle" class="lbl">12h</text></g><g><title>13h: 13 tarefas, 2 erros</title><rect x="270.6" y="0" width="28.0" height="96" fill="transparent"/><path d="M272.6 35.9v-7.9q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v7.9z" fill="#d03b3b"/><rect x="272.6" y="37.9" width="24.0" height="58.1" fill="var(--accent)"/><text x="284.6" y="19.9" text-anchor="middle" class="num">13</text></g><g><title>14h: 1 tarefas</title><rect x="300.8" y="0" width="28.0" height="96" fill="transparent"/><path d="M302.8 96.0v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="var(--accent)"/><text x="314.8" y="85.5" text-anchor="middle" class="num">1</text></g><g><title>15h: 0 tarefas</title><rect x="330.9" y="0" width="28.0" height="96" fill="transparent"/><text x="344.9" y="110.0" text-anchor="middle" class="lbl">15h</text></g><g><title>16h: 1 tarefas</title><rect x="361.1" y="0" width="28.0" height="96" fill="transparent"/><path d="M363.1 96.0v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="var(--accent)"/><text x="375.1" y="85.5" text-anchor="middle" class="num">1</text></g><g><title>17h: 15 tarefas, 1 erros</title><rect x="391.2" y="0" width="28.0" height="96" fill="transparent"/><path d="M393.2 19.5v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="393.2" y="21.5" width="24.0" height="74.5" fill="var(--accent)"/><text x="405.2" y="9.0" text-anchor="middle" class="num">15</text></g><g><title>18h: 7 tarefas, 2 erros</title><rect x="421.4" y="0" width="28.0" height="96" fill="transparent"/><path d="M423.4 68.7v-7.9q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v7.9z" fill="#d03b3b"/><rect x="423.4" y="70.7" width="24.0" height="25.3" fill="var(--accent)"/><text x="435.4" y="52.7" text-anchor="middle" class="num">7</text><text x="435.4" y="110.0" text-anchor="middle" class="lbl">18h</text></g><g><title>19h: 14 tarefas, 2 erros</title><rect x="451.6" y="0" width="28.0" height="96" fill="transparent"/><path d="M453.6 30.4v-7.9q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v7.9z" fill="#d03b3b"/><rect x="453.6" y="32.4" width="24.0" height="63.6" fill="var(--accent)"/><text x="465.6" y="14.5" text-anchor="middle" class="num">14</text></g><g><title>20h: 9 tarefas</title><rect x="481.8" y="0" width="28.0" height="96" fill="transparent"/><path d="M483.8 96.0v-46.2q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v46.2z" fill="var(--accent)"/><text x="495.8" y="41.8" text-anchor="middle" class="num">9</text></g><g><title>21h: 2 tarefas, 1 erros</title><rect x="511.9" y="0" width="28.0" height="96" fill="transparent"/><path d="M513.9 90.5v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="513.9" y="92.5" width="24.0" height="3.5" fill="var(--accent)"/><text x="525.9" y="80.1" text-anchor="middle" class="num">2</text><text x="525.9" y="110.0" text-anchor="middle" class="lbl">21h</text></g><g><title>22h: 4 tarefas, 1 erros</title><rect x="542.1" y="0" width="28.0" height="96" fill="transparent"/><path d="M544.1 79.6v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="544.1" y="81.6" width="24.0" height="14.4" fill="var(--accent)"/><text x="556.1" y="69.1" text-anchor="middle" class="num">4</text></g><g><title>23h: 2 tarefas</title><rect x="572.3" y="0" width="28.0" height="96" fill="transparent"/><path d="M574.3 96.0v-7.9q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v7.9z" fill="var(--accent)"/><text x="586.3" y="80.1" text-anchor="middle" class="num">2</text></g><g><title>00h: 11 tarefas, 8 erros</title><rect x="602.4" y="0" width="28.0" height="96" fill="transparent"/><path d="M604.4 79.6v-40.7q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v40.7z" fill="#d03b3b"/><rect x="604.4" y="81.6" width="24.0" height="14.4" fill="var(--accent)"/><text x="616.4" y="30.9" text-anchor="middle" class="num">11</text><text x="616.4" y="110.0" text-anchor="middle" class="lbl">00h</text></g><g><title>01h: 0 tarefas</title><rect x="632.6" y="0" width="28.0" height="96" fill="transparent"/></g><g><title>02h: 8 tarefas, 1 erros</title><rect x="662.8" y="0" width="28.0" height="96" fill="transparent"/><path d="M664.8 57.7v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="664.8" y="59.7" width="24.0" height="36.3" fill="var(--accent)"/><text x="676.8" y="47.3" text-anchor="middle" class="num">8</text></g><g><title>03h: 7 tarefas, 1 erros</title><rect x="692.9" y="0" width="28.0" height="96" fill="transparent"/><path d="M694.9 63.2v-2.5q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v2.5z" fill="#d03b3b"/><rect x="694.9" y="65.2" width="24.0" height="30.8" fill="var(--accent)"/><text x="706.9" y="52.7" text-anchor="middle" class="num">7</text><text x="706.9" y="110.0" text-anchor="middle" class="lbl">03h</text></g></svg><div class="chart-sum">131 tarefas e 20 erros na janela de 14 dias.</div></div><div class="duo"><div><h2>Serviços</h2><div class="panel"><div class="svc-grid"><div class="row "><span class="dot"></span>PostgreSQL<span class="d">3/3 verificações</span><span class="state">✓ ok</span></div><div class="row "><span class="dot"></span>Redis<span class="d">2/2 verificações</span><span class="state">✓ ok</span></div><div class="row "><span class="dot"></span>Portainer<span class="state">✓ ok</span></div><div class="row "><span class="dot"></span>Uptime Kuma<span class="state">✓ ok</span></div><div class="row "><span class="dot"></span>Hermes Gateway<span class="state">✓ ok</span></div><div class="row "><span class="dot"></span>Rede privada<span class="state">✓ ok</span></div></div></div></div><div><h2>Modelos de IA</h2><div class="panel tblwrap"><table class="tbl"><thead><tr><th scope="col">Modelo</th><th scope="col" class="num">Tarefas</th><th scope="col" class="num">Sucesso</th><th scope="col" class="num">p95</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">Custo</th></tr></thead><tbody><tr><td>glm-5.2</td><td class="num">125</td><td class="num">88%</td><td class="num">418s</td><td class="num">20.2M</td><td class="num">$105</td></tr><tr><td>minimax-m3</td><td class="num">5</td><td class="num">0%</td><td class="num">—</td><td class="num">0.0M</td><td class="num">$0.00</td></tr><tr><td>claude-haiku-4-5-20251001</td><td class="num">1</td><td class="num">100%</td><td class="num">4s</td><td class="num">0.0M</td><td class="num">$0.00</td></tr></tbody></table></div></div></div><h2>Falhas por causa (14d)</h2><div class="panel"><div class="kv"><span>Saída não parseável <b>12</b></span><span>Outro <b>6</b></span><span>Configuração/credenciais <b>2</b></span></div></div><h2>Últimas execuções</h2><div class="panel tblwrap"><table class="tbl"><thead><tr><th scope="col">Quando (UTC)</th><th scope="col">Modelo</th><th scope="col" class="num">Duração</th><th scope="col" class="num">Tokens (in→out)</th><th scope="col" class="num">Custo</th><th scope="col">Status</th></tr></thead><tbody><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">36s</td><td class="num">197k→0.4k</td><td class="num">$1.00</td><td><span class="st ">Sucesso</span></td></tr><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">43s</td><td class="num">392k→0.1k</td><td class="num">$1.96</td><td><span class="st ">Sucesso</span></td></tr><tr class="err"><td>18/07 03h</td><td>glm-5.2</td><td class="num">13s</td><td class="num">0k→0.0k</td><td class="num">$0.00</td><td><span class="st err">Erro</span></td></tr><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">93s</td><td class="num">580k→0.4k</td><td class="num">$2.91</td><td><span class="st ">Sucesso</span></td></tr><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">29s</td><td class="num">192k→0.0k</td><td class="num">$0.96</td><td><span class="st ">Sucesso</span></td></tr><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">33s</td><td class="num">381k→0.1k</td><td class="num">$1.91</td><td><span class="st ">Sucesso</span></td></tr><tr class=""><td>18/07 03h</td><td>glm-5.2</td><td class="num">67s</td><td class="num">568k→0.3k</td><td class="num">$2.85</td><td><span class="st ">Sucesso</span></td></tr><tr class=""><td>18/07 02h</td><td>glm-5.2</td><td class="num">736s</td><td class="num">1311k→1.1k</td><td class="num">$6.58</td><td><span class="st ">Sucesso</span></td></tr></tbody></table></div><h2>Incidentes</h2><div class="panel"><div class="inc"><span class="d">17/07/2026</span>Falhas elevadas de execução (saídas não parseáveis no endpoint de modelos)<span class="badge warn">Monitorando</span></div></div><h2>Proteção e alertas</h2><div class="panel"><div class="kv"><span>Último backup <b>9h atrás</b></span><span>Cópia externa <b>sim ✓</b></span><span>Alertas abertos <b>0</b></span></div></div><footer><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z" fill="var(--accent)"/><path d="M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z" fill="var(--card)"/></svg><span>Snapshot estático · atualiza a cada 15 min</span><span>· <a href="https://github.com/william-gebowski-dev/nexus-public">feito com Hermes Nexus</a></span></footer><script>
-(function(){var t=document.getElementById('upd'),a=document.getElementById('ago');
-if(!t||!a)return;var d=new Date(t.getAttribute('datetime'));
+</style></head><body><div class="strip warn" aria-hidden="true"></div><a class="skip" href="#visao-geral">Ir para o conteúdo</a><nav class="nav" aria-label="Seções da página"><div class="wrap"><a class="brand" href="#visao-geral"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true" style="width:22px;height:22px;flex:none"><path d="M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z" fill="var(--blue)"/><path d="M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z" fill="var(--surface)"/></svg>NEXUS</a><div class="links"><a href="#visao-geral">Visão geral</a><a href="#atividade">Atividade</a><a href="#modelos">Modelos</a><a href="#servicos">Serviços</a><a href="#execucoes">Execuções</a><a href="#incidentes">Incidentes</a></div><details class="menu" id="mnav"><summary aria-label="Menu de seções">Menu ▾</summary><div class="sheet"><a href="#visao-geral">Visão geral</a><a href="#atividade">Atividade</a><a href="#modelos">Modelos</a><a href="#servicos">Serviços</a><a href="#execucoes">Execuções</a><a href="#incidentes">Incidentes</a></div></details><button id="thm" class="thm" type="button" aria-label="Tema">◐</button></div></nav><main class="wrap"><header class="hero warn" id="visao-geral"><div class="top"><div><h1>NEXUS</h1><div class="sub">Central de Operações</div></div><span class="pill">Status público</span></div><p class="state warn"><span class="ic" aria-hidden="true"></span>Desempenho degradado</p><p class="lede">Todos os serviços estão disponíveis, mas as execuções apresentam taxa de erro de 15.3% — acima da meta operacional.</p><div class="badges"><span class="badge">Infraestrutura: Operacional</span><span class="badge warn">Execuções: Desempenho degradado</span><span class="badge ">Backups: Saudáveis</span><span class="badge mut">Alertas: Nenhum aberto</span></div><div class="meta-line" aria-live="polite"><span>Atualizado <time id="upd" datetime="2026-07-18T03:40:32.021538+00:00">18/07/2026 03:40 UTC</time><span id="ago"></span></span><span id="next" hidden data-js></span><button id="rfr" class="btn" type="button" hidden data-js>Atualizar dados</button><span>Janela padrão: 14 dias</span></div></header><section aria-label="Métricas principais"><div class="kpis"><div class="card" title="Tempo desde a última reinicialização do servidor."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12v4H2zm0 6h12v4H2z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="4.5" cy="6" r=".9" fill="currentColor"/><circle cx="4.5" cy="12" r=".9" fill="currentColor"/></svg>Servidor <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">no ar há 2 dias</div><div class="d">Infraestrutura própria</div></div><div class="card" title="Execuções concluídas sem erro na janela."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5 6 12l7.5-8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Taxa de sucesso <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v down">84.7<small>%</small></div><div class="d">-13.3 pts vs. meta · Meta operacional: 98%</div></div><div class="card" title="Total de execuções de agentes na janela."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 1 3 9.5h3.5L6.5 15l6-8.5H9z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Execuções <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">131</div><div class="d">20 com erro · <span title="Sem janela anterior completa para comparar">vs. anterior: —</span></div></div><div class="card" title="Duração das execuções concluídas: mediana, p95 e máxima."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.5V8l2.4 1.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Latência <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">46s</div><div class="d">p95 <b>415s</b> · máx <b>743s</b></div></div><div class="card" title="Custo estimado de API na janela."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 4.6v6.8M6 6.4c0-.9.9-1.4 2-1.4 s2 .5 2 1.4-.9 1.3-2 1.6-2 .7-2 1.6.9 1.4 2 1.4 2-.5 2-1.4" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>Custo estimado <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">$105</div><div class="d">$0.81 por execução · <span title="Sem janela anterior completa para comparar">vs. anterior: —</span></div></div><div class="card" title="Tokens processados (entrada + saída) na janela."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 1 3 9.5h3.5L6.5 15l6-8.5H9z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>Tokens <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">20.2M</div><div class="d">20.2M entrada · 65k saída</div></div><div class="card" title="Agentes configurados e ativos na plataforma."><div class="k"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="3.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6 1v2M10 1v2M6 13v2M10 13v2M1 6h2M1 10h2M13 6h2M13 10h2" stroke="currentColor" stroke-width="1.2"/></svg>Agentes ativos <small style="text-transform:none;letter-spacing:0">(14d)</small></div><div class="v ">5</div><div class="d">Configurados e habilitados</div></div></div></section><section id="atividade"><h2>Atividade<small>UTC</small></h2><div class="main-grid"><div class="panel"><div class="chart-ctl" data-js hidden><div class="grp" role="group" aria-label="Período"><button class="chip" data-period="24h" aria-pressed="true">24h</button><button class="chip" data-period="7d" aria-pressed="false">7d</button><button class="chip" data-period="14d" aria-pressed="false">14d</button><button class="chip" data-period="30d" aria-pressed="false" disabled title="Histórico insuficiente — dados desde 17/07">30d</button><button class="chip" data-period="90d" aria-pressed="false" disabled title="Histórico insuficiente — dados desde 17/07">90d</button></div><div class="grp" role="group" aria-label="Métrica"><button class="chip" data-metric="tarefas" aria-pressed="true">Tarefas</button><button class="chip" data-metric="erros" aria-pressed="false">Erros</button><button class="chip" data-metric="latencia" aria-pressed="false">Latência</button><button class="chip" data-metric="tokens" aria-pressed="false">Tokens</button><button class="chip" data-metric="custo" aria-pressed="false">Custo</button></div></div><p class="chart-sum" id="csum" aria-live="polite"><b>119</b> execuções · <b>99</b> concluídas · <b>20</b> falhas · taxa de sucesso <b>83.2%</b></p><div id="chart"><svg viewBox="0 0 720 170" role="img" aria-label="Atividade de execuções por período"><style>.num{font:600 11px system-ui;fill:var(--t2)}.lbl{font:10px system-ui;fill:var(--t3)}</style><line x1="0" y1="136" x2="720" y2="136" stroke="var(--border-2)" stroke-width="1"/><g><title>04h: 0 execuções</title><rect x="-0.9" y="0" width="28.0" height="136" fill="transparent"/></g><g><title>05h: 0 execuções</title><rect x="29.2" y="0" width="28.0" height="136" fill="transparent"/></g><g><title>06h: 0 execuções</title><rect x="59.4" y="0" width="28.0" height="136" fill="transparent"/><text x="73.4" y="152.0" text-anchor="middle" class="lbl">06h</text></g><g><title>07h: 1 execuções</title><rect x="89.6" y="0" width="28.0" height="136" fill="transparent"/><path d="M91.6 136.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--blue)"/><text x="103.6" y="123.0" text-anchor="middle" class="num">1</text></g><g><title>08h: 0 execuções</title><rect x="119.8" y="0" width="28.0" height="136" fill="transparent"/></g><g><title>09h: 0 execuções</title><rect x="149.9" y="0" width="28.0" height="136" fill="transparent"/><text x="163.9" y="152.0" text-anchor="middle" class="lbl">09h</text></g><g><title>10h: 3 execuções</title><rect x="180.1" y="0" width="28.0" height="136" fill="transparent"/><path d="M182.1 136.0v-21.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v21.0z" fill="var(--blue)"/><text x="194.1" y="107.0" text-anchor="middle" class="num">3</text></g><g><title>11h: 13 execuções, 1 erros</title><rect x="210.3" y="0" width="28.0" height="136" fill="transparent"/><path d="M212.3 40.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="212.3" y="42.0" width="24.0" height="94.0" fill="var(--blue)"/><text x="224.3" y="27.0" text-anchor="middle" class="num">13</text></g><g><title>12h: 1 execuções</title><rect x="240.4" y="0" width="28.0" height="136" fill="transparent"/><path d="M242.4 136.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--blue)"/><text x="254.4" y="123.0" text-anchor="middle" class="num">1</text><text x="254.4" y="152.0" text-anchor="middle" class="lbl">12h</text></g><g><title>13h: 13 execuções, 2 erros</title><rect x="270.6" y="0" width="28.0" height="136" fill="transparent"/><path d="M272.6 48.0v-13.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v13.0z" fill="var(--red)"/><rect x="272.6" y="50.0" width="24.0" height="86.0" fill="var(--blue)"/><text x="284.6" y="27.0" text-anchor="middle" class="num">13</text></g><g><title>14h: 1 execuções</title><rect x="300.8" y="0" width="28.0" height="136" fill="transparent"/><path d="M302.8 136.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--blue)"/><text x="314.8" y="123.0" text-anchor="middle" class="num">1</text></g><g><title>15h: 0 execuções</title><rect x="330.9" y="0" width="28.0" height="136" fill="transparent"/><text x="344.9" y="152.0" text-anchor="middle" class="lbl">15h</text></g><g><title>16h: 1 execuções</title><rect x="361.1" y="0" width="28.0" height="136" fill="transparent"/><path d="M363.1 136.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--blue)"/><text x="375.1" y="123.0" text-anchor="middle" class="num">1</text></g><g><title>17h: 15 execuções, 1 erros</title><rect x="391.2" y="0" width="28.0" height="136" fill="transparent"/><path d="M393.2 24.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="393.2" y="26.0" width="24.0" height="110.0" fill="var(--blue)"/><text x="405.2" y="11.0" text-anchor="middle" class="num">15</text></g><g><title>18h: 7 execuções, 2 erros</title><rect x="421.4" y="0" width="28.0" height="136" fill="transparent"/><path d="M423.4 96.0v-13.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v13.0z" fill="var(--red)"/><rect x="423.4" y="98.0" width="24.0" height="38.0" fill="var(--blue)"/><text x="435.4" y="75.0" text-anchor="middle" class="num">7</text><text x="435.4" y="152.0" text-anchor="middle" class="lbl">18h</text></g><g><title>19h: 14 execuções, 2 erros</title><rect x="451.6" y="0" width="28.0" height="136" fill="transparent"/><path d="M453.6 40.0v-13.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v13.0z" fill="var(--red)"/><rect x="453.6" y="42.0" width="24.0" height="94.0" fill="var(--blue)"/><text x="465.6" y="19.0" text-anchor="middle" class="num">14</text></g><g><title>20h: 9 execuções</title><rect x="481.8" y="0" width="28.0" height="136" fill="transparent"/><path d="M483.8 136.0v-69.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v69.0z" fill="var(--blue)"/><text x="495.8" y="59.0" text-anchor="middle" class="num">9</text></g><g><title>21h: 2 execuções, 1 erros</title><rect x="511.9" y="0" width="28.0" height="136" fill="transparent"/><path d="M513.9 128.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="513.9" y="130.0" width="24.0" height="6.0" fill="var(--blue)"/><text x="525.9" y="115.0" text-anchor="middle" class="num">2</text><text x="525.9" y="152.0" text-anchor="middle" class="lbl">21h</text></g><g><title>22h: 4 execuções, 1 erros</title><rect x="542.1" y="0" width="28.0" height="136" fill="transparent"/><path d="M544.1 112.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="544.1" y="114.0" width="24.0" height="22.0" fill="var(--blue)"/><text x="556.1" y="99.0" text-anchor="middle" class="num">4</text></g><g><title>23h: 2 execuções</title><rect x="572.3" y="0" width="28.0" height="136" fill="transparent"/><path d="M574.3 136.0v-13.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v13.0z" fill="var(--blue)"/><text x="586.3" y="115.0" text-anchor="middle" class="num">2</text></g><g><title>00h: 11 execuções, 8 erros</title><rect x="602.4" y="0" width="28.0" height="136" fill="transparent"/><path d="M604.4 112.0v-61.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v61.0z" fill="var(--red)"/><rect x="604.4" y="114.0" width="24.0" height="22.0" fill="var(--blue)"/><text x="616.4" y="43.0" text-anchor="middle" class="num">11</text><text x="616.4" y="152.0" text-anchor="middle" class="lbl">00h</text></g><g><title>01h: 0 execuções</title><rect x="632.6" y="0" width="28.0" height="136" fill="transparent"/></g><g><title>02h: 8 execuções, 1 erros</title><rect x="662.8" y="0" width="28.0" height="136" fill="transparent"/><path d="M664.8 80.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="664.8" y="82.0" width="24.0" height="54.0" fill="var(--blue)"/><text x="676.8" y="67.0" text-anchor="middle" class="num">8</text></g><g><title>03h: 7 execuções, 1 erros</title><rect x="692.9" y="0" width="28.0" height="136" fill="transparent"/><path d="M694.9 88.0v-5.0q0 -3.0 3.0 -3.0h18.0q3.0 0 3.0 3.0v5.0z" fill="var(--red)"/><rect x="694.9" y="90.0" width="24.0" height="46.0" fill="var(--blue)"/><text x="706.9" y="75.0" text-anchor="middle" class="num">7</text><text x="706.9" y="152.0" text-anchor="middle" class="lbl">03h</text></g></svg></div><p class="chart-note" id="cnote" hidden></p></div><aside class="panel" aria-label="Resumo da saúde operacional"><h2 style="margin:0 0 6px">Saúde operacional</h2><div class="hlist"><div class="hrow"><span class="hk">Infraestrutura</span><span class="hv ok">✓ Operacional</span></div><div class="hrow"><span class="hk">Serviços no ar</span><span class="hv ">9 <small>de 9 verificações</small></span></div><div class="hrow"><span class="hk">Execuções</span><span class="hv warn">⚠ Desempenho degradado</span></div><div class="hrow"><span class="hk">Taxa de sucesso</span><span class="hv down">84.7%</span></div><div class="hrow"><span class="hk">Latência p95</span><span class="hv ">415s</span></div><div class="hrow"><span class="hk">Backups</span><span class="hv ok">✓ há 10h <small>· cópia externa</small></span></div><div class="hrow"><span class="hk">Alertas abertos</span><span class="hv ok">✓ Nenhum</span></div><div class="hrow"><span class="hk">Último incidente</span><span class="hv warn">17/07 <small>· Monitorando</small></span></div></div></aside></div></section><div class="duo"><div><h2 id="modelos">Modelos de IA<small>janela de 14d</small></h2><div class="panel tblwrap"><table class="tbl"><caption class="sr">Desempenho por modelo de IA</caption><thead><tr><th scope="col">Modelo</th><th scope="col" class="num">Execuções</th><th scope="col" class="num">Particip.</th><th scope="col" class="num">Sucesso</th><th scope="col" class="num">p95</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">Custo</th></tr></thead><tbody><tr><td data-l="Modelo"><b>GLM 5.2</b><br><small>glm-5.2</small></td><td class="num" data-l="Execuções">125</td><td class="num" data-l="Participação">95%</td><td class="num" style="color:var(--red)" data-l="Sucesso">88.0%</td><td class="num" data-l="p95">418s</td><td class="num" data-l="Tokens">20.2M<small>→65k</small></td><td class="num" data-l="Custo">$105</td></tr><tr><td data-l="Modelo"><b>MiniMax M3</b><br><small>minimax-m3</small></td><td class="num" data-l="Execuções">5</td><td class="num" data-l="Participação">4%</td><td class="num" style="color:var(--red)" data-l="Sucesso">0.0%</td><td class="num" data-l="p95">—</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td></tr><tr><td data-l="Modelo"><b>Claude Haiku 4.5</b><br><small>claude-haiku-4-5-20251001</small></td><td class="num" data-l="Execuções">1</td><td class="num" data-l="Participação">1%</td><td class="num" data-l="Sucesso">100.0%</td><td class="num" data-l="p95">3.8s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td></tr></tbody></table></div></div><div><h2>Falhas por causa<small>janela de 14d</small></h2><div class="panel"><div class="bars"><button class="bar" data-cause="Saída não parseável" title="Filtrar execuções por: Saída não parseável"><span class="lbl"><b>Saída não parseável</b><span>12 · 60%</span></span><span class="trk"><i style="width:60%"></i></span></button><button class="bar" data-cause="Outro" title="Filtrar execuções por: Outro"><span class="lbl"><b>Outro</b><span>6 · 30%</span></span><span class="trk"><i style="width:30%"></i></span></button><button class="bar" data-cause="Configuração/credenciais" title="Filtrar execuções por: Configuração/credenciais"><span class="lbl"><b>Configuração/credenciais</b><span>2 · 10%</span></span><span class="trk"><i style="width:10%"></i></span></button></div><p class="chart-note">Clique em uma causa para filtrar as execuções relacionadas.</p></div></div></div><section id="servicos"><h2>Serviços</h2><div class="svcs"><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Banco de dados</div><div class="r">PostgreSQL</div><div class="s">✓ Operacional</div><div class="c">3/3 verificações · último check 03:40 UTC</div></div><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Cache</div><div class="r">Redis</div><div class="s">✓ Operacional</div><div class="c">2/2 verificações · último check 03:40 UTC</div></div><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Orquestração</div><div class="r">Portainer</div><div class="s">✓ Operacional</div><div class="c">1 verificação · último check 03:40 UTC</div></div><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Monitoramento</div><div class="r">Uptime Kuma</div><div class="s">✓ Operacional</div><div class="c">1 verificação · último check 03:40 UTC</div></div><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Gateway</div><div class="r">Hermes Gateway</div><div class="s">✓ Operacional</div><div class="c">1 verificação · último check 03:40 UTC</div></div><div class="svc "><div class="n"><span class="dot" aria-hidden="true"></span>Rede privada</div><div class="s">✓ Operacional</div><div class="c">1 verificação · último check 03:40 UTC</div></div></div></section><section id="execucoes"><h2>Execuções recentes<small>100 mais recentes · UTC</small></h2><div class="panel"><div class="filters" data-js hidden><label class="sr" for="fst">Filtrar por status</label><select id="fst"><option value="all">Todos os status</option><option value="ok">Sucesso</option><option value="err">Erro</option></select><label class="sr" for="fmd">Filtrar por modelo</label><select id="fmd"><option value="all">Todos os modelos</option><option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option><option value="glm-5.2">GLM 5.2</option><option value="minimax-m3">MiniMax M3</option></select><label class="sr" for="fq">Buscar execuções</label><input id="fq" type="search" placeholder="Buscar…"><button id="fcs" class="fchip" hidden type="button"></button><button id="fex" class="btn" type="button">Exportar CSV</button><span class="count" id="fct" aria-live="polite"></span></div><div class="tblwrap"><table class="tbl" id="xtbl"><caption class="sr">Execuções recentes de agentes</caption><thead><tr><th scope="col"><button data-sort="x">Horário ↕</button></th><th scope="col">Modelo</th><th scope="col" class="num"><button data-sort="d">Duração ↕</button></th><th scope="col" class="num">Tokens</th><th scope="col" class="num"><button data-sort="c">Custo ↕</button></th><th scope="col">Status</th></tr></thead><tbody id="xbody"><tr class="" tabindex="0" data-x="29739078" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:18</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">36s</td><td class="num" data-l="Tokens">197k<small>→393</small></td><td class="num" data-l="Custo">$1.00</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739076" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:16</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">43s</td><td class="num" data-l="Tokens">392k<small>→120</small></td><td class="num" data-l="Custo">$1.96</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="err" tabindex="0" data-x="29739076" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:16</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">14s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr><tr class="" tabindex="0" data-x="29739071" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:11</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">94s</td><td class="num" data-l="Tokens">580k<small>→364</small></td><td class="num" data-l="Custo">$2.91</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739068" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:08</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">29s</td><td class="num" data-l="Tokens">192k<small>→21</small></td><td class="num" data-l="Custo">$0.96</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739063" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:03</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">34s</td><td class="num" data-l="Tokens">381k<small>→135</small></td><td class="num" data-l="Custo">$1.91</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739062" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 03:02</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">67s</td><td class="num" data-l="Tokens">568k<small>→337</small></td><td class="num" data-l="Custo">$2.85</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739050" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:50</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">737s</td><td class="num" data-l="Tokens">1.3M<small>→1k</small></td><td class="num" data-l="Custo">$6.58</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739040" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:40</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">24s</td><td class="num" data-l="Tokens">180k<small>→256</small></td><td class="num" data-l="Custo">$0.91</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739032" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:32</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">287s</td><td class="num" data-l="Tokens">1.9M<small>→2k</small></td><td class="num" data-l="Custo">$9.78</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739029" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:29</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">58s</td><td class="num" data-l="Tokens">347k<small>→357</small></td><td class="num" data-l="Custo">$1.74</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739025" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:25</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">71s</td><td class="num" data-l="Tokens">343k<small>→342</small></td><td class="num" data-l="Custo">$1.72</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="err" tabindex="0" data-x="29739014" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:14</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">24s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr><tr class="" tabindex="0" data-x="29739012" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:12</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">32s</td><td class="num" data-l="Tokens">169k<small>→323</small></td><td class="num" data-l="Custo">$0.85</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29739011" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 02:11</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">25s</td><td class="num" data-l="Tokens">168k<small>→192</small></td><td class="num" data-l="Custo">$0.84</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="err" tabindex="0" data-x="29738930" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:50</td><td data-l="Modelo">MiniMax M3</td><td class="num" data-l="Duração">1.4s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Outro</small></td></tr><tr class="err" tabindex="0" data-x="29738917" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:37</td><td data-l="Modelo">MiniMax M3</td><td class="num" data-l="Duração">2.4s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Outro</small></td></tr><tr class="err" tabindex="0" data-x="29738911" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:31</td><td data-l="Modelo">MiniMax M3</td><td class="num" data-l="Duração">1.4s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Outro</small></td></tr><tr class="err" tabindex="0" data-x="29738902" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:22</td><td data-l="Modelo">MiniMax M3</td><td class="num" data-l="Duração">1.4s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Outro</small></td></tr><tr class="err" tabindex="0" data-x="29738891" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:11</td><td data-l="Modelo">MiniMax M3</td><td class="num" data-l="Duração">1.4s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Outro</small></td></tr><tr class="err" tabindex="0" data-x="29738891" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:11</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">17s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr><tr class="err" tabindex="0" data-x="29738890" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:10</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">28s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr><tr class="err" tabindex="0" data-x="29738889" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:09</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">85s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr><tr class="" tabindex="0" data-x="29738886" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:06</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">153s</td><td class="num" data-l="Tokens">759k<small>→1k</small></td><td class="num" data-l="Custo">$3.83</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29738885" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:05</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">31s</td><td class="num" data-l="Tokens">150k<small>→196</small></td><td class="num" data-l="Custo">$0.76</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29738881" role="button" aria-label="Detalhes da execução"><td data-l="Horário">18/07 00:01</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">205s</td><td class="num" data-l="Tokens">886k<small>→2k</small></td><td class="num" data-l="Custo">$4.48</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29738864" role="button" aria-label="Detalhes da execução"><td data-l="Horário">17/07 23:44</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">111s</td><td class="num" data-l="Tokens">415k<small>→822</small></td><td class="num" data-l="Custo">$2.09</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29738856" role="button" aria-label="Detalhes da execução"><td data-l="Horário">17/07 23:36</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">118s</td><td class="num" data-l="Tokens">406k<small>→632</small></td><td class="num" data-l="Custo">$2.05</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="" tabindex="0" data-x="29738779" role="button" aria-label="Detalhes da execução"><td data-l="Horário">17/07 22:19</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">116s</td><td class="num" data-l="Tokens">396k<small>→701</small></td><td class="num" data-l="Custo">$2.00</td><td data-l="Status"><span class="st">Sucesso</span></td></tr><tr class="err" tabindex="0" data-x="29738771" role="button" aria-label="Detalhes da execução"><td data-l="Horário">17/07 22:11</td><td data-l="Modelo">GLM 5.2</td><td class="num" data-l="Duração">467s</td><td class="num" data-l="Tokens">0<small>→0</small></td><td class="num" data-l="Custo">$0.00</td><td data-l="Status"><span class="st err">Erro</span> <small>Saída não parseável</small></td></tr></tbody></table></div><p class="chart-note" data-js hidden id="xmore"></p></div></section><section id="incidentes"><h2>Incidentes</h2><div class="panel"><ul class="tl"><li class="warn live"><div class="ti">Falhas elevadas de execução (saídas não parseáveis no endpoint de modelos)<span class="badge warn">Monitorando</span></div><div class="dt">17/07/2026</div></li></ul></div></section></main><footer><div class="wrap"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true" style="width:22px;height:22px;flex:none"><path d="M12 1.6 21 6.8v10.4L12 22.4 3 17.2V6.8z" fill="var(--blue)"/><path d="M13.4 5.6 8.2 13.4h2.9l-1.2 5 5.9-8h-3z" fill="var(--surface)"/></svg><span><b>Nexus Status</b></span><span>Snapshot atualizado automaticamente a cada 15 min · Horários em UTC</span><a href="https://github.com/william-gebowski-dev/nexus-public">Histórico</a><a href="https://github.com/william-gebowski-dev/nexus-public">GitHub</a></div></footer><div class="scrim" id="scrim" hidden></div><aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-t" hidden><button class="btn x" id="dr-x" type="button" aria-label="Fechar detalhes">✕</button><h3 id="dr-t">Execução</h3><div id="dr-st"></div><dl><dt>Horário (UTC)</dt><dd id="dr-h"></dd><dt>Modelo</dt><dd id="dr-m"></dd><dt>Duração</dt><dd id="dr-d"></dd><dt>Tokens</dt><dd id="dr-k"></dd><dt>Custo</dt><dd id="dr-c"></dd><dt>Causa da falha</dt><dd id="dr-cs">—</dd></dl></aside><script type="application/json" id="snap">{"meta":{"generated":"2026-07-18T03:40:32.021538+00:00","refresh_min":15,"window_days":14,"targets":{"success_pct":98},"thresholds":{"warn":2.0,"bad":5.0},"show_cost":true},"periods":{"24h":{"available":true,"granularity":"hour","partial":false,"since":"17/07","buckets":[{"l":"04h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"05h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"06h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"07h","n":1,"e":0,"c":0.0,"t":0,"d":159.8},{"l":"08h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"09h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"10h","n":3,"e":0,"c":0.0,"t":0,"d":99.0},{"l":"11h","n":13,"e":1,"c":0.0,"t":0,"d":57.8},{"l":"12h","n":1,"e":0,"c":0.0,"t":0,"d":19.6},{"l":"13h","n":13,"e":2,"c":0.0,"t":0,"d":13.1},{"l":"14h","n":1,"e":0,"c":0.0,"t":0,"d":4.8},{"l":"15h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"16h","n":1,"e":0,"c":0.0,"t":0,"d":3.4},{"l":"17h","n":15,"e":1,"c":4.1005,"t":770978,"d":34.5},{"l":"18h","n":7,"e":2,"c":5.8404,"t":1135815,"d":244.0},{"l":"19h","n":14,"e":2,"c":20.0029,"t":3319074,"d":45.5},{"l":"20h","n":9,"e":0,"c":22.0732,"t":4353441,"d":64.9},{"l":"21h","n":2,"e":1,"c":0.6091,"t":118672,"d":97.6},{"l":"22h","n":4,"e":1,"c":5.6458,"t":1120860,"d":116.3},{"l":"23h","n":2,"e":0,"c":4.1418,"t":822539,"d":114.5},{"l":"00h","n":11,"e":8,"c":9.0605,"t":1798847,"d":153.2},{"l":"01h","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"02h","n":8,"e":1,"c":22.4346,"t":4466901,"d":58.0},{"l":"03h","n":7,"e":1,"c":11.5836,"t":2311234,"d":39.8}],"sum":{"n":119,"e":20,"ok_pct":83.2}},"7d":{"available":true,"granularity":"day","partial":true,"since":"17/07","buckets":[{"l":"12/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"13/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"14/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"15/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"16/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"17/07","n":105,"e":10,"c":62.4137,"t":11641379,"d":46.2},{"l":"18/07","n":26,"e":10,"c":43.0787,"t":8576982,"d":50.7}],"sum":{"n":131,"e":20,"ok_pct":84.7}},"14d":{"available":true,"granularity":"day","partial":true,"since":"17/07","buckets":[{"l":"05/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"06/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"07/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"08/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"09/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"10/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"11/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"12/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"13/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"14/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"15/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"16/07","n":0,"e":0,"c":0.0,"t":0,"d":null},{"l":"17/07","n":105,"e":10,"c":62.4137,"t":11641379,"d":46.2},{"l":"18/07","n":26,"e":10,"c":43.0787,"t":8576982,"d":50.7}],"sum":{"n":131,"e":20,"ok_pct":84.7}},"30d":{"available":false,"granularity":"week","partial":false,"since":"17/07"},"90d":{"available":false,"granularity":"week","partial":false,"since":"17/07"}},"executions":[{"x":29739078,"t":"18/07 03:18","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":36.4,"ti":197082,"to":393,"c":0.9952},{"x":29739076,"t":"18/07 03:16","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":43.3,"ti":391847,"to":120,"c":1.9622},{"x":29739076,"t":"18/07 03:16","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":13.6,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29739071,"t":"18/07 03:11","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":94.0,"ti":580100,"to":364,"c":2.9096},{"x":29739068,"t":"18/07 03:08","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":29.2,"ti":191821,"to":21,"c":0.9596},{"x":29739063,"t":"18/07 03:03","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":34.0,"ti":381274,"to":135,"c":1.9097},{"x":29739062,"t":"18/07 03:02","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":67.4,"ti":567740,"to":337,"c":2.8471},{"x":29739050,"t":"18/07 02:50","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":736.8,"ti":1310690,"to":1108,"c":6.5812},{"x":29739040,"t":"18/07 02:40","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":24.2,"ti":179879,"to":256,"c":0.9058},{"x":29739032,"t":"18/07 02:32","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":287.3,"ti":1944734,"to":2427,"c":9.7843},{"x":29739029,"t":"18/07 02:29","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":58.0,"ti":346866,"to":357,"c":1.7433},{"x":29739025,"t":"18/07 02:25","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":70.6,"ti":342991,"to":342,"c":1.7235},{"x":29739014,"t":"18/07 02:14","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":24.2,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29739012,"t":"18/07 02:12","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":31.9,"ti":168970,"to":323,"c":0.8529},{"x":29739011,"t":"18/07 02:11","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":25.3,"ti":167766,"to":192,"c":0.8436},{"x":29738930,"t":"18/07 00:50","m":"minimax-m3","mn":"MiniMax M3","ok":0,"d":1.4,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738917,"t":"18/07 00:37","m":"minimax-m3","mn":"MiniMax M3","ok":0,"d":2.4,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738911,"t":"18/07 00:31","m":"minimax-m3","mn":"MiniMax M3","ok":0,"d":1.4,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738902,"t":"18/07 00:22","m":"minimax-m3","mn":"MiniMax M3","ok":0,"d":1.4,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738891,"t":"18/07 00:11","m":"minimax-m3","mn":"MiniMax M3","ok":0,"d":1.4,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738891,"t":"18/07 00:11","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":17.3,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738890,"t":"18/07 00:10","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":28.4,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738889,"t":"18/07 00:09","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":84.6,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738886,"t":"18/07 00:06","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":153.2,"ti":759029,"to":1336,"c":3.8285},{"x":29738885,"t":"18/07 00:05","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":30.6,"ti":150054,"to":196,"c":0.7552},{"x":29738881,"t":"18/07 00:01","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":204.8,"ti":886450,"to":1782,"c":4.4768},{"x":29738864,"t":"17/07 23:44","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":111.0,"ti":414732,"to":822,"c":2.0942},{"x":29738856,"t":"17/07 23:36","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":117.9,"ti":406353,"to":632,"c":2.0476},{"x":29738779,"t":"17/07 22:19","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":116.3,"ti":395785,"to":701,"c":1.9965},{"x":29738771,"t":"17/07 22:11","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":466.8,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738769,"t":"17/07 22:09","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":61.9,"ti":121956,"to":438,"c":0.6207},{"x":29738764,"t":"17/07 22:04","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":186.8,"ti":601043,"to":937,"c":3.0286},{"x":29738720,"t":"17/07 21:20","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":97.6,"ti":117886,"to":786,"c":0.6091},{"x":29738701,"t":"17/07 21:01","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":582.6,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738691,"t":"17/07 20:51","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":448.6,"ti":547316,"to":1819,"c":2.7821},{"x":29738689,"t":"17/07 20:49","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":64.0,"ti":959164,"to":2456,"c":4.8572},{"x":29738686,"t":"17/07 20:46","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":53.3,"ti":415340,"to":1362,"c":2.1108},{"x":29738686,"t":"17/07 20:46","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":22.8,"ti":102320,"to":630,"c":0.5273},{"x":29738684,"t":"17/07 20:44","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":64.9,"ti":897440,"to":2191,"c":4.542},{"x":29738683,"t":"17/07 20:43","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":36.1,"ti":389338,"to":959,"c":1.9721},{"x":29738655,"t":"17/07 20:15","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":565.6,"ti":753531,"to":3972,"c":3.867},{"x":29738651,"t":"17/07 20:11","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":125.5,"ti":183666,"to":808,"c":0.9385},{"x":29738648,"t":"17/07 20:08","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":125.7,"ti":90097,"to":1032,"c":0.4763},{"x":29738637,"t":"17/07 19:57","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":381.5,"ti":965075,"to":3226,"c":4.906},{"x":29738634,"t":"17/07 19:54","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":181.6,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738633,"t":"17/07 19:53","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":31.7,"ti":78415,"to":874,"c":0.4139},{"x":29738632,"t":"17/07 19:52","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":17.9,"ti":77428,"to":694,"c":0.4045},{"x":29738631,"t":"17/07 19:51","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":20.1,"ti":152709,"to":821,"c":0.7841},{"x":29738629,"t":"17/07 19:49","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":22.6,"ti":75105,"to":735,"c":0.3939},{"x":29738627,"t":"17/07 19:47","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":47.2,"ti":221153,"to":992,"c":1.1306},{"x":29738624,"t":"17/07 19:44","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":96.6,"ti":72185,"to":859,"c":0.3824},{"x":29738621,"t":"17/07 19:41","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":32.9,"ti":71287,"to":600,"c":0.3714},{"x":29738619,"t":"17/07 19:39","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":43.7,"ti":211134,"to":643,"c":1.0717},{"x":29738613,"t":"17/07 19:33","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":224.1,"ti":479582,"to":1731,"c":2.4412},{"x":29738600,"t":"17/07 19:20","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":766.2,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738596,"t":"17/07 19:16","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":143.2,"ti":295586,"to":1174,"c":1.5073},{"x":29738586,"t":"17/07 19:06","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":509.8,"ti":603935,"to":3131,"c":6.1959},{"x":29738575,"t":"17/07 18:55","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":633.0,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738572,"t":"17/07 18:52","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":185.0,"ti":94554,"to":937,"c":0.4962},{"x":29738559,"t":"17/07 18:39","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":720.4,"ti":311994,"to":2846,"c":1.6311},{"x":29738556,"t":"17/07 18:36","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":113.5,"ti":124596,"to":760,"c":0.642},{"x":29738552,"t":"17/07 18:32","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":244.0,"ti":199335,"to":1201,"c":1.0267},{"x":29738537,"t":"17/07 18:17","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":847.1,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738522,"t":"17/07 18:02","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":742.9,"ti":397272,"to":2320,"c":2.0444},{"x":29738512,"t":"17/07 17:52","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":538.8,"ti":0,"to":0,"c":0.0,"cs":"Saída não parseável"},{"x":29738507,"t":"17/07 17:47","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":36.0,"ti":81985,"to":597,"c":0.4248},{"x":29738504,"t":"17/07 17:44","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":105.6,"ti":261301,"to":2524,"c":1.3696},{"x":29738502,"t":"17/07 17:42","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":53.0,"ti":61527,"to":1106,"c":0.3353},{"x":29738500,"t":"17/07 17:40","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":113.7,"ti":150142,"to":2289,"c":0.8079},{"x":29738497,"t":"17/07 17:37","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":29.3,"ti":17007,"to":531,"c":0.0983},{"x":29738496,"t":"17/07 17:36","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":15.5,"ti":16583,"to":407,"c":0.0931},{"x":29738489,"t":"17/07 17:29","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":38.4,"ti":47063,"to":953,"c":0.2591},{"x":29738488,"t":"17/07 17:28","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":11.7,"ti":29174,"to":395,"c":0.1557},{"x":29738484,"t":"17/07 17:24","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":58.7,"ti":46854,"to":1440,"c":0.2703},{"x":29738483,"t":"17/07 17:23","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":32.9,"ti":15269,"to":479,"c":0.0883},{"x":29738481,"t":"17/07 17:21","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":8.1,"ti":6769,"to":272,"c":0.0406},{"x":29738481,"t":"17/07 17:21","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":4.7,"ti":6571,"to":157,"c":0.0368},{"x":29738479,"t":"17/07 17:19","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":87.9,"ti":16041,"to":1117,"c":0.1081},{"x":29738478,"t":"17/07 17:18","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":5.8,"ti":2413,"to":12,"c":0.0124},{"x":29738432,"t":"17/07 16:32","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":3.4,"ti":0,"to":0,"c":0.0},{"x":29738293,"t":"17/07 14:13","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":4.8,"ti":0,"to":0,"c":0.0},{"x":29738242,"t":"17/07 13:22","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":5.0,"ti":0,"to":0,"c":0.0},{"x":29738241,"t":"17/07 13:21","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":27.8,"ti":0,"to":0,"c":0.0},{"x":29738235,"t":"17/07 13:15","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":12.7,"ti":0,"to":0,"c":0.0},{"x":29738234,"t":"17/07 13:14","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":2.9,"ti":0,"to":0,"c":0.0},{"x":29738228,"t":"17/07 13:08","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":16.8,"ti":0,"to":0,"c":0.0,"cs":"Configuração/credenciais"},{"x":29738228,"t":"17/07 13:08","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":19.6,"ti":0,"to":0,"c":0.0},{"x":29738227,"t":"17/07 13:07","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":1.8,"ti":0,"to":0,"c":0.0,"cs":"Configuração/credenciais"},{"x":29738226,"t":"17/07 13:06","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":16.7,"ti":0,"to":0,"c":0.0},{"x":29738226,"t":"17/07 13:06","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":13.1,"ti":0,"to":0,"c":0.0},{"x":29738224,"t":"17/07 13:04","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":17.5,"ti":0,"to":0,"c":0.0},{"x":29738223,"t":"17/07 13:03","m":"claude-haiku-4-5-20251001","mn":"Claude Haiku 4.5","ok":1,"d":3.8,"ti":0,"to":0,"c":0.0},{"x":29738223,"t":"17/07 13:03","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":9.5,"ti":0,"to":0,"c":0.0},{"x":29738222,"t":"17/07 13:02","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":33.5,"ti":0,"to":0,"c":0.0},{"x":29738175,"t":"17/07 12:15","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":19.6,"ti":0,"to":0,"c":0.0},{"x":29738155,"t":"17/07 11:55","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":185.4,"ti":0,"to":0,"c":0.0},{"x":29738138,"t":"17/07 11:38","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":111.1,"ti":0,"to":0,"c":0.0},{"x":29738136,"t":"17/07 11:36","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":19.4,"ti":0,"to":0,"c":0.0},{"x":29738134,"t":"17/07 11:34","m":"glm-5.2","mn":"GLM 5.2","ok":0,"d":71.5,"ti":0,"to":0,"c":0.0,"cs":"Outro"},{"x":29738133,"t":"17/07 11:33","m":"glm-5.2","mn":"GLM 5.2","ok":1,"d":74.1,"ti":0,"to":0,"c":0.0}]}</script><script>
+(function(){'use strict';
+var S=null;
+try{S=JSON.parse(document.getElementById('snap').textContent)}catch(e){}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){
+  return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+/* Relógio: há X min, dados atrasados, countdown, atualizar */
+try{(function(){
+var t=$('upd'),a=$('ago');if(!t)return;
+var d=new Date(t.getAttribute('datetime'));
+var nx=$('next'),rf=$('rfr');
+if(nx)nx.hidden=false;if(rf){rf.hidden=false;
+  rf.addEventListener('click',function(){rf.disabled=true;
+    rf.textContent='Atualizando…';location.reload()})}
 function f(){var m=Math.round((Date.now()-d.getTime())/60000);
-a.textContent=' · há '+(m<1?'menos de 1':m)+' min'+(m>25?' · dados atrasados':'');
-a.className=m>25?'late':''}f();setInterval(f,60000)})();
-(function(){var K='nexus-theme',r=document.documentElement,
-b=document.getElementById('thm');if(!b)return;
+if(a){a.textContent=' · há '+(m<1?'menos de 1':m)+' min'
+  +(m>25?' · dados desatualizados':'');a.className=m>25?'late':''}
+if(nx){var r=15-m;nx.textContent=r>0?'Próxima atualização em ~'+r+' min'
+  :'Próxima atualização a qualquer momento'}}
+f();setInterval(f,30000)})()}catch(e){}
+
+/* Tema: auto → claro → escuro */
+try{(function(){
+var K='nexus-theme',r=document.documentElement,b=$('thm');if(!b)return;
 var seq=['auto','light','dark'],
-ic={auto:'\u25d0',light:'\u2600\ufe0e',dark:'\u263e'},
+ic={auto:'◐',light:'☀︎',dark:'☾'},
 nm={auto:'sistema',light:'claro',dark:'escuro'};
 function ap(m){m==='auto'?r.removeAttribute('data-theme')
 :r.setAttribute('data-theme',m);b.textContent=ic[m];
 b.setAttribute('aria-label','Tema: '+nm[m]);b.title='Tema: '+nm[m]}
 var m=localStorage.getItem(K)||'auto';if(seq.indexOf(m)<0)m='auto';ap(m);
 b.addEventListener('click',function(){m=seq[(seq.indexOf(m)+1)%3];
-try{localStorage.setItem(K,m)}catch(e){}ap(m)})})();
+try{localStorage.setItem(K,m)}catch(e){}ap(m)})})()}catch(e){}
+
+/* Menu mobile: fecha ao navegar */
+try{(function(){var d=$('mnav');if(!d)return;
+d.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click',function(){d.open=false})})})()}catch(e){}
+
+if(!S)return;
+document.querySelectorAll('[data-js]').forEach(function(el){
+  el.hidden=false});
+
+/* Gráfico: período × métrica (espelha a geometria SSR) */
+try{(function(){
+var box=$('chart'),sum=$('csum'),note=$('cnote');if(!box)return;
+var period=null,metric='tarefas';
+document.querySelectorAll('[data-period]').forEach(function(b){
+  if(b.getAttribute('aria-pressed')==='true')period=b.dataset.period});
+if(!period)return;
+var MET={tarefas:function(b){return b.n},erros:function(b){return b.e},
+  latencia:function(b){return b.d},tokens:function(b){return b.t},
+  custo:function(b){return b.c||0}};
+var UNIT={tarefas:'execuções',erros:'erros',latencia:'s (mediana)',
+  tokens:'tokens',custo:'US$'};
+function fmtV(v,m){if(v==null)return'—';
+if(m==='custo')return'$'+(v>=10?v.toFixed(0):v.toFixed(2));
+if(m==='tokens')return v>=1e6?(v/1e6).toFixed(1)+'M'
+  :v>=1e3?Math.round(v/1e3)+'k':String(v);
+if(m==='latencia')return(v>=10?v.toFixed(0):v.toFixed(1))+'s';
+return String(v)}
+function topRound(x,y,w,h,r){r=Math.min(r,w/2,h);
+return'M'+x.toFixed(1)+' '+(y+h).toFixed(1)+'v-'+(h-r).toFixed(1)
++'q0 -'+r.toFixed(1)+' '+r.toFixed(1)+' -'+r.toFixed(1)
++'h'+(w-2*r).toFixed(1)+'q'+r.toFixed(1)+' 0 '+r.toFixed(1)+' '
++r.toFixed(1)+'v'+(h-r).toFixed(1)+'z'}
+function draw(){
+var p=S.periods[period];
+if(!p||!p.available||!p.buckets){box.innerHTML=
+'<div class="empty">Sem dados suficientes para exibir.</div>';return}
+var bk=p.buckets,W=720,H=170,PAD=4,n=bk.length,
+slot=(W-PAD*(n-1))/n,bw=Math.min(slot,24),ph=H-34,
+get=MET[metric],vals=bk.map(get),
+mx=Math.max.apply(null,vals.map(function(v){return v||0}));
+if(!mx){box.innerHTML='<div class="empty">Sem dados de '
++UNIT[metric]+' neste período.</div>'}
+else{var ev=p.granularity==='hour'?3:(n>10?2:1),parts=[];
+for(var i=0;i<n;i++){var b=bk[i],v=vals[i]||0,
+x=i*(slot+PAD)+(slot-bw)/2,cx=x+bw/2,
+h=v?v/mx*(ph-16):0,y=ph-h,seg='',
+tip=b.l+': '+fmtV(vals[i],metric)+' '+UNIT[metric]
++(metric==='tarefas'&&b.e?', '+b.e+' erros':'');
+if(v){if(metric==='tarefas'&&b.e){
+var he=Math.max(Math.min(b.e/mx*(ph-16),h),3);
+seg='<path d="'+topRound(x,y,bw,he,3)+'" fill="var(--red)"/>'
++(h-he-2>0?'<rect x="'+x.toFixed(1)+'" y="'+(y+he+2).toFixed(1)
++'" width="'+bw.toFixed(1)+'" height="'+(h-he-2).toFixed(1)
++'" fill="var(--blue)"/>':'')}
+else{seg='<path d="'+topRound(x,y,bw,Math.max(h,3),3)
++'" fill="'+(metric==='erros'?'var(--red)':'var(--blue)')+'"/>'}}
+parts.push('<g><title>'+esc(tip)+'</title><rect x="'+(x-2).toFixed(1)
++'" y="0" width="'+(bw+4).toFixed(1)+'" height="'+ph
++'" fill="transparent"/>'+seg
++(v&&n<=31?'<text x="'+cx.toFixed(1)+'" y="'+(y-5).toFixed(1)
++'" text-anchor="middle" class="num">'+fmtV(vals[i],metric)+'</text>':'')
++(i%ev===(n-1)%ev?'<text x="'+cx.toFixed(1)+'" y="'+(H-18)
++'" text-anchor="middle" class="lbl">'+esc(b.l)+'</text>':'')+'</g>')}
+box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'
++'Gráfico de '+UNIT[metric]+' por período">'
++'<style>.num{font:600 11px system-ui;fill:var(--t2)}'
++'.lbl{font:10px system-ui;fill:var(--t3)}</style>'
++'<line x1="0" y1="'+ph+'" x2="'+W+'" y2="'+ph
++'" stroke="var(--border-2)" stroke-width="1"/>'+parts.join('')+'</svg>'}
+if(sum&&p.sum){var s=p.sum;sum.innerHTML=s.n
+?'<b>'+s.n+'</b> execuções · <b>'+(s.n-s.e)+'</b> concluídas · <b>'+s.e
++'</b> falhas · taxa de sucesso <b>'+s.ok_pct.toFixed(1)+'%</b>'
+:'Sem execuções neste período.'}
+if(note){if(p.partial&&p.since){note.hidden=false;
+note.textContent='Histórico parcial — dados desde '+p.since+'.'}
+else note.hidden=true}}
+document.querySelectorAll('[data-period]').forEach(function(b){
+b.addEventListener('click',function(){if(b.disabled)return;
+document.querySelectorAll('[data-period]').forEach(function(o){
+o.setAttribute('aria-pressed','false')});
+b.setAttribute('aria-pressed','true');period=b.dataset.period;draw()})});
+document.querySelectorAll('[data-metric]').forEach(function(b){
+b.addEventListener('click',function(){
+document.querySelectorAll('[data-metric]').forEach(function(o){
+o.setAttribute('aria-pressed','false')});
+b.setAttribute('aria-pressed','true');metric=b.dataset.metric;draw()})});
+draw()})()}catch(e){}
+
+/* Tabela de execuções: filtros, busca, ordenação, exportação, drawer */
+try{(function(){
+var body=$('xbody');if(!body||!S.executions)return;
+var rows=S.executions,showCost=!!S.meta.show_cost,
+st={status:'all',model:'all',cause:null,q:'',key:'x',dir:-1},
+fst=$('fst'),fmd=$('fmd'),fq=$('fq'),fct=$('fct'),fcs=$('fcs'),
+more=$('xmore'),shown=rows.length;
+function fmtDur(v){return v==null?'—':(v>=10?v.toFixed(0):v.toFixed(1))+'s'}
+function fmtTok(v){return v>=1e6?(v/1e6).toFixed(1)+'M'
+:v>=1e3?Math.round(v/1e3)+'k':String(v)}
+function rowHtml(e,i){var err=!e.ok,cs=e.cs?esc(e.cs):'';
+return'<tr class="'+(err?'err':'')+'" tabindex="0" role="button" '
++'aria-label="Detalhes da execução" data-i="'+i+'">'
++'<td data-l="Horário">'+esc(e.t)+'</td>'
++'<td data-l="Modelo">'+esc(e.mn)+'</td>'
++'<td class="num" data-l="Duração">'+fmtDur(e.d)+'</td>'
++'<td class="num" data-l="Tokens">'+fmtTok(e.ti)
++'<small>→'+fmtTok(e.to)+'</small></td>'
++(showCost?'<td class="num" data-l="Custo">$'+(e.c||0).toFixed(2)+'</td>':'')
++'<td data-l="Status">'+(err?'<span class="st err">Erro</span>'
+:'<span class="st">Sucesso</span>')
++(cs?' <small>'+cs+'</small>':'')+'</td></tr>'}
+function apply(){
+var out=[];
+for(var i=0;i<rows.length;i++){var e=rows[i];
+if(st.status==='ok'&&!e.ok)continue;
+if(st.status==='err'&&e.ok)continue;
+if(st.model!=='all'&&e.m!==st.model)continue;
+if(st.cause&&e.cs!==st.cause)continue;
+if(st.q){var hay=(e.t+' '+e.mn+' '+e.m+' '+(e.cs||'')
++' '+(e.ok?'sucesso':'erro')).toLowerCase();
+if(hay.indexOf(st.q)<0)continue}
+out.push(i)}
+out.sort(function(a,b){var x=rows[a][st.key]||0,y=rows[b][st.key]||0;
+return(x<y?-1:x>y?1:0)*st.dir});
+shown=out.length;
+body.innerHTML=out.map(function(i){return rowHtml(rows[i],i)}).join('')
+||'<tr><td colspan="6"><span class="empty" style="display:block">'
++'Nenhuma execução corresponde aos filtros.</span></td></tr>';
+if(fct)fct.textContent=shown+' de '+rows.length+' execuções';
+if(fcs){if(st.cause){fcs.hidden=false;
+fcs.innerHTML='Causa: '+esc(st.cause)+' ✕'}else fcs.hidden=true}
+if(more){more.hidden=false;
+more.textContent='Exibindo as '+rows.length
++' execuções mais recentes embutidas no snapshot.'}
+bind()}
+function bind(){body.querySelectorAll('tr[data-i]').forEach(function(tr){
+function go(){open(rows[+tr.dataset.i])}
+tr.addEventListener('click',go);
+tr.addEventListener('keydown',function(ev){
+if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}})})}
+if(fst)fst.addEventListener('change',function(){
+st.status=fst.value;apply()});
+if(fmd)fmd.addEventListener('change',function(){
+st.model=fmd.value;apply()});
+if(fq)fq.addEventListener('input',function(){
+st.q=fq.value.trim().toLowerCase();apply()});
+if(fcs)fcs.addEventListener('click',function(){st.cause=null;apply()});
+document.querySelectorAll('[data-sort]').forEach(function(b){
+b.addEventListener('click',function(){var k=b.dataset.sort;
+if(st.key===k)st.dir=-st.dir;else{st.key=k;st.dir=-1}apply()})});
+document.querySelectorAll('[data-cause]').forEach(function(b){
+b.addEventListener('click',function(){st.cause=b.dataset.cause;
+st.status='all';if(fst)fst.value='all';apply();
+var sec=$('execucoes');if(sec)sec.scrollIntoView()})});
+var fex=$('fex');
+if(fex)fex.addEventListener('click',function(){
+var head=['horario_utc','modelo','status','duracao_s','tokens_in',
+'tokens_out'].concat(showCost?['custo_usd']:[]).concat(['causa']),
+lines=[head.join(',')];
+rows.forEach(function(e){
+var l=[e.t,e.m,e.ok?'sucesso':'erro',e.d,e.ti,e.to];
+if(showCost)l.push(e.c||0);l.push(e.cs||'');
+lines.push(l.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"'})
+.join(','))});
+var a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([lines.join('\n')],
+{type:'text/csv'}));
+a.download='nexus-execucoes.csv';a.click();
+URL.revokeObjectURL(a.href)});
+
+/* Drawer */
+var dr=$('drawer'),sc=$('scrim'),dx=$('dr-x'),last=null;
+function open(e){if(!dr)return;last=document.activeElement;
+$('dr-h').textContent=e.t;
+$('dr-m').innerHTML=esc(e.mn)+' <small>'+esc(e.m)+'</small>';
+$('dr-d').textContent=fmtDur(e.d);
+$('dr-k').innerHTML=fmtTok(e.ti)+' entrada <small>→</small> '
++fmtTok(e.to)+' saída';
+var c=$('dr-c');if(c)c.textContent='$'+(e.c||0).toFixed(4);
+$('dr-cs').textContent=e.cs||'—';
+$('dr-st').innerHTML=e.ok?'<span class="st">Sucesso</span>'
+:'<span class="st err">Erro</span>';
+dr.hidden=false;if(sc)sc.hidden=false;dx.focus()}
+function close(){if(!dr||dr.hidden)return;dr.hidden=true;
+if(sc)sc.hidden=true;if(last&&last.focus)last.focus()}
+if(dx)dx.addEventListener('click',close);
+if(sc)sc.addEventListener('click',close);
+document.addEventListener('keydown',function(ev){
+if(ev.key==='Escape')close();
+if(ev.key==='Tab'&&dr&&!dr.hidden){
+var f=dr.querySelectorAll('button,[href],input,select,[tabindex]');
+if(!f.length)return;var a=f[0],z=f[f.length-1];
+if(ev.shiftKey&&document.activeElement===a){ev.preventDefault();z.focus()}
+else if(!ev.shiftKey&&document.activeElement===z){
+ev.preventDefault();a.focus()}}});
+bind();apply()})()}catch(e){}
+})();
 </script></body></html>
