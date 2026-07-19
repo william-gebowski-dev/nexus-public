@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-07-19T15:55:38.871143",
+  "agentes": {
+    "hermes-cli": {
+      "status": "healthy",
+      "pids": [
+        "258490"
+      ],
+      "count": 1,
+      "updated": "2026-07-19T15:55:38.901935"
+    },
+    "hermes-gateway": {
+      "status": "healthy",
+      "pids": [
+        "1685494"
+      ],
+      "count": 1,
+      "updated": "2026-07-19T15:55:38.931349"
+    },
+    "nexus-api": {
+      "status": "healthy",
+      "pids": [
+        "1620353"
+      ],
+      "count": 1,
+      "updated": "2026-07-19T15:55:38.959936"
+    },
+    "nexus-scheduler": {
+      "status": "healthy",
+      "pids": [
+        "1601389"
+      ],
+      "count": 1,
+      "updated": "2026-07-19T15:55:38.986550"
+    },
+    "telegram-bridge": {
+      "status": "healthy",
+      "pids": [
+        "1995398"
+      ],
+      "count": 1,
+      "updated": "2026-07-19T15:55:39.013998"
+    }
+  },
+  "sessions": {
+    "ativas": [
+      "principal"
+    ],
+    "inativas": [
+      "17jul-1418"
+    ]
+  },
+  "summary": {
+    "total_agentes": 5,
+    "agentes_up": 5,
+    "agentes_down": 0,
+    "overall": "healthy"
+  }
+}
