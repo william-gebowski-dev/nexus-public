@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T02:00:01.279349",
+  "generated_at": "2026-07-20T02:05:01.270844",
   "agentes": {
     "hermes-cli": {
       "status": "healthy",
@@ -7,7 +7,7 @@
         "258490"
       ],
       "count": 1,
-      "updated": "2026-07-20T02:00:01.308615"
+      "updated": "2026-07-20T02:05:01.296094"
     },
     "hermes-gateway": {
       "status": "healthy",
@@ -15,7 +15,7 @@
         "1685494"
       ],
       "count": 1,
-      "updated": "2026-07-20T02:00:01.337156"
+      "updated": "2026-07-20T02:05:01.328220"
     },
     "nexus-api": {
       "status": "healthy",
@@ -23,7 +23,7 @@
         "1620353"
       ],
       "count": 1,
-      "updated": "2026-07-20T02:00:01.367711"
+      "updated": "2026-07-20T02:05:01.360677"
     },
     "nexus-scheduler": {
       "status": "healthy",
@@ -31,7 +31,7 @@
         "1601389"
       ],
       "count": 1,
-      "updated": "2026-07-20T02:00:01.398248"
+      "updated": "2026-07-20T02:05:01.385281"
     },
     "telegram-bridge": {
       "status": "healthy",
@@ -39,7 +39,7 @@
         "2505179"
       ],
       "count": 1,
-      "updated": "2026-07-20T02:00:01.429738"
+      "updated": "2026-07-20T02:05:01.412448"
     }
   },
   "sessions": {
