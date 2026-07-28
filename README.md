@@ -1,20 +1,19 @@
 # nexus-public
 
-Saídas públicas da plataforma **Hermes Nexus** — a página de status, sem
-segredos. É a visão externa; o painel administrativo interno (`:8100`) fica na
-Tailscale e **não** vai para cá.
+Repositório público que hospeda o **Registro mestre do ecossistema de IA** — a visão
+externa do ecossistema pessoal e técnico de IA (William Gebowski Duda): separação das
+contas `.geb` / `.dev`, equipamentos e sistemas, sistemas de conhecimento, modelo
+operacional dos agentes, memória, direção acadêmica e decisões consolidadas.
 
 - **Deploy:** [nexus-public-mu.vercel.app](https://nexus-public-mu.vercel.app)
   (Vercel, a partir deste repositório).
-- **Conteúdo:** `index.html` — um snapshot estático de status (serviços,
-  execuções, saúde), atualizado periodicamente.
+- **Conteúdo:** `index.html` (documento) carregando `css/style.css` e `js/app.js`.
 
-## Gerado automaticamente — não editar à mão
+## Documento vivo
 
-O `index.html` é **produzido e publicado por automação** no monorepo
-`hermes-nexus-os` (`scripts/status-page-publish.sh`, disparado pelo timer
-systemd `status-page-publish.timer`). Qualquer edição manual aqui é sobrescrita
-no próximo ciclo de publicação.
+A fonte vivente do documento fica em `~/ecossistema-ia/` (não versionada aqui). Este
+repositório recebe uma **publicação manual** do conteúdo — edite a fonte e copie para cá.
 
-Para mudar o conteúdo ou o visual da página, altere o gerador no monorepo, não
-este repositório.
+> Anteriormente este repositório hospedava uma página de status de infraestrutura
+> ("Nexus Status"), gerada e publicada por automação. Essa automação foi descontinuada
+> e o repositório agora hospeda o Registro mestre do ecossistema de IA.
