@@ -1,0 +1,12 @@
+[
+  { "id": "ex-001", "name": "Monitoramento de saúde (5 min)", "runner": "system-monitor", "startedAt": "2026-07-28T19:55:00Z", "durationMs": 1840, "status": "success", "summary": "Coleta concluída sem alertas.", "source": "periodic" },
+  { "id": "ex-002", "name": "Resumo diário", "runner": "hermes", "startedAt": "2026-07-28T08:00:00Z", "durationMs": 41200, "status": "success", "summary": "Resumo gerado e arquivado.", "source": "periodic" },
+  { "id": "ex-003", "name": "Backup diário", "runner": "backup", "startedAt": "2026-07-28T03:30:00Z", "durationMs": 184000, "status": "success", "summary": "Snapshot compactado e offsite.", "source": "periodic" },
+  { "id": "ex-004", "name": "Pipeline Entropia", "runner": "entropia", "startedAt": "2026-07-28T06:00:00Z", "durationMs": 86400, "status": "success", "summary": "14 fontes curadas.", "source": "periodic" },
+  { "id": "ex-005", "name": "Eventos GitHub (15 min)", "runner": "system-monitor", "startedAt": "2026-07-28T19:45:00Z", "durationMs": 2200, "status": "success", "summary": "0 eventos detectados.", "source": "periodic" },
+  { "id": "ex-006", "name": "Sessão de chat", "runner": "nexus-forge", "startedAt": "2026-07-28T19:50:00Z", "durationMs": 18420, "status": "success", "summary": "Tarefa concluída.", "source": "periodic" },
+  { "id": "ex-007", "name": "Migração de banco", "runner": "system-monitor", "startedAt": "2026-07-28T18:00:00Z", "durationMs": 6200, "status": "success", "summary": "Migrações aplicadas.", "source": "periodic" },
+  { "id": "ex-008", "name": "Notificação Telegram", "runner": "telegram-bridge", "startedAt": "2026-07-28T17:30:00Z", "durationMs": 540, "status": "success", "summary": "Mensagem entregue.", "source": "periodic" },
+  { "id": "ex-009", "name": "Sessão de chat", "runner": "nexus-forge", "startedAt": "2026-07-28T16:50:00Z", "durationMs": 14200, "status": "failed", "summary": "Limite de taxa da API externa.", "source": "periodic" },
+  { "id": "ex-010", "name": "Sessão de chat", "runner": "hermes", "startedAt": "2026-07-28T16:30:00Z", "durationMs": 7400, "status": "success", "summary": "Tarefa concluída.", "source": "periodic" }
+]

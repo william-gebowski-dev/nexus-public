@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro mestre do ecossistema de IA — William Gebowski Duda</title>
+<meta name="description" content="Registro mestre consolidado do ecossistema pessoal e técnico de IA: contas .geb/.dev, Zorin OS, Hermes Agent, conhecimento, projetos e direção acadêmica.">
+<link rel="stylesheet" href="/legacy/css/style.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ==================== SIDEBAR / ÍNDICE ==================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-title">
+        Registro mestre
+        <small>Ecossistema de IA</small>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema claro/escuro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
+
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="toc-search" type="text" placeholder="Buscar seção…" autocomplete="off">
+    </div>
+
+    <ul class="toc" id="toc">
+      <li class="toc-main"><a href="#visao-geral">1. Visão geral</a></li>
+
+      <li class="toc-main"><a href="#equipamentos">2. Equipamentos e sistemas operacionais</a></li>
+      <li class="toc-sub"><a href="#notebook-principal">2.1 Notebook principal</a></li>
+      <li class="toc-sub"><a href="#kali-linux">2.2 Kali Linux</a></li>
+      <li class="toc-sub"><a href="#outros-dispositivos">2.3 Outros dispositivos</a></li>
+
+      <li class="toc-main"><a href="#separacao-contas">3. Separação das contas</a></li>
+      <li class="toc-sub"><a href="#conta-geb">3.1 Conta pessoal .geb</a></li>
+      <li class="toc-sub"><a href="#conta-dev">3.2 Conta técnica .dev</a></li>
+      <li class="toc-sub"><a href="#regra-resumida">3.3 Regra resumida</a></li>
+
+      <li class="toc-main"><a href="#sistemas-conhecimento">4. Sistemas pessoais de conhecimento</a></li>
+      <li class="toc-sub"><a href="#notion">4.1 Notion</a></li>
+      <li class="toc-sub"><a href="#notebooklm">4.2 NotebookLM</a></li>
+      <li class="toc-sub"><a href="#obsidian">4.3 Obsidian</a></li>
+      <li class="toc-sub"><a href="#tailscale">4.4 Tailscale</a></li>
+
+      <li class="toc-main"><a href="#fluxo-conhecimento">5. Fluxo entre conhecimento e projetos</a></li>
+      <li class="toc-main"><a href="#projetos-ia-zorin">6. Projetos de IA no Zorin</a></li>
+      <li class="toc-main"><a href="#engenharia-contexto">7. Engenharia de contexto</a></li>
+      <li class="toc-main"><a href="#ritual-inicio">8. Ritual de início de tarefa</a></li>
+
+      <li class="toc-main"><a href="#memoria-niveis">9. Memória em três níveis</a></li>
+      <li class="toc-sub"><a href="#memoria-global">9.1 Memória global</a></li>
+      <li class="toc-sub"><a href="#memoria-projeto">9.2 Memória do projeto</a></li>
+      <li class="toc-sub"><a href="#memoria-tarefa">9.3 Memória da tarefa</a></li>
+
+      <li class="toc-main"><a href="#modelo-operacional">10. Modelo operacional dos agentes</a></li>
+      <li class="toc-main"><a href="#app-proprio">11. Aplicativo próprio e limitação do Telegram</a></li>
+
+      <li class="toc-main"><a href="#hermes-central">12. Hermes Agent como solução central</a></li>
+      <li class="toc-sub"><a href="#papel-zorin">12.1 Papel do Zorin</a></li>
+      <li class="toc-sub"><a href="#papel-celular">12.2 Papel do celular</a></li>
+      <li class="toc-sub"><a href="#papel-pc">12.3 Papel do PC</a></li>
+      <li class="toc-sub"><a href="#papel-tailscale">12.4 Papel do Tailscale</a></li>
+
+      <li class="toc-main"><a href="#memoria-compartilhada">13. Memória compartilhada mobile/PC</a></li>
+
+      <li class="toc-main"><a href="#dados-hermes">14. Onde os dados do Hermes ficam</a></li>
+      <li class="toc-sub"><a href="#memoria-permanente">14.1 Memória permanente</a></li>
+      <li class="toc-sub"><a href="#conversas-sessoes">14.2 Conversas e sessões</a></li>
+      <li class="toc-sub"><a href="#outros-conteudos">14.3 Outros conteúdos</a></li>
+
+      <li class="toc-main"><a href="#localidade-privacidade">15. Localidade e privacidade dos dados</a></li>
+      <li class="toc-main"><a href="#disponibilidade-hermes">16. Disponibilidade do Hermes</a></li>
+      <li class="toc-main"><a href="#telegram-final">17. Telegram no desenho final</a></li>
+      <li class="toc-main"><a href="#firebase">18. Firebase e banco externo</a></li>
+      <li class="toc-main"><a href="#backup-hermes">19. Backup do Hermes</a></li>
+      <li class="toc-main"><a href="#copilot">20. Situação desta conversa no Copilot</a></li>
+
+      <li class="toc-main"><a href="#formacao-academica">21. Formação acadêmica e direção profissional</a></li>
+      <li class="toc-sub"><a href="#formacao-atual">21.1 Formação atual</a></li>
+      <li class="toc-sub"><a href="#areas-consideradas">21.2 Áreas consideradas</a></li>
+      <li class="toc-sub"><a href="#criterio-alterado">21.3 Critério alterado</a></li>
+
+      <li class="toc-main"><a href="#comparacao-engenharias">22. Comparação das engenharias</a></li>
+      <li class="toc-sub"><a href="#controle-automacao">22.1 Controle e Automação</a></li>
+      <li class="toc-sub"><a href="#eng-producao">22.2 Engenharia de Produção</a></li>
+      <li class="toc-sub"><a href="#eng-eletrica">22.3 Engenharia Elétrica</a></li>
+
+      <li class="toc-main"><a href="#escolha-academica">23. Escolha acadêmica mais discutida</a></li>
+      <li class="toc-main"><a href="#eletrica-semipresencial">24. Engenharia Elétrica semipresencial</a></li>
+      <li class="toc-main"><a href="#responsabilidade-tecnica">25. Responsabilidade técnica em empresas</a></li>
+      <li class="toc-main"><a href="#relacao-hermes">26. Relação entre as engenharias e o Hermes</a></li>
+      <li class="toc-main"><a href="#ordem-zorin">27. Ordem recomendada de configuração do Zorin</a></li>
+      <li class="toc-main"><a href="#decisoes-consolidadas">28. Decisões atualmente consolidadas</a></li>
+      <li class="toc-main"><a href="#pontos-abertos">29. Pontos ainda abertos</a></li>
+      <li class="toc-main"><a href="#proximo-passo">30. Próximo passo recomendado</a></li>
+      <li class="toc-main"><a href="#resumo-executivo">31. Resumo executivo final</a></li>
+    </ul>
+
+    <div class="sidebar-foot">
+      <span>Atualizado em 28 de julho de 2026</span>
+      <span>Editar: <span class="mono">~/ecossistema-ia/index.html</span></span>
+    </div>
+  </aside>
+
+  <!-- ==================== CONTEÚDO ==================== -->
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Documento vivo — atualizado ao longo do tempo</div>
+      <h1>Registro mestre do ecossistema de IA</h1>
+      <p class="dim">Estrutura pessoal, técnica e de inteligência artificial de William, com separação clara entre contas, projetos, conhecimento, infraestrutura e dispositivos.</p>
+
+      <div class="hero-meta">
+        <div><div class="label">Responsável</div><div class="value">William Gebowski Duda</div></div>
+        <div><div class="label">Data da consolidação</div><div class="value">28 de julho de 2026</div></div>
+        <div><div class="label">Objetivo</div><div class="value">Organizar contas, conhecimento, infraestrutura e agentes de IA</div></div>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:var(--geb)"></span> .geb — pessoal</span>
+        <span><span class="dot" style="background:var(--accent)"></span> .dev — técnico</span>
+        <span><span class="dot" style="background:var(--green)"></span> decisão confirmada</span>
+        <span><span class="dot" style="background:var(--amber)"></span> ponto em aberto</span>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section class="doc-section" id="visao-geral">
+      <h2><span class="num">1.</span> Visão geral</h2>
+      <p>O objetivo é transformar o notebook com <strong>Zorin OS</strong> no ambiente principal para:</p>
+      <ul class="plain-list">
+        <li>desenvolvimento</li>
+        <li>projetos de inteligência artificial</li>
+        <li>agentes e automações</li>
+        <li>estudos</li>
+        <li>controle da VPS</li>
+        <li>acesso remoto</li>
+        <li>gestão dos projetos</li>
+        <li>execução de tarefas recorrentes</li>
+        <li>operação do AI Career Hub</li>
+      </ul>
+      <p>O <strong>Kali Linux</strong> permanecerá separado, instalado em um pendrive, para estudos e testes relacionados à segurança.</p>
+      <p>A organização será dividida entre dois ecossistemas:</p>
+      <div class="card-grid">
+        <div class="card accent-geb"><h4><span class="tag tag-geb">.geb</span></h4><p>Uso pessoal, conhecimento e dispositivos.</p></div>
+        <div class="card accent-dev"><h4><span class="tag tag-dev">.dev</span></h4><p>Desenvolvimento, projetos, infraestrutura e operação digital.</p></div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="doc-section" id="equipamentos">
+      <h2><span class="num">2.</span> Equipamentos e sistemas operacionais</h2>
+
+      <h3 id="notebook-principal"><span class="num">2.1</span> Notebook principal</h3>
+      <p><strong>Sistema operacional:</strong> Zorin OS</p>
+      <p>O notebook será utilizado para:</p>
+      <ul class="plain-list">
+        <li>desenvolvimento cotidiano</li>
+        <li>faculdade</li>
+        <li>projetos de IA</li>
+        <li>agentes</li>
+        <li>automações</li>
+        <li>GitHub</li>
+        <li>produção de conteúdo</li>
+        <li>conexão com a VPS</li>
+        <li>acesso remoto</li>
+        <li>operação do AI Career Hub</li>
+        <li>execução de modelos locais, quando possível</li>
+        <li>armazenamento local da memória do Hermes</li>
+        <li>eventual migração de tarefas que hoje executam na VPS</li>
+      </ul>
+      <div class="callout accent"><p>O Zorin será o sistema <strong>principal</strong>, não apenas um ambiente temporário.</p></div>
+
+      <h3 id="kali-linux"><span class="num">2.2</span> Kali Linux</h3>
+      <p><strong>Local:</strong> pendrive separado</p>
+      <p>Finalidades:</p>
+      <ul class="plain-list">
+        <li>estudos de segurança</li>
+        <li>testes controlados</li>
+        <li>laboratórios</li>
+        <li>ferramentas específicas de cibersegurança</li>
+        <li>aprendizado técnico</li>
+      </ul>
+      <p class="dim">O Kali não será usado como sistema operacional principal nem como local central para credenciais, projetos ou arquivos importantes.</p>
+
+      <h3 id="outros-dispositivos"><span class="num">2.3</span> Outros dispositivos</h3>
+      <p>O ecossistema também poderá envolver:</p>
+      <ul class="plain-list">
+        <li>PC principal</li>
+        <li>celular</li>
+        <li>VPS</li>
+        <li>notebook com Zorin</li>
+        <li>outros dispositivos conectados pelo Tailscale</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="doc-section" id="separacao-contas">
+      <h2><span class="num">3.</span> Separação das contas</h2>
+
+      <h3 id="conta-geb"><span class="num">3.1</span> Conta pessoal <span class="tag tag-geb">.geb</span></h3>
+      <p><strong>Abreviação oficial:</strong> <code>.geb</code></p>
+      <h4>Serviços vinculados</h4>
+      <ul class="plain-list">
+        <li>Notion</li><li>NotebookLM</li><li>Obsidian</li><li>Tailscale</li>
+        <li>conhecimento pessoal</li><li>estudos</li><li>faculdade</li>
+        <li>planejamento pessoal</li><li>dispositivos</li><li>rede privada</li><li>acesso remoto pessoal</li>
+      </ul>
+      <h4>Significado</h4>
+      <p>A conta <code>.geb</code> representa William como pessoa: conhecimento, aprendizado, pesquisas, anotações, organização, dispositivos, acesso remoto, rede pessoal, informações privadas.</p>
+
+      <h3 id="conta-dev"><span class="num">3.2</span> Conta técnica <span class="tag tag-dev">.dev</span></h3>
+      <p><strong>Abreviação oficial:</strong> <code>.dev</code></p>
+      <h4>Serviços e ativos vinculados</h4>
+      <ul class="plain-list">
+        <li>GitHub</li><li>repositórios</li><li>Instagram do AI Career Hub</li>
+        <li>projetos de IA</li><li>agentes</li><li>automações</li><li>APIs</li>
+        <li>serviços técnicos</li><li>VPS</li><li>infraestrutura</li>
+        <li>armazenamento técnico</li><li>backups dos projetos</li>
+        <li>backups do conteúdo do AI Career Hub</li><li>landing pages</li>
+        <li>domínios</li><li>ferramentas de publicação</li><li>métricas</li>
+        <li>integrações</li><li>ativos digitais</li><li>operação técnica</li>
+        <li>operação comercial dos projetos</li>
+      </ul>
+      <h4>Significado</h4>
+      <p>A conta <code>.dev</code> representa: desenvolvimento, projetos, execução, publicação, infraestrutura, automações, produtos digitais, operação comercial, propriedade técnica do AI Career Hub.</p>
+
+      <h3 id="regra-resumida"><span class="num">3.3</span> Regra resumida das contas</h3>
+      <div class="callout accent">
+        <p><span class="tag tag-geb">.geb</span> pensa, pesquisa, organiza e conecta os dispositivos.</p>
+        <p><span class="tag tag-dev">.dev</span> desenvolve, executa, publica e preserva os projetos.</p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="doc-section" id="sistemas-conhecimento">
+      <h2><span class="num">4.</span> Sistemas pessoais de conhecimento</h2>
+
+      <h3 id="notion"><span class="num">4.1</span> Notion <span class="tag tag-geb">.geb</span></h3>
+      <p>Função principal: painel de organização, gestão de projetos, objetivos, prioridades, cronogramas, tarefas de alto nível, planejamento pessoal, planejamento de conteúdo, visão geral do AI Career Hub, acompanhamento das iniciativas.</p>
+      <p class="dim">O Notion funciona como a camada de <strong>gestão e planejamento</strong>.</p>
+
+      <h3 id="notebooklm"><span class="num">4.2</span> NotebookLM <span class="tag tag-geb">.geb</span></h3>
+      <p>Função principal: análise de fontes, leitura de livros, leitura de PDFs, estudo de artigos, documentação, materiais de cursos, comparação de fontes, produção de resumos, sínteses, pesquisa assistida por IA.</p>
+      <p class="dim">O NotebookLM funciona como a camada de <strong>pesquisa e análise de materiais</strong>.</p>
+
+      <h3 id="obsidian"><span class="num">4.3</span> Obsidian <span class="tag tag-geb">.geb</span></h3>
+      <p>Função principal: segundo cérebro, conhecimento permanente, estudos, ideias, aprendizados, anotações, relações entre conceitos, referências, decisões pessoais, conhecimento técnico selecionado.</p>
+      <p class="dim">O Obsidian funciona como a camada de <strong>conhecimento conectado e permanente</strong>.</p>
+
+      <h4>Divisão recomendada</h4>
+      <p>Dentro do Obsidian, é recomendável manter uma separação entre:</p>
+      <ul class="plain-list">
+        <li>conteúdo estritamente pessoal</li>
+        <li>conhecimento técnico</li>
+        <li>materiais que podem ser compartilhados com agentes</li>
+        <li>conteúdos que podem virar documentação oficial dos projetos</li>
+      </ul>
+
+      <h4>Vault técnico separado</h4>
+      <p>Foi sugerida a criação de um segundo vault, por exemplo: <code>William Dev Knowledge</code>.</p>
+      <p>Esse vault conteria somente informações que poderiam ser compartilhadas com agentes de IA:</p>
+      <ul class="plain-list">
+        <li>visão dos projetos</li><li>pesquisas técnicas</li><li>decisões</li>
+        <li>referências</li><li>arquitetura</li><li>resumos</li>
+        <li>documentação</li><li>próximos passos</li>
+      </ul>
+      <div class="callout amber"><p>O vault estritamente pessoal <strong>não</strong> deveria ser entregue integralmente aos agentes.</p></div>
+
+      <h3 id="tailscale"><span class="num">4.4</span> Tailscale <span class="tag tag-geb">.geb</span></h3>
+      <p>Função principal: rede privada entre dispositivos, acesso remoto, conexão entre celular, notebook, PC e VPS, acesso privado ao Hermes no Zorin, redução da necessidade de expor serviços diretamente na internet.</p>
+      <p class="dim">O Tailscale pertence ao ambiente pessoal porque conecta os dispositivos pessoais de William.</p>
+    </section>
+
+    <!-- 5 -->
+    <section class="doc-section" id="fluxo-conhecimento">
+      <h2><span class="num">5.</span> Fluxo entre conhecimento e projetos</h2>
+      <p>O fluxo conceitual definido foi:</p>
+      <div class="ascii-diagram">NotebookLM <span class="hl">→</span> pesquisa e análise de fontes
+    │
+    ▼
+Obsidian <span class="hl">→</span> conhecimento permanente
+    │
+    ▼
+Notion <span class="hl">→</span> organização, priorização e planejamento
+    │
+    ▼
+GitHub <span class="hl">→</span> documentação oficial e implementação
+    │
+    ▼
+Agentes de IA <span class="hl">→</span> análise, planejamento e execução
+    │
+    ▼
+Revisão humana</div>
+
+      <h4>Regra de transferência</h4>
+      <div class="callout amber"><p>A IA de desenvolvimento <strong>não</strong> deve receber acesso irrestrito ao Notion, NotebookLM ou Obsidian.</p></div>
+      <p>O processo recomendado é:</p>
+      <ol class="steps">
+        <li>pesquisar no NotebookLM</li>
+        <li>consolidar aprendizados no Obsidian</li>
+        <li>organizar a iniciativa no Notion</li>
+        <li>selecionar somente o contexto relevante</li>
+        <li>remover dados pessoais</li>
+        <li>transferir uma cópia revisada para o projeto</li>
+        <li>registrar a informação nos arquivos oficiais do GitHub</li>
+        <li>permitir que o agente consulte somente o contexto autorizado</li>
+      </ol>
+    </section>
+
+    <!-- 6 -->
+    <section class="doc-section" id="projetos-ia-zorin">
+      <h2><span class="num">6.</span> Projetos de IA no Zorin</h2>
+      <p>O Zorin será preparado para comportar diferentes áreas de trabalho:</p>
+      <ul class="plain-list">
+        <li>AI Career Hub</li><li>agentes e automações</li><li>projetos de RAG</li>
+        <li>bases de conhecimento</li><li>experimentos com modelos</li><li>conteúdo</li>
+        <li>produtos digitais</li><li>integrações com a VPS</li><li>projetos acadêmicos</li>
+        <li>provas de conceito</li><li>ferramentas pessoais de produtividade</li><li>Hermes Agent</li>
+      </ul>
+      <p>Cada projeto deverá possuir:</p>
+      <ul class="plain-list">
+        <li>objetivo</li><li>contexto</li><li>documentação</li><li>decisões</li>
+        <li>tarefas</li><li>critérios de conclusão</li><li>credenciais isoladas</li>
+        <li>backup</li><li>repositório, quando aplicável</li><li>permissões do agente</li>
+      </ul>
+    </section>
+
+    <!-- 7 -->
+    <section class="doc-section" id="engenharia-contexto">
+      <h2><span class="num">7.</span> Engenharia de contexto</h2>
+      <p>Foi definido que a melhor forma de dar contexto às IAs é utilizar <strong>engenharia de contexto</strong>, principalmente por meio de arquivos Markdown organizados em cada projeto.</p>
+
+      <div class="ascii-diagram">Projeto
+├── README.md
+├── AGENTS.md
+├── CLAUDE.md
+└── docs
+    ├── PRODUCT.md
+    ├── ARCHITECTURE.md
+    ├── CONTEXT.md
+    ├── DECISIONS.md
+    └── TASKS.md</div>
+      <p class="dim">Esses arquivos são documentos de orientação, não código.</p>
+
+      <h4>Função de cada arquivo</h4>
+      <div class="card-grid">
+        <div class="card"><h4>README.md</h4><p>Apresentação geral do projeto.</p><ul><li>o que é</li><li>problema que resolve</li><li>situação atual</li><li>estrutura</li><li>visão de uso</li><li>instruções básicas</li></ul></div>
+        <div class="card"><h4>AGENTS.md</h4><p>Manual principal para os agentes.</p><ul><li>objetivo do projeto</li><li>forma de trabalho</li><li>documentos obrigatórios</li><li>permissões</li><li>restrições</li><li>procedimentos de validação</li><li>ações que exigem autorização</li><li>ações proibidas</li></ul></div>
+        <div class="card"><h4>CLAUDE.md</h4><p>Arquivo específico para o Claude, caso seja utilizado.</p><ul><li>instruções particulares do Claude</li><li>referência ao AGENTS.md</li><li>contexto que deve ser carregado</li><li>regras específicas da ferramenta</li></ul></div>
+        <div class="card"><h4>PRODUCT.md</h4><p>Descrição do produto.</p><ul><li>público</li><li>problema</li><li>proposta de valor</li><li>funcionalidades</li><li>modelo de negócio</li><li>métricas</li><li>limites de escopo</li></ul></div>
+        <div class="card"><h4>ARCHITECTURE.md</h4><p>Visão técnica.</p><ul><li>componentes</li><li>integrações</li><li>serviços</li><li>modelos de IA</li><li>bancos</li><li>fluxos</li><li>dependências</li><li>limites técnicos</li></ul></div>
+        <div class="card"><h4>CONTEXT.md</h4><p>Resumo executivo do estado atual.</p><ul><li>situação</li><li>últimas mudanças</li><li>problema atual</li><li>riscos</li><li>bloqueios</li><li>próximos passos</li><li>documentos relevantes</li></ul></div>
+        <div class="card"><h4>DECISIONS.md</h4><p>Registro das decisões.</p><ul><li>decisão tomada</li><li>justificativa</li><li>alternativas descartadas</li><li>impactos</li><li>data</li><li>possíveis revisões futuras</li></ul></div>
+        <div class="card"><h4>TASKS.md</h4><p>Controle operacional.</p><ul><li>pendências</li><li>prioridades</li><li>tarefas em andamento</li><li>bloqueios</li><li>critérios de conclusão</li><li>próximos marcos</li></ul></div>
+      </div>
+    </section>
+
+    <!-- 8 -->
+    <section class="doc-section" id="ritual-inicio">
+      <h2><span class="num">8.</span> Ritual de início de tarefa para os agentes</h2>
+      <p>Antes de trabalhar em uma tarefa, o agente deverá:</p>
+      <ol class="steps">
+        <li>ler o AGENTS.md</li>
+        <li>ler o CONTEXT.md</li>
+        <li>consultar o PRODUCT.md</li>
+        <li>consultar o ARCHITECTURE.md se a atividade for técnica</li>
+        <li>verificar o DECISIONS.md</li>
+        <li>verificar o TASKS.md</li>
+        <li>analisar apenas os arquivos relevantes</li>
+        <li>apresentar um plano antes de alterações importantes</li>
+        <li>executar somente o que estiver autorizado</li>
+        <li>atualizar contexto, decisões e tarefas ao concluir</li>
+        <li>solicitar revisão humana em ações críticas</li>
+      </ol>
+      <div class="callout amber">
+        <p>A orientação é evitar pedidos vagos como <em>"Analise tudo."</em></p>
+        <p>O agente deve consultar documentos específicos e carregar apenas o contexto necessário.</p>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="doc-section" id="memoria-niveis">
+      <h2><span class="num">9.</span> Memória em três níveis</h2>
+
+      <h3 id="memoria-global"><span class="num">9.1</span> Memória global</h3>
+      <p>Preferências válidas para todos os projetos:</p>
+      <ul class="plain-list">
+        <li>comunicação em português</li><li>explicar antes de alterações importantes</li>
+        <li>priorizar soluções simples</li><li>evitar mudanças desnecessárias</li>
+        <li>não apagar arquivos sem autorização</li><li>não publicar automaticamente</li>
+        <li>não expor credenciais</li><li>registrar decisões relevantes</li>
+        <li>manter revisão humana</li><li>usar um agente principal</li>
+        <li>limitar agentes complementares</li>
+      </ul>
+
+      <h3 id="memoria-projeto"><span class="num">9.2</span> Memória do projeto</h3>
+      <p>Informações duradouras de um projeto:</p>
+      <ul class="plain-list">
+        <li>propósito</li><li>produto</li><li>arquitetura</li><li>ferramentas</li>
+        <li>integrações</li><li>decisões</li><li>restrições</li><li>estado atual</li>
+        <li>riscos</li><li>tarefas</li>
+      </ul>
+
+      <h3 id="memoria-tarefa"><span class="num">9.3</span> Memória da tarefa</h3>
+      <p>Informações temporárias:</p>
+      <ul class="plain-list">
+        <li>atividade atual</li><li>resultado esperado</li><li>arquivos envolvidos</li>
+        <li>prioridade</li><li>prazo</li><li>critérios de conclusão</li><li>validações necessárias</li>
+      </ul>
+    </section>
+
+    <!-- 10 -->
+    <section class="doc-section" id="modelo-operacional">
+      <h2><span class="num">10.</span> Modelo operacional dos agentes</h2>
+      <p>A preferência definida é:</p>
+      <ul class="plain-list">
+        <li>um agente principal</li>
+        <li>no máximo uma tarefa ou agente complementar por execução</li>
+        <li>revisão humana</li>
+        <li>registro das atividades</li>
+        <li>controle de custos</li>
+        <li>permissões restritas</li>
+        <li>ações críticas somente com aprovação</li>
+      </ul>
+
+      <div class="card-grid">
+        <div class="card" style="border-top:2px solid var(--green)">
+          <h4>✓ O agente pode fazer</h4>
+          <ul>
+            <li>ler documentos autorizados</li><li>analisar</li><li>resumir</li>
+            <li>organizar</li><li>sugerir</li><li>planejar</li><li>documentar</li>
+            <li>executar tarefas reversíveis</li><li>atualizar registros autorizados</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top:2px solid var(--amber)">
+          <h4>⚠ Precisa pedir autorização</h4>
+          <ul>
+            <li>alterar arquitetura</li><li>adicionar dependências importantes</li>
+            <li>acessar serviços externos</li><li>publicar conteúdo</li>
+            <li>enviar mensagens</li><li>gerar despesas</li><li>alterar produção</li>
+            <li>excluir arquivos</li><li>copiar dados da .geb para a .dev</li>
+            <li>modificar permissões</li><li>alterar infraestrutura</li>
+            <li>realizar ações não reversíveis</li>
+          </ul>
+        </div>
+        <div class="card" style="border-top:2px solid #f87171">
+          <h4>✕ O agente nunca pode</h4>
+          <ul>
+            <li>revelar credenciais</li><li>publicar informações privadas</li>
+            <li>registrar senhas em repositórios</li><li>expor tokens</li>
+            <li>enviar documentos pessoais</li><li>apagar backups</li>
+            <li>executar ações irreversíveis sem autorização</li>
+            <li>misturar dados pessoais e comerciais sem revisão</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="doc-section" id="app-proprio">
+      <h2><span class="num">11.</span> Aplicativo próprio e limitação do Telegram</h2>
+      <p>Inicialmente foi considerada a criação de um aplicativo próprio parecido com o ChatGPT. A motivação é que o Telegram pode ficar ineficiente no longo prazo por apresentar limitações como:</p>
+      <ul class="plain-list">
+        <li>histórico pouco organizado</li><li>mistura de assuntos</li>
+        <li>dificuldade de separar projetos</li><li>experiência limitada com documentos</li>
+        <li>pouca visibilidade de tarefas</li><li>dificuldade de acompanhar agentes</li>
+        <li>interface pouco adequada para fluxos complexos</li>
+        <li>pouco controle sobre contexto e memória</li>
+      </ul>
+      <p>Foi considerada uma solução completa com: aplicativo, banco de dados, Firebase, Postgres, tarefas, agentes, RAG, sincronização.</p>
+      <p class="dim">Porém, essa alternativa foi considerada complexa demais para a necessidade atual.</p>
+
+      <h4>Necessidade real identificada</h4>
+      <div class="callout accent"><p>O objetivo imediato não é desenvolver um novo GPT. O objetivo é <strong>ter uma experiência mobile melhor para utilizar o Hermes Agent</strong>, mantendo o notebook como cérebro principal.</p></div>
+    </section>
+
+    <!-- 12 -->
+    <section class="doc-section" id="hermes-central">
+      <h2><span class="num">12.</span> Hermes Agent como solução central</h2>
+      <p>A solução selecionada conceitualmente foi:</p>
+      <div class="ascii-diagram">Hermes Agent no Zorin
+    +
+Hermes WebUI
+    +
+Tailscale
+    <span class="hl">=</span>
+Hermes disponível no celular e no PC</div>
+
+      <h3 id="papel-zorin"><span class="num">12.1</span> Papel do Zorin</h3>
+      <p>O Zorin será o servidor principal do Hermes: agente, memória, conversas, skills, tarefas, projetos, arquivos de contexto, histórico, ferramentas, modelos, automações.</p>
+
+      <h3 id="papel-celular"><span class="num">12.2</span> Papel do celular</h3>
+      <p>O celular será um cliente remoto: chat, histórico, envio de mensagens, envio de arquivos, envio de áudio, consulta aos projetos, acompanhamento de tarefas, aprovações, interrupção de tarefas, continuação de conversas.</p>
+      <p class="dim">O celular não precisa executar o Hermes completo.</p>
+
+      <h3 id="papel-pc"><span class="num">12.3</span> Papel do PC</h3>
+      <p>O PC poderá acessar a mesma WebUI: continuar conversas, consultar o histórico, acessar projetos, interagir com o mesmo agente, visualizar os mesmos dados.</p>
+
+      <h3 id="papel-tailscale"><span class="num">12.4</span> Papel do Tailscale</h3>
+      <p>O Tailscale será a conexão privada entre celular, Zorin, PC e VPS.</p>
+      <p class="dim">O Hermes não precisa ser exposto diretamente à internet.</p>
+    </section>
+
+    <!-- 13 -->
+    <section class="doc-section" id="memoria-compartilhada">
+      <h2><span class="num">13.</span> Memória compartilhada entre mobile e PC</h2>
+      <p>Se o celular e o PC acessarem a mesma instalação do Hermes no Zorin: as conversas, a memória, o histórico, as tarefas, os projetos, as skills e o workspace são todos compartilhados.</p>
+      <p class="dim">O celular não possui uma memória independente. Ele consulta o mesmo servidor.</p>
+
+      <div class="ascii-diagram">Celular ─────┐
+             ├── Hermes no Zorin
+     PC ──────────┘      (memória central)</div>
+
+      <h4>Exemplo</h4>
+      <ol class="steps">
+        <li>Uma conversa é iniciada no celular.</li>
+        <li>A conversa é registrada no Hermes do Zorin.</li>
+        <li>O PC acessa a WebUI.</li>
+        <li>A conversa aparece no histórico.</li>
+        <li>A conversa pode ser continuada.</li>
+        <li>As informações salvas na memória ficam disponíveis nos dois dispositivos.</li>
+      </ol>
+
+      <h4>Situações que criariam memórias separadas</h4>
+      <ul class="plain-list">
+        <li>instalar um Hermes completo no celular</li>
+        <li>instalar outro Hermes independente no PC</li>
+        <li>usar servidores diferentes</li>
+        <li>usar perfis diferentes</li>
+        <li>utilizar diretórios de dados diferentes</li>
+        <li>conectar cada dispositivo a um backend separado</li>
+      </ul>
+      <div class="callout accent"><p>A decisão é manter um <strong>único Hermes central</strong>.</p></div>
+    </section>
+
+    <!-- 14 -->
+    <section class="doc-section" id="dados-hermes">
+      <h2><span class="num">14.</span> Onde os dados do Hermes ficam</h2>
+      <p>Os dados do Hermes ficam localmente no notebook com Zorin, principalmente na pasta <code>~/.hermes/</code>, o que em uma instalação Linux normalmente representa <code>/home/nome-do-usuario/.hermes/</code>.</p>
+
+      <h3 id="memoria-permanente"><span class="num">14.1</span> Memória permanente</h3>
+      <p><code>~/.hermes/memories/MEMORY.md</code> e <code>~/.hermes/memories/USER.md</code></p>
+      <table class="cmp">
+        <tr><th>Arquivo</th><th>Pode conter</th></tr>
+        <tr><td><code>MEMORY.md</code></td><td>Informações do ambiente, convenções, detalhes importantes dos projetos, aprendizados, fatos operacionais.</td></tr>
+        <tr><td><code>USER.md</code></td><td>Preferências, estilo de comunicação, expectativas, perfil do usuário, forma de trabalho.</td></tr>
+      </table>
+
+      <h3 id="conversas-sessoes"><span class="num">14.2</span> Conversas e sessões</h3>
+      <p><code>~/.hermes/state.db</code> — banco SQLite que pode armazenar:</p>
+      <ul class="plain-list">
+        <li>sessões</li><li>títulos</li><li>histórico de mensagens</li><li>modelos</li>
+        <li>chamadas de ferramentas</li><li>resultados</li><li>uso de tokens</li>
+        <li>datas</li><li>origens das sessões</li><li>custos estimados</li><li>configuração utilizada</li>
+      </ul>
+
+      <h3 id="outros-conteudos"><span class="num">14.3</span> Outros conteúdos</h3>
+      <p>Dentro da estrutura do Hermes também podem existir: skills, configurações, arquivos operacionais, referências, tarefas, outros dados criados pelo agente.</p>
+      <p class="dim">A estrutura específica pode variar conforme versão e configuração.</p>
+    </section>
+
+    <!-- 15 -->
+    <section class="doc-section" id="localidade-privacidade">
+      <h2><span class="num">15.</span> Localidade e privacidade dos dados</h2>
+      <div class="callout accent"><p>Os dados do Hermes ficam locais no Zorin. O celular e o PC somente acessam esses dados por meio da WebUI.</p></div>
+
+      <h4>Ressalva sobre APIs</h4>
+      <p>Mesmo com memória e histórico locais, quando um modelo de IA externo é utilizado, o conteúdo necessário para produzir a resposta é enviado ao provedor da API. Portanto:</p>
+      <ul class="plain-list">
+        <li>armazenamento local não significa processamento totalmente local</li>
+        <li>informações sensíveis devem ser tratadas com cuidado</li>
+        <li>modelos locais podem ser utilizados para conteúdos privados</li>
+        <li>modelos externos podem ser utilizados em tarefas não sensíveis</li>
+        <li>credenciais não devem ser inseridas diretamente nas conversas</li>
+      </ul>
+    </section>
+
+    <!-- 16 -->
+    <section class="doc-section" id="disponibilidade-hermes">
+      <h2><span class="num">16.</span> Disponibilidade do Hermes</h2>
+      <p>Se o Hermes estiver apenas no Zorin:</p>
+      <ul class="plain-list">
+        <li>funcionará enquanto o notebook estiver ligado</li>
+        <li>poderá ficar indisponível durante suspensão</li>
+        <li>ficará inacessível quando o notebook estiver desligado</li>
+        <li>tarefas locais aguardarão o retorno da máquina</li>
+      </ul>
+
+      <h4>Evolução futura</h4>
+      <div class="ascii-diagram">Hermes principal na VPS
+        ↕
+     Celular
+        ↕
+   Zorin como executor técnico</div>
+      <p>Nesse modelo: Hermes fica disponível continuamente, celular acessa a VPS, Zorin executa tarefas locais quando estiver conectado, o histórico principal fica no servidor escolhido.</p>
+      <p class="dim">Essa decisão não precisa ser tomada agora.</p>
+    </section>
+
+    <!-- 17 -->
+    <section class="doc-section" id="telegram-final">
+      <h2><span class="num">17.</span> Telegram no desenho final</h2>
+      <p>O Telegram não precisa ser removido imediatamente. Ele pode permanecer como:</p>
+      <ul class="plain-list">
+        <li>contingência</li><li>alertas</li><li>notificações</li><li>avisos de falha</li>
+        <li>tarefas concluídas</li><li>aprovações rápidas</li><li>canal de emergência</li>
+      </ul>
+      <p class="dim">A WebUI do Hermes seria a interface principal. O Telegram seria um canal secundário.</p>
+    </section>
+
+    <!-- 18 -->
+    <section class="doc-section" id="firebase">
+      <h2><span class="num">18.</span> Firebase e banco externo</h2>
+      <p>O Firebase foi considerado para: login, sincronização, hospedagem, histórico, notificações, aplicativo mobile.</p>
+      <p class="dim">Entretanto, para a necessidade atual, foi considerado desnecessariamente complexo.</p>
+
+      <h4>Decisão atual</h4>
+      <p>Não há necessidade imediata de:</p>
+      <ul class="plain-list">
+        <li>Firebase</li><li>Postgres</li><li>banco vetorial</li><li>backend comercial</li>
+        <li>múltiplos usuários</li><li>aplicativo nativo</li><li>plataforma completa</li>
+        <li>novo sistema de agentes</li>
+      </ul>
+      <p>O Hermes já possui memória, histórico e servidor central. O melhor caminho inicial é explorar: Hermes Agent, Hermes WebUI, Tailscale, navegador mobile, atalho na tela inicial.</p>
+    </section>
+
+    <!-- 19 -->
+    <section class="doc-section" id="backup-hermes">
+      <h2><span class="num">19.</span> Backup do Hermes</h2>
+      <div class="callout amber"><p>Como os dados ficam no notebook, o backup é <strong>obrigatório</strong>.</p></div>
+
+      <h4>Conteúdo mínimo do backup</h4>
+      <p><code>~/.hermes/memories/</code> &nbsp;e&nbsp; <code>~/.hermes/state.db</code></p>
+
+      <h4>Backup recomendado</h4>
+      <p><code>~/.hermes/</code> (pasta completa) — pode incluir memória, conversas, preferências, skills, configurações, histórico, informações operacionais.</p>
+
+      <h4>Classificação do backup</h4>
+      <p>A infraestrutura de backup pertence à <span class="tag tag-dev">.dev</span>, mas o conteúdo deve ser:</p>
+      <ul class="plain-list">
+        <li>criptografado</li><li>protegido</li><li>separado dos repositórios públicos</li>
+        <li>restrito</li><li>tratado como informação sensível</li>
+      </ul>
+      <p class="dim">Isso é necessário porque o Hermes poderá conter tanto informações técnicas quanto pessoais.</p>
+    </section>
+
+    <!-- 20 -->
+    <section class="doc-section" id="copilot">
+      <h2><span class="num">20.</span> Situação desta conversa no Copilot</h2>
+      <p>Todo o conteúdo desta conversa atual está no Microsoft 365 Copilot. Ele não foi transferido automaticamente para: Zorin, Hermes, Obsidian, Notion, NotebookLM, GitHub, arquivos locais.</p>
+      <p class="dim">Algumas preferências importantes foram registradas como memória do Copilot, mas isso não transfere os dados ao Hermes.</p>
+
+      <h4>Fluxo de migração</h4>
+      <div class="ascii-diagram">Conversa no Copilot
+    │
+    ▼
+Exportação
+    │
+    ▼
+Análise e revisão
+    │
+    ▼
+Resumo mestre
+    │
+    ▼
+Arquivos Markdown no Zorin
+    │
+    ▼
+Memória e contexto do Hermes</div>
+
+      <div class="callout amber"><p>Não é recomendável copiar todo o chat bruto diretamente para a memória permanente do Hermes.</p></div>
+      <p>O ideal é:</p>
+      <ol class="steps">
+        <li>exportar</li>
+        <li>analisar</li>
+        <li>remover repetições</li>
+        <li>verificar informações desatualizadas</li>
+        <li>separar fatos, preferências, decisões e ideias</li>
+        <li>inserir somente o contexto duradouro na memória</li>
+        <li>colocar conteúdos detalhados em documentos de referência</li>
+      </ol>
+    </section>
+
+    <!-- 21 -->
+    <section class="doc-section" id="formacao-academica">
+      <h2><span class="num">21.</span> Formação acadêmica e direção profissional</h2>
+
+      <h3 id="formacao-atual"><span class="num">21.1</span> Formação atual</h3>
+      <p>Você está quase concluindo <strong>Engenharia de Software</strong>. Essa graduação já comprova formalmente sua formação em: tecnologia, desenvolvimento, sistemas, arquitetura, requisitos, testes, banco de dados, projetos, engenharia de software.</p>
+      <p class="dim">A conclusão foi que outra graduação semelhante em TI poderia gerar muita redundância.</p>
+
+      <h3 id="areas-consideradas"><span class="num">21.2</span> Áreas inicialmente consideradas</h3>
+      <ul class="plain-list">
+        <li>Matemática</li><li>Matemática Aplicada e Computacional</li><li>Estatística</li>
+        <li>Física</li><li>Engenharia de Produção</li><li>Engenharia de Controle e Automação</li>
+        <li>Engenharia Elétrica</li><li>Engenharia Mecatrônica</li><li>Engenharia Mecânica</li>
+        <li>Administração</li><li>Economia</li><li>Segurança da Informação</li>
+      </ul>
+
+      <h3 id="criterio-alterado"><span class="num">21.3</span> Critério alterado</h3>
+      <p>Inicialmente, Matemática Aplicada e Estatística apareceram como opções fortes por complementar IA. Depois, você indicou interesse em ter mais peso no mundo físico.</p>
+      <p>A partir disso, as opções de engenharia passaram a ser avaliadas com maior prioridade.</p>
+    </section>
+
+    <!-- 22 -->
+    <section class="doc-section" id="comparacao-engenharias">
+      <h2><span class="num">22.</span> Comparação das engenharias</h2>
+
+      <h3 id="controle-automacao"><span class="num">22.1</span> Engenharia de Controle e Automação</h3>
+      <p>Complementa Engenharia de Software por meio de: sensores, instrumentação, controle, microcontroladores, sistemas embarcados, robótica, IoT, automação industrial, máquinas, processos físicos.</p>
+      <p class="dim">Indicada para: IA aplicada a máquinas, robótica, automação, sistemas autônomos, integração entre software e equipamentos.</p>
+
+      <h3 id="eng-producao"><span class="num">22.2</span> Engenharia de Produção</h3>
+      <p>Complementa Engenharia de Software por meio de: processos, operações, planejamento, logística, qualidade, custos, otimização, gestão, cadeia de suprimentos, pesquisa operacional, negócios.</p>
+      <p class="dim">Indicada para: IA aplicada a empresas, automação de processos, eficiência operacional, liderança, produtos, empreendedorismo, otimização empresarial. Tem contato com o mundo físico de forma sistêmica, mas não a mesma profundidade em eletrônica, circuitos, sensores e máquinas.</p>
+
+      <h3 id="eng-eletrica"><span class="num">22.3</span> Engenharia Elétrica</h3>
+      <p>Complementa Engenharia de Software por meio de: eletricidade, eletromagnetismo, circuitos, eletrônica, sistemas elétricos, energia, máquinas elétricas, instalações, instrumentação, controle, automação, sistemas físicos.</p>
+      <p class="dim">Indicada para: energia, eletrônica, automação, hardware, sistemas inteligentes, infraestrutura, mobilidade elétrica, sistemas embarcados, IoT, IA aplicada ao mundo físico.</p>
+      <div class="callout accent"><p>Entre as opções, Engenharia Elétrica oferece maior amplitude técnica no mundo físico e pode possuir forte relevância para responsabilidade técnica, conforme a atividade e as atribuições concedidas.</p></div>
+    </section>
+
+    <!-- 23 -->
+    <section class="doc-section" id="escolha-academica">
+      <h2><span class="num">23.</span> Escolha acadêmica mais discutida</h2>
+      <div class="callout accent"><p>A combinação considerada mais forte ao final foi: <strong>Engenharia de Software + Engenharia Elétrica</strong></p></div>
+
+      <table class="cmp">
+        <tr><th>Engenharia de Software entrega</th><th>Engenharia Elétrica acrescenta</th></tr>
+        <tr>
+          <td>sistemas digitais, programação, aplicações, APIs, dados, nuvem, arquitetura, IA, RAG, agentes, automação digital</td>
+          <td>sistemas físicos, energia, circuitos, eletrônica, máquinas, medição, instrumentação, controle, automação, responsabilidade técnica em áreas compatíveis</td>
+        </tr>
+      </table>
+
+      <h4>Posicionamento futuro possível</h4>
+      <p><em>Engenheiro de Software e Engenheiro Eletricista, especializado em IA aplicada, automação e sistemas inteligentes.</em></p>
+    </section>
+
+    <!-- 24 -->
+    <section class="doc-section" id="eletrica-semipresencial">
+      <h2><span class="num">24.</span> Engenharia Elétrica semipresencial</h2>
+      <p>Foi analisada a possibilidade de realizar Engenharia Elétrica a distância. A conclusão foi:</p>
+      <ul class="plain-list">
+        <li>não escolher formação puramente online</li>
+        <li>preferir presencial noturno, se viável</li>
+        <li>como segunda opção, escolher semipresencial de boa qualidade</li>
+        <li>verificar laboratórios reais</li>
+        <li>validar curso e polo</li>
+        <li>analisar reconhecimento</li>
+        <li>conferir grade</li>
+        <li>confirmar atividades práticas</li>
+        <li>verificar possíveis atribuições profissionais</li>
+      </ul>
+
+      <h4>Pontos que devem ser avaliados</h4>
+      <ul class="plain-list">
+        <li>regularidade do curso</li><li>situação no e-MEC</li><li>reconhecimento</li>
+        <li>endereço e qualidade do polo</li><li>frequência das atividades presenciais</li>
+        <li>laboratórios</li><li>equipamentos</li><li>professores</li><li>estágio</li>
+        <li>projetos práticos</li><li>ementas</li><li>exemplos de egressos registrados</li>
+        <li>atribuições concedidas pelo CREA</li>
+      </ul>
+
+      <h4>Disciplinas de interesse</h4>
+      <p>A formação ideal deve conter bom peso em:</p>
+      <ul class="plain-list">
+        <li>cálculo</li><li>álgebra linear</li><li>física experimental</li><li>circuitos</li>
+        <li>eletrônica</li><li>eletromagnetismo</li><li>sinais e sistemas</li>
+        <li>máquinas elétricas</li><li>sistemas de potência</li><li>instalações</li>
+        <li>instrumentação</li><li>controle</li><li>automação</li><li>microcontroladores</li>
+        <li>sistemas embarcados</li><li>energias renováveis</li><li>segurança</li><li>normas técnicas</li>
+      </ul>
+      <div class="callout accent"><p>O objetivo da segunda graduação é adquirir conhecimento prático do mundo físico. Portanto, laboratórios e experiências presenciais são essenciais.</p></div>
+    </section>
+
+    <!-- 25 -->
+    <section class="doc-section" id="responsabilidade-tecnica">
+      <h2><span class="num">25.</span> Responsabilidade técnica em empresas</h2>
+      <p>Foi discutido se alguma empresa necessariamente precisa de determinada engenharia. A conclusão conceitual foi:</p>
+      <ul class="plain-list">
+        <li>nenhuma empresa precisa universalmente de uma modalidade específica</li>
+        <li>a necessidade depende da atividade principal</li>
+        <li>depende dos serviços prestados</li>
+        <li>depende do objeto social</li>
+        <li>depende das instalações e processos</li>
+        <li>a empresa pode precisar de vários responsáveis técnicos</li>
+        <li>cada profissional responde somente dentro de suas atribuições</li>
+      </ul>
+      <p>Entre as áreas discutidas:</p>
+      <ul class="plain-list">
+        <li>Engenharia Elétrica tende a ser relevante em atividades elétricas</li>
+        <li>Controle e Automação tende a ser relevante em projetos de automação</li>
+        <li>Produção é muito valiosa para eficiência, mas sua presença não é uma exigência universal</li>
+        <li>a graduação e o registro não conferem automaticamente todas as atribuições</li>
+        <li>o CREA analisa a formação e o escopo profissional</li>
+      </ul>
+    </section>
+
+    <!-- 26 -->
+    <section class="doc-section" id="relacao-hermes">
+      <h2><span class="num">26.</span> Relação entre as duas engenharias e o Hermes</h2>
+      <p>A combinação entre Engenharia de Software e Engenharia Elétrica também se conecta ao projeto do Hermes.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Engenharia de Software</h4>
+          <p>Permite desenvolver:</p>
+          <ul><li>interface</li><li>integrações</li><li>agentes</li><li>automações</li><li>memória</li><li>segurança</li><li>infraestrutura</li><li>aplicações mobile e web</li><li>orquestração</li><li>APIs</li></ul>
+        </div>
+        <div class="card">
+          <h4>Engenharia Elétrica</h4>
+          <p>Pode futuramente permitir que o sistema interaja com:</p>
+          <ul><li>sensores</li><li>dispositivos</li><li>medidores</li><li>equipamentos</li><li>automação residencial</li><li>sistemas de energia</li><li>máquinas</li><li>edge AI</li><li>IoT</li><li>monitoramento físico</li></ul>
+        </div>
+      </div>
+      <div class="callout accent"><p>No futuro, o Hermes poderia deixar de ser apenas uma interface conversacional e tornar-se uma central que também observa e controla elementos do mundo físico.</p></div>
+    </section>
+
+    <!-- 27 -->
+    <section class="doc-section" id="ordem-zorin">
+      <h2><span class="num">27.</span> Ordem recomendada de configuração do Zorin</h2>
+      <ol class="steps">
+        <li>atualizar o Zorin</li>
+        <li>verificar drivers e hardware</li>
+        <li>configurar segurança</li>
+        <li>organizar os perfis .geb e .dev</li>
+        <li>configurar gerenciador de senhas</li>
+        <li>ativar autenticação em dois fatores</li>
+        <li>configurar GitHub pela .dev</li>
+        <li>organizar as pastas dos projetos</li>
+        <li>preparar documentos de contexto</li>
+        <li>configurar Notion, NotebookLM e Obsidian pela .geb</li>
+        <li>configurar Tailscale pela .geb</li>
+        <li>conectar o Zorin à VPS</li>
+        <li>configurar backups pessoais e técnicos</li>
+        <li>testar uma aplicação pequena</li>
+        <li>instalar e validar o Hermes</li>
+        <li>configurar a WebUI</li>
+        <li>acessar a WebUI pelo celular</li>
+        <li>validar memória compartilhada</li>
+        <li>testar backup</li>
+        <li>migrar gradualmente tarefas da VPS para o notebook</li>
+      </ol>
+    </section>
+
+    <!-- 28 -->
+    <section class="doc-section" id="decisoes-consolidadas">
+      <h2><span class="num">28.</span> Decisões atualmente consolidadas</h2>
+      <ul class="checklist confirmed">
+        <li>Zorin OS é o ambiente principal.</li>
+        <li>Kali Linux permanece no pendrive.</li>
+        <li>Não colocar código ou comandos nesta conversa.</li>
+        <li><code>.geb</code> é a abreviação da conta pessoal.</li>
+        <li><code>.dev</code> é a abreviação da conta técnica.</li>
+        <li>Notion fica na .geb.</li>
+        <li>NotebookLM fica na .geb.</li>
+        <li>Obsidian fica na .geb.</li>
+        <li>Tailscale fica na .geb.</li>
+        <li>GitHub fica na .dev.</li>
+        <li>Instagram do AI Career Hub fica na .dev.</li>
+        <li>Backups técnicos e dos projetos ficam na .dev.</li>
+        <li>Materiais pessoais permanecem separados dos projetos.</li>
+        <li>O Obsidian pessoal não deve ser analisado integralmente pelos agentes.</li>
+        <li>O contexto técnico deve ser revisado antes de ser compartilhado.</li>
+        <li>Arquivos Markdown serão usados para organizar contexto.</li>
+        <li>Um agente principal coordenará as tarefas.</li>
+        <li>Ações críticas exigem revisão humana.</li>
+        <li>Telegram pode ficar como canal secundário.</li>
+        <li>Hermes Agent no Zorin é a solução preferida para o agente pessoal.</li>
+        <li>Hermes WebUI será usada como interface.</li>
+        <li>Tailscale conectará celular, PC e Zorin.</li>
+        <li>A memória oficial do Hermes ficará local no Zorin.</li>
+        <li>Mobile e PC acessarão a mesma memória.</li>
+        <li>Não há necessidade imediata de Firebase.</li>
+        <li>Não há necessidade imediata de criar outro GPT completo.</li>
+        <li>O backup da pasta do Hermes será essencial.</li>
+        <li>Engenharia Elétrica é a candidata mais forte para a segunda graduação com peso no mundo físico.</li>
+      </ul>
+    </section>
+
+    <!-- 29 -->
+    <section class="doc-section" id="pontos-abertos">
+      <h2><span class="num">29.</span> Pontos ainda abertos</h2>
+      <p class="dim">Os seguintes pontos precisam ser analisados posteriormente:</p>
+
+      <h4>Ambiente técnico</h4>
+      <ul class="checklist open">
+        <li>especificações completas do notebook</li>
+        <li>capacidade de RAM</li>
+        <li>GPU</li>
+        <li>armazenamento</li>
+        <li>compatibilidade com modelos locais</li>
+        <li>estratégia de suspensão e energia</li>
+        <li>necessidade de deixar o notebook ligado</li>
+        <li>divisão exata entre notebook e VPS</li>
+      </ul>
+
+      <h4>Hermes</h4>
+      <ul class="checklist open">
+        <li>versão a ser instalada</li>
+        <li>localização definitiva dos arquivos</li>
+        <li>estratégia de backup</li>
+        <li>autenticação da WebUI</li>
+        <li>comportamento de anexos</li>
+        <li>suporte a áudio</li>
+        <li>modelos de IA usados</li>
+        <li>fornecedores de API</li>
+        <li>custos</li>
+        <li>contexto inicial</li>
+        <li>regras do SOUL.md</li>
+        <li>skills iniciais</li>
+        <li>política de retenção das conversas</li>
+      </ul>
+
+      <h4>Conhecimento</h4>
+      <ul class="checklist open">
+        <li>criação ou não de vault técnico separado</li>
+        <li>quais notas podem sair da .geb</li>
+        <li>processo de revisão</li>
+        <li>integração futura com Notion</li>
+        <li>integração futura com Obsidian</li>
+        <li>necessidade futura de RAG</li>
+      </ul>
+
+      <h4>Formação</h4>
+      <ul class="checklist open">
+        <li>instituição para Engenharia Elétrica</li>
+        <li>modalidade presencial ou semipresencial</li>
+        <li>qualidade dos laboratórios</li>
+        <li>reconhecimento</li>
+        <li>localização</li>
+        <li>horários</li>
+        <li>mensalidade</li>
+        <li>aproveitamento de disciplinas</li>
+        <li>atribuições concedidas</li>
+        <li>compatibilidade com trabalho e projetos</li>
+      </ul>
+    </section>
+
+    <!-- 30 -->
+    <section class="doc-section" id="proximo-passo">
+      <h2><span class="num">30.</span> Próximo passo recomendado</h2>
+      <p>Antes de instalar o Hermes, transformar este documento em quatro blocos:</p>
+      <div class="card-grid">
+        <div class="card"><h4>Bloco 1 — Perfil permanente</h4><p>Conteúdo duradouro sobre: William, preferências, estilo de trabalho, contas, ecossistema, regras pessoais.</p></div>
+        <div class="card"><h4>Bloco 2 — Ambiente técnico</h4><p>Conteúdo sobre: Zorin, Kali, PC, celular, VPS, Tailscale, GitHub, backups.</p></div>
+        <div class="card"><h4>Bloco 3 — Projetos</h4><p>Documento separado para: AI Career Hub, agentes, automações, RAG, estudos, conteúdo, produtos digitais.</p></div>
+        <div class="card"><h4>Bloco 4 — Regras do Hermes</h4><p>Conteúdo sobre: memória, permissões, revisão humana, segurança, ações autorizadas, ações proibidas, escolha de modelos, comportamento no celular e PC.</p></div>
+      </div>
+    </section>
+
+    <!-- 31 -->
+    <section class="doc-section" id="resumo-executivo">
+      <h2><span class="num">31.</span> Resumo executivo final</h2>
+      <p>O ecossistema planejado é:</p>
+      <div class="ascii-diagram">Conta pessoal <span class="hl">.geb</span>              Conta técnica <span class="hl">.dev</span>
+├── Notion                  ├── GitHub
+├── NotebookLM              ├── AI Career Hub
+├── Obsidian                ├── Instagram
+├── Tailscale                 ├── Projetos de IA
+├── Estudos                 ├── Agentes
+├── Conhecimento            ├── Automações
+└── Dispositivos            ├── VPS
+                            ├── Infraestrutura
+                            └── Backups técnicos
+
+Notebook com Zorin                Celular e PC
+├── Ambiente principal            ├── Clientes da WebUI
+├── Projetos                      ├── Mesma memória
+├── Hermes Agent                  ├── Mesmas conversas
+├── Hermes WebUI                  ├── Mesmos projetos
+├── Memória local                 └── Conexão via Tailscale
+├── Modelos locais
+└── Execução de tarefas
+
+Pendrive com Kali
+├── Estudos de segurança
+├── Laboratórios
+└── Testes isolados</div>
+
+      <h4>Princípio central</h4>
+      <div class="callout accent"><p>Uma identidade pessoal para conhecimento e dispositivos, uma identidade técnica para projetos e operação, um Hermes central no Zorin e clientes conectados pelo celular e pelo PC.</p></div>
+
+      <h4>Direção acadêmica</h4>
+      <p>Concluir Engenharia de Software e avaliar Engenharia Elétrica como segunda graduação, preferencialmente com formação prática consistente e direcionamento para automação, eletrônica e sistemas inteligentes.</p>
+
+      <h4>Direção para a IA pessoal</h4>
+      <p>Não construir outro GPT agora. Usar o Hermes Agent no Zorin, acessar pelo mobile com a WebUI e manter memória e histórico locais, compartilhados entre os dispositivos.</p>
+
+      <h4>Direção para o contexto</h4>
+      <p>Não entregar todo o conhecimento pessoal à IA. Selecionar, revisar, documentar e permitir acesso somente ao contexto necessário para cada projeto.</p>
+
+      <div class="doc-foot">
+        <p>Registro mestre do ecossistema de IA — William Gebowski Duda · 28 de julho de 2026<br>Documento vivo: edite <span class="mono">index.html</span> diretamente para atualizar seções ao longo do tempo.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<button id="top-btn" class="top-btn" aria-label="Voltar ao topo" title="Voltar ao topo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+</button>
+
+<script src="/legacy/js/app.js"></script>
+</body>
+</html>

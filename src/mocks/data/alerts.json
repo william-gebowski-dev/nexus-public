@@ -1,0 +1,24 @@
+[
+  {
+    "id": "al-001",
+    "category": "limit_near",
+    "severity": "warning",
+    "title": "Latência em alta na API administrativa",
+    "description": "Tempo de resposta acima do baseline — observar tendência.",
+    "raisedAt": "2026-07-28T19:30:00Z",
+    "read": false,
+    "ignored": false,
+    "source": "periodic"
+  },
+  {
+    "id": "al-002",
+    "category": "agent_idle",
+    "severity": "info",
+    "title": "Agente Entropia sem execução hoje",
+    "description": "Próxima execução programada para o ciclo seguinte.",
+    "raisedAt": "2026-07-28T07:00:00Z",
+    "read": true,
+    "ignored": false,
+    "source": "periodic"
+  }
+]

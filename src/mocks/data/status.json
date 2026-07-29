@@ -1,0 +1,17 @@
+{
+  "overall": "operational",
+  "generatedAt": "2026-07-28T20:00:00Z",
+  "counts": {
+    "servicesUp": 7,
+    "servicesAttention": 1,
+    "servicesDown": 0,
+    "agentsActive": 5,
+    "mcpsActive": 4,
+    "skillsActive": 12,
+    "automationsActive": 5,
+    "projectsActive": 6,
+    "executionsLast24h": 28
+  },
+  "nextRefreshAt": "2026-07-28T20:15:00Z",
+  "source": "periodic"
+}

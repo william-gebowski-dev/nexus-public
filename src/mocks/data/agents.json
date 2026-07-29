@@ -1,0 +1,62 @@
+[
+  {
+    "id": "nexus-forge",
+    "name": "Nexus Forge",
+    "role": "Claude Code + GLM via LiteLLM, operado pelo Telegram",
+    "status": "active",
+    "model": "glm-5.2",
+    "lastActivityAt": "2026-07-28T19:55:00Z",
+    "completedCount": 142,
+    "errorCount": 3,
+    "avgDurationMs": 18420,
+    "source": "periodic"
+  },
+  {
+    "id": "hermes",
+    "name": "Hermes",
+    "role": "Assistente pessoal e orquestrador",
+    "status": "active",
+    "model": "minimax-m3",
+    "lastActivityAt": "2026-07-28T19:50:00Z",
+    "completedCount": 87,
+    "errorCount": 1,
+    "avgDurationMs": 9860,
+    "source": "periodic"
+  },
+  {
+    "id": "system-monitor",
+    "name": "System Monitor",
+    "role": "Métricas + alertas",
+    "status": "active",
+    "model": "minimax-m3",
+    "lastActivityAt": "2026-07-28T19:58:00Z",
+    "completedCount": 720,
+    "errorCount": 0,
+    "avgDurationMs": 1240,
+    "source": "periodic"
+  },
+  {
+    "id": "backup",
+    "name": "Backup",
+    "role": "Backup diário da plataforma",
+    "status": "active",
+    "model": "minimax-m3",
+    "lastActivityAt": "2026-07-28T03:30:00Z",
+    "completedCount": 12,
+    "errorCount": 0,
+    "avgDurationMs": 184000,
+    "source": "periodic"
+  },
+  {
+    "id": "entropia",
+    "name": "Entropia",
+    "role": "Pesquisa tecnológica contínua",
+    "status": "active",
+    "model": "minimax-m3",
+    "lastActivityAt": "2026-07-28T06:00:00Z",
+    "completedCount": 24,
+    "errorCount": 0,
+    "avgDurationMs": 41200,
+    "source": "periodic"
+  }
+]
