@@ -1,12 +1,24 @@
 import { http, HttpResponse } from "msw";
 import { safeStringify } from "@/lib/sanitize";
-import type { Activity, Agent, Mcp, Project, RoadmapItem, Service, Skill } from "@/types";
+import { sanitizePayload } from "./serializers";
+import type { Activity, Agent, Alert, Automation, Execution, Mcp, ModelInfo, NexusSystemStatus, Project, RoadmapItem, Service, Skill } from "@/types";
+
+import {
+  MOCK_AVAILABILITY,
+  MOCK_CRON_STATUS,
+  MOCK_DAILY_REPORT,
+  MOCK_GENERATED_ARTIFACTS,
+  MOCK_INFRASTRUCTURE,
+  MOCK_RECENT_EXECUTIONS,
+  MOCK_ROUTINE_TODAY,
+} from "@/data/mock-routine";
 
 import status from "./data/status.json";
 import services from "./data/services.json";
 import agents from "./data/agents.json";
 import mcps from "./data/mcps.json";
 import skills from "./data/skills.json";
+import automations from "./data/automations.json";
 import models from "./data/models.json";
 import projects from "./data/projects.json";
 import activities from "./data/activities.json";
@@ -16,9 +28,12 @@ import alerts from "./data/alerts.json";
 
 /**
  * Handlers MSW — endpoints do dashboard.
- * Toda resposta passa por `safeStringify` antes de ir ao cliente.
- * Se um padrão sensível vazar no payload, a request retorna 500
- * (mesmo gate final do `status-page.py`).
+ *
+ * Toda resposta passa por DUAS camadas antes de ir ao cliente:
+ *   1. `sanitizePayload` — reescreve marcas internas (hermes, tailscale) e
+ *      mapeia categorias restritas para termos públicos (rede-privada).
+ *   2. `safeStringify` — gate final de regex. Se algum padrão sensível
+ *      sobreviver à camada 1 e bater na blocklist, a request retorna 500.
  */
 
 function jsonResponse(value: unknown, init?: ResponseInit): Response {
@@ -40,25 +55,43 @@ function paginate<T>(items: T[], limit: number, cursor: number | null): {
   return { items: page, nextCursor };
 }
 
+// JSON imports inferem tipos literalmente; estes casts tipam os dados ao
+// contrato público. Não há `as unknown[]` — TypeScript valida cada objeto
+// contra a interface exportada em src/types.
+const statusData = status as unknown as NexusSystemStatus;
+const servicesData = services as unknown as Service[];
+const agentsData = agents as unknown as Agent[];
+const mcpsData = mcps as unknown as Mcp[];
+const skillsData = skills as unknown as Skill[];
+const automationsData = automations as unknown as Automation[];
+const modelsData = models as unknown as ModelInfo[];
+const projectsData = projects as unknown as Project[];
+const activitiesData = activities as unknown as Activity[];
+const roadmapData = roadmap as unknown as RoadmapItem[];
+const executionsData = executions as unknown as Execution[];
+const alertsData = alerts as unknown as Alert[];
+
 export const handlers = [
-  http.get("/api/status", () => jsonResponse(status)),
-  http.get("/api/services", () => jsonResponse(services)),
+  http.get("/api/system/status", () => jsonResponse(sanitizePayload(statusData))),
+  http.get("/api/status", () => jsonResponse(sanitizePayload(statusData))),
+  http.get("/api/services", () => jsonResponse(sanitizePayload(servicesData))),
 
-  http.get("/api/agents", () => jsonResponse(agents)),
-  http.get("/api/mcps", () => jsonResponse(mcps)),
-  http.get("/api/skills", () => jsonResponse(skills)),
-  http.get("/api/models", () => jsonResponse(models)),
+  http.get("/api/agents", () => jsonResponse(sanitizePayload(agentsData))),
+  http.get("/api/mcps", () => jsonResponse(sanitizePayload(mcpsData))),
+  http.get("/api/skills", () => jsonResponse(sanitizePayload(skillsData))),
+  http.get("/api/automations", () => jsonResponse(sanitizePayload(automationsData))),
+  http.get("/api/models", () => jsonResponse(sanitizePayload(modelsData))),
 
-  http.get("/api/projects", () => jsonResponse(projects)),
-  http.get("/api/roadmap", () => jsonResponse(roadmap)),
-  http.get("/api/alerts", () => jsonResponse(alerts)),
+  http.get("/api/projects", () => jsonResponse(sanitizePayload(projectsData))),
+  http.get("/api/roadmap", () => jsonResponse(sanitizePayload(roadmapData))),
+  http.get("/api/alerts", () => jsonResponse(sanitizePayload(alertsData))),
 
   http.get("/api/activities", ({ request }) => {
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get("limit") ?? 10);
     const cursorRaw = url.searchParams.get("cursor");
     const cursor = cursorRaw ? Number(cursorRaw) : null;
-    return jsonResponse(paginate(activities as unknown[], limit, cursor));
+    return jsonResponse(sanitizePayload(paginate(activitiesData, limit, cursor)));
   }),
 
   http.get("/api/executions", ({ request }) => {
@@ -66,7 +99,7 @@ export const handlers = [
     const limit = Number(url.searchParams.get("limit") ?? 10);
     const cursorRaw = url.searchParams.get("cursor");
     const cursor = cursorRaw ? Number(cursorRaw) : null;
-    return jsonResponse(paginate(executions as unknown[], limit, cursor));
+    return jsonResponse(sanitizePayload(paginate(executionsData, limit, cursor)));
   }),
 
   // Endpoint de busca global — combina várias entidades.
@@ -80,6 +113,7 @@ export const handlers = [
         agents: [],
         mcps: [],
         skills: [],
+        automations: [],
         activities: [],
         roadmap: [],
       });
@@ -96,25 +130,54 @@ export const handlers = [
 
     const matchesArray = <T, K extends keyof T>(items: T[], fields: K[]): T[] =>
       items.filter((it) => {
-        const haystack = fields
-          .map((f) => String(it[f] ?? ""))
-          .join(" ")
-          .toLowerCase();
+        const haystack = fields.map((f) => String(it[f] ?? "")).join(" ").toLowerCase();
         return haystack.includes(q);
       });
 
-    return jsonResponse({
-      projects: matchesByName(projects as Project[], (p) => [
-        p.description,
-        p.category,
-        p.currentPhase,
-      ]),
-      services: matchesByName(services as Service[], (s) => [s.description, s.category]),
-      agents: matchesByName(agents as Agent[], (a) => [a.role, a.model]),
-      mcps: matchesByName(mcps as Mcp[], (m) => [m.category]),
-      skills: matchesByName(skills as Skill[], (s) => [s.purpose]),
-      activities: matchesArray(activities as unknown as Activity[], ["title", "description", "origin", "scope"] as const),
-      roadmap: matchesArray(roadmap as unknown as RoadmapItem[], ["title", "objective", "doneCriteria"] as const),
-    });
+    return jsonResponse(
+      sanitizePayload({
+        projects: matchesByName(projectsData, (p) => [p.description, p.category, p.currentPhase]),
+        services: matchesByName(servicesData, (s) => [s.description, s.category]),
+        agents: matchesByName(agentsData, (a) => [a.role, a.model]),
+        mcps: matchesByName(mcpsData, (m) => [m.category]),
+        skills: matchesByName(skillsData, (s) => [s.purpose]),
+        automations: matchesByName(automationsData, (a) => [a.purpose, a.project ?? ""]),
+        activities: matchesArray(activitiesData, ["title", "description", "origin", "scope"] as const),
+        roadmap: matchesArray(roadmapData, ["title", "objective", "doneCriteria"] as const),
+      }),
+    );
   }),
+
+  // === Rotina Hermes 12×4 — handlers espelhando USE_MOCK_DATA ===
+  http.get("/api/cron/status", () =>
+    jsonResponse(sanitizePayload(MOCK_CRON_STATUS))),
+
+  http.get("/api/routine/today", () =>
+    jsonResponse(sanitizePayload(MOCK_ROUTINE_TODAY))),
+
+  http.get("/api/routine/:date", () =>
+    jsonResponse(sanitizePayload(MOCK_ROUTINE_TODAY))),
+
+  http.get("/api/reports/daily/:date", ({ params }) => {
+    const date = String(params.date);
+    const report = MOCK_DAILY_REPORT[date] ?? MOCK_DAILY_REPORT[Object.keys(MOCK_DAILY_REPORT)[0]];
+    return jsonResponse(sanitizePayload(report));
+  }),
+
+  http.get("/api/executions/:id", ({ params }) => {
+    const id = String(params.id);
+    const item = MOCK_RECENT_EXECUTIONS.find((e) => e.id === id);
+    return item
+      ? jsonResponse(sanitizePayload(item))
+      : new HttpResponse(null, { status: 404 });
+  }),
+
+  http.get("/api/artifacts", () =>
+    jsonResponse(sanitizePayload(MOCK_GENERATED_ARTIFACTS))),
+
+  http.get("/api/infrastructure", () =>
+    jsonResponse(sanitizePayload(MOCK_INFRASTRUCTURE))),
+
+  http.get("/api/availability", () =>
+    jsonResponse(sanitizePayload(MOCK_AVAILABILITY))),
 ];
