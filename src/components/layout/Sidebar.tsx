@@ -1,31 +1,33 @@
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Server,
-  Bot,
-  FolderKanban,
-  Map,
   Activity,
-  PlayCircle,
-  FileText,
-  Settings,
-  ShieldCheck,
+  Bot,
   BookOpen,
+  CalendarClock,
+  FolderKanban,
+  LayoutDashboard,
+  ListChecks,
+  Plug,
+  Server,
+  Settings,
+  Sparkles,
+  Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const NAV = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },
-  { to: "/infraestrutura", label: "Infraestrutura", icon: Server },
-  { to: "/ia", label: "Inteligência Artificial", icon: Bot },
-  { to: "/projetos", label: "Projetos", icon: FolderKanban },
-  { to: "/roadmap", label: "Roadmap", icon: Map },
-  { to: "/atividades", label: "Atividades", icon: Activity },
-  { to: "/execucoes", label: "Execuções", icon: PlayCircle },
-  { to: "/documentacao", label: "Documentação", icon: FileText },
-  { to: "/admin", label: "Admin", icon: ShieldCheck },
-  { to: "/docs", label: "Registro do ecossistema", icon: BookOpen },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
+  { to: "/routine", label: "Rotina 12×4", icon: CalendarClock },
+  { to: "/executions", label: "Execuções", icon: ListChecks },
+  { to: "/infrastructure", label: "Infraestrutura", icon: Server },
+  { to: "/agents", label: "Agentes", icon: Bot },
+  { to: "/mcps", label: "MCPs", icon: Plug },
+  { to: "/skills", label: "Skills", icon: Sparkles },
+  { to: "/automations", label: "Automações", icon: Workflow },
+  { to: "/projects", label: "Projetos", icon: FolderKanban },
+  { to: "/activities", label: "Atividades", icon: Activity },
+  { to: "/knowledge", label: "Conhecimento", icon: BookOpen },
+  { to: "/configs", label: "Configurações", icon: Settings },
 ];
 
 export function Sidebar({
@@ -37,12 +39,17 @@ export function Sidebar({
 }) {
   return (
     <nav className="flex h-full flex-col gap-1 p-3">
-      <div className="px-2 pb-3">
+      <div className="px-2 pb-4">
         <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-geb to-accent" aria-hidden />
+          <div className="relative h-8 w-8 rounded-xl border border-primary/30 bg-primary-soft" aria-hidden>
+            <div className="absolute inset-1 rounded-lg border border-primary/35 bg-surface" />
+            <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
+          </div>
           <div className={cn("min-w-0", collapsed && "sr-only")}>
-            <div className="font-mono text-sm font-semibold leading-none">Nexus</div>
-            <div className="text-[10px] uppercase tracking-wider text-text-faint">Painel operacional</div>
+            <div className="font-mono text-sm font-semibold leading-none tracking-tight">Nexus</div>
+            <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-text-faint">
+              Centro operacional
+            </div>
           </div>
         </div>
       </div>
@@ -54,17 +61,15 @@ export function Sidebar({
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
+              "flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
               isActive
-                ? "bg-accent-soft text-accent"
+                ? "border border-primary/20 bg-primary-soft text-primary"
                 : "text-text-dim hover:bg-surface-hover hover:text-text",
             )
           }
         >
           <item.icon className="h-4 w-4 shrink-0" aria-hidden />
-          <span className={cn("truncate font-mono text-[13px]", collapsed && "sr-only")}>
-            {item.label}
-          </span>
+          <span className={cn("truncate font-mono text-[13px]", collapsed && "sr-only")}>{item.label}</span>
         </NavLink>
       ))}
     </nav>
