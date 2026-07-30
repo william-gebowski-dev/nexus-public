@@ -1,5 +1,5 @@
 /**
- * Domínio da rotina operacional Hermes 12×4.
+ * Domínio da rotina operacional (12 blocos × 4 tarefas).
  *
  * Os 48 jobs (`job-30m-01..48`) são mapeados em 12 blocos × 4 tarefas,
  * com dependência sequencial interna (Coletar → Analisar → Produzir → Consolidar). Estados podem ser 8 valores; o status do `Execution` legado tem 5 valores e convive em paralelo.
