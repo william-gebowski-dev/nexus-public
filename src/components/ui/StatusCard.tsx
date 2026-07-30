@@ -1,20 +1,27 @@
 import type { ReactNode } from "react";
 import type { OverallState } from "@/types";
 import { cn } from "@/lib/cn";
+import type { PillTone } from "@/lib/tones";
 
-const STATE_COPY: Record<OverallState, { label: string; tone: "green" | "amber" | "red" | "geb" }> = {
+const STATE_COPY: Record<OverallState, { label: string; tone: PillTone }> = {
   operational: { label: "Operacional", tone: "green" },
   attention: { label: "Requer atenção", tone: "amber" },
+  attention_required: { label: "Requer atenção", tone: "amber" },
+  maintenance: { label: "Em manutenção", tone: "accent" },
   unstable: { label: "Instabilidade detectada", tone: "amber" },
   unavailable: { label: "Indisponível", tone: "red" },
   no_recent_data: { label: "Sem dados recentes", tone: "geb" },
 };
 
-const TONE_STYLES: Record<"green" | "amber" | "red" | "geb", { dot: string; text: string; bg: string }> = {
+// Estrutura própria (dot + text + bg) — StatusCard tem layout diferente
+// de um pill simples, mas reusa o mesmo vocabulário de tons (PillTone).
+const TONE_STYLES: Record<PillTone, { dot: string; text: string; bg: string }> = {
   green: { dot: "bg-green", text: "text-green", bg: "bg-green-soft" },
   amber: { dot: "bg-amber", text: "text-amber", bg: "bg-amber-soft" },
   red: { dot: "bg-red", text: "text-red", bg: "bg-red-soft" },
   geb: { dot: "bg-geb", text: "text-geb", bg: "bg-geb-soft" },
+  accent: { dot: "bg-accent", text: "text-accent", bg: "bg-accent-soft" },
+  neutral: { dot: "bg-text-faint", text: "text-text-dim", bg: "bg-surface-hover" },
 };
 
 export function StatusCard({

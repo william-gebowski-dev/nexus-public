@@ -1,20 +1,24 @@
-import { cn } from "@/lib/cn";
 import type { Service } from "@/types";
 import { formatPercent, formatDuration } from "@/lib/format";
 import { Sparkline } from "@/components/charts/Sparkline";
 import { UptimeBar } from "@/components/charts/UptimeBar";
 import { SourceBadge } from "./SourceBadge";
+import { Pill } from "./Pill";
+import type { PillTone } from "@/lib/tones";
 
-const STATUS_LABEL: Record<Service["status"], { label: string; tone: string }> = {
-  healthy: { label: "Operacional", tone: "text-green bg-green-soft border-green/40" },
-  attention: { label: "Atenção", tone: "text-amber bg-amber-soft border-amber/40" },
-  down: { label: "Indisponível", tone: "text-red bg-red-soft border-red/40" },
+const STATUS_LABEL: Record<Service["status"], { label: string; tone: PillTone }> = {
+  healthy: { label: "Operacional", tone: "green" },
+  attention: { label: "Atenção", tone: "amber" },
+  down: { label: "Indisponível", tone: "red" },
 };
 
 const CATEGORY_LABEL: Record<Service["category"], string> = {
   vps: "VPS",
+  cloud: "Cloud",
   docker: "Docker",
-  tailscale: "Tailscale",
+  containers: "Containers",
+  tailscale: "Rede privada",
+  "rede-privada": "Rede privada",
   web: "Web",
   database: "Banco de dados",
   api: "API",
@@ -32,7 +36,7 @@ export function ServiceCard({ service }: { service: Service }) {
           <div className="flex items-center gap-2 text-xs text-text-faint">
             <span>{CATEGORY_LABEL[service.category]}</span>
             <span aria-hidden>·</span>
-            <span className={cn("nx-pill text-[10px] py-0", status.tone)}>{status.label}</span>
+            <Pill tone={status.tone} size="xs">{status.label}</Pill>
           </div>
           <h3 className="mt-1 truncate font-mono text-base text-text">{service.name}</h3>
           <p className="mt-1 text-xs text-text-dim">{service.description}</p>
