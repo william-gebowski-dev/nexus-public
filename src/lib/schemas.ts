@@ -231,6 +231,7 @@ export const ExecutionStatusEnum = z.enum([
   "failed",
   "cancelled",
   "queued",
+  "partial",
 ]);
 
 export const ExecutionSchema = z.object({

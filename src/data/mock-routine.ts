@@ -98,9 +98,9 @@ function buildTaskResults(): Record<string, TaskResultEntry> {
     if (t > "18:00") {
       results[task.id] = {
         status: "scheduled",
-        startedAt: isoTodayAt(t),
-        finishedAt: isoTodayEnd(t),
-        durationSeconds: 180,
+        // Não inventar startedAt/finishedAt/durationSeconds para tarefas
+        // agendadas: o status "scheduled" significa que ainda não rodaram
+        // (audit E.3).
       };
       continue;
     }
@@ -245,6 +245,8 @@ export const MOCK_ROUTINE_TODAY: RoutineDay = applyResults(ROUTINE_BLOCKS, MOCK_
 function buildExecutionFromTask(task: RoutineTask): Execution {
   const startedAt = task.startedAt ?? isoTodayAt(task.scheduledTime);
   const durationMs = (task.durationSeconds ?? 180) * 1000;
+  // partial ≠ success (audit E.4): manter a granularidade para que a UI
+  // consiga mostrar resultado incompleto em vez de "OK".
   const baseStatus: Execution["status"] = task.status === "completed"
     ? "success"
     : task.status === "running"
@@ -252,7 +254,7 @@ function buildExecutionFromTask(task: RoutineTask): Execution {
       : task.status === "failed"
         ? "failed"
         : task.status === "partial"
-          ? "success"
+          ? "partial"
           : task.status === "cancelled"
             ? "cancelled"
             : "queued";
@@ -328,11 +330,12 @@ function buildInfra(
   latencyMs: number,
   availabilityPct: number,
   uptime7d: readonly boolean[],
+  status: "healthy" | "attention" = "healthy",
 ): RoutineInfrastructureService {
   return {
     id,
     name,
-    status: "healthy",
+    status,
     latencyMs,
     availabilityPct,
     lastCheckedAt: "2026-07-30T17:58:00-03:00",
@@ -351,7 +354,9 @@ export const MOCK_INFRASTRUCTURE: RoutineInfrastructureService[] = [
   buildInfra("rede-privada", "Rede Privada", "1.78", 35, 99.7, [true, true, true, true, true, true, true]),
   buildInfra("modelo-local", "Modelo Local", "0.5.7", 145, 98.3, [true, false, true, true, true, true, true]),
   buildInfra("banco-dados", "Banco de Dados", "16.3", 8, 99.95, [true, true, true, true, true, true, true]),
-  buildInfra("scheduler-cron", "Scheduler Cron", "v2.4.1", 5, 99.6, [true, true, true, false, true, true, true]),
+  // Scheduler-cron em "attention" para casar com o systemStatus mock
+  // (1 serviço em atenção). Audit E.5: status geral e infra discordavam.
+  buildInfra("scheduler-cron", "Scheduler Cron", "v2.4.1", 5, 99.6, [true, true, true, false, true, true, true], "attention"),
   buildInfra("armazenamento-local", "Armazenamento Local", "ZFS 2.2", 11, 99.99, [true, true, true, true, true, true, true]),
 ];
 

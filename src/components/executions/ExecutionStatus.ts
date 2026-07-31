@@ -7,4 +7,5 @@ export const EXECUTION_STATUS: Record<Execution["status"], { label: string; tone
   failed: { label: "Erro", tone: "red" },
   cancelled: { label: "Cancelada", tone: "neutral" },
   queued: { label: "Na fila", tone: "geb" },
+  partial: { label: "Parcial", tone: "amber" },
 };

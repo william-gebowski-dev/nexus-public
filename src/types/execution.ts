@@ -5,7 +5,8 @@ export type ExecutionStatus =
   | "running"
   | "failed"
   | "cancelled"
-  | "queued";
+  | "queued"
+  | "partial";
 
 export interface Execution {
   id: string;
