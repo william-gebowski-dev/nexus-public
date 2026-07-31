@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Shell } from "@/components/layout/Shell";
+import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { Overview } from "@/pages/Overview";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ROUTES } from "@/lib/routes";
@@ -49,29 +50,31 @@ function lazyRoute(node: React.ReactNode) {
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Shell />}>
-            <Route index element={<Overview />} />
-            <Route path={ROUTES.routine.slice(1)} element={lazyRoute(<Routine />)} />
-            <Route path={ROUTES.executions.slice(1)} element={lazyRoute(<Executions />)} />
-            <Route path="executions/:id" element={lazyRoute(<ExecutionDetail />)} />
-            <Route path={ROUTES.infrastructure.slice(1)} element={lazyRoute(<Infrastructure />)} />
-            <Route path={ROUTES.agents.slice(1)} element={lazyRoute(<Agents />)} />
-            <Route path={ROUTES.mcps.slice(1)} element={lazyRoute(<Mcps />)} />
-            <Route path={ROUTES.skills.slice(1)} element={lazyRoute(<Skills />)} />
-            <Route path={ROUTES.automations.slice(1)} element={lazyRoute(<Automations />)} />
-            <Route path={ROUTES.projects.slice(1)} element={lazyRoute(<Projects />)} />
-            <Route path={ROUTES.activities.slice(1)} element={lazyRoute(<Activities />)} />
-            <Route path={ROUTES.knowledge.slice(1)} element={lazyRoute(<Knowledge />)} />
-            <Route path={ROUTES.configs.slice(1)} element={lazyRoute(<Configs />)} />
-            <Route path={ROUTES.admin.slice(1)} element={lazyRoute(<Admin />)} />
-            <Route path="reports/daily/:date" element={lazyRoute(<DailyReport />)} />
-            <Route path="*" element={lazyRoute(<NotFound />)} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Shell />}>
+              <Route index element={<Overview />} />
+              <Route path={ROUTES.routine.slice(1)} element={lazyRoute(<Routine />)} />
+              <Route path={ROUTES.executions.slice(1)} element={lazyRoute(<Executions />)} />
+              <Route path="executions/:id" element={lazyRoute(<ExecutionDetail />)} />
+              <Route path={ROUTES.infrastructure.slice(1)} element={lazyRoute(<Infrastructure />)} />
+              <Route path={ROUTES.agents.slice(1)} element={lazyRoute(<Agents />)} />
+              <Route path={ROUTES.mcps.slice(1)} element={lazyRoute(<Mcps />)} />
+              <Route path={ROUTES.skills.slice(1)} element={lazyRoute(<Skills />)} />
+              <Route path={ROUTES.automations.slice(1)} element={lazyRoute(<Automations />)} />
+              <Route path={ROUTES.projects.slice(1)} element={lazyRoute(<Projects />)} />
+              <Route path={ROUTES.activities.slice(1)} element={lazyRoute(<Activities />)} />
+              <Route path={ROUTES.knowledge.slice(1)} element={lazyRoute(<Knowledge />)} />
+              <Route path={ROUTES.configs.slice(1)} element={lazyRoute(<Configs />)} />
+              <Route path={ROUTES.admin.slice(1)} element={lazyRoute(<Admin />)} />
+              <Route path="reports/daily/:date" element={lazyRoute(<DailyReport />)} />
+              <Route path="*" element={lazyRoute(<NotFound />)} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+   </ErrorBoundary>
   );
 }
