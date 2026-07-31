@@ -13,6 +13,12 @@ export interface Execution {
   name: string;
   /** Agente/automação responsável. */
   runner: string;
+  /** ID estruturado do job (ex.: "job-30m-12"). */
+  jobId?: string;
+  /** Bloco 1..12 ao qual a execução pertence. */
+  blockId?: number;
+  /** Horário agendado (HH:mm) na rotina 12×4. */
+  scheduledTime?: string;
   /** Nome público do agente responsável. */
   agent?: string;
   /** Projeto relacionado. */

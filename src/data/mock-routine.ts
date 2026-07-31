@@ -222,10 +222,18 @@ function buildExecutionFromTask(task: RoutineTask): Execution {
           : task.status === "cancelled"
             ? "cancelled"
             : "queued";
+  // Extrai o número do job a partir do id (formato job-30m-NN) e calcula
+  // o bloco correspondente: bloco = floor((N-1)/4) + 1, com N ∈ [1..48].
+  const jobMatch = task.id.match(/^job-30m-(\d{1,2})$/);
+  const jobNumber = jobMatch ? Number(jobMatch[1]) : undefined;
+  const blockId = jobNumber !== undefined ? Math.floor((jobNumber - 1) / 4) + 1 : undefined;
   return {
     id: `exec-${task.id}`,
     name: task.title,
     runner: "scheduler-cron",
+    jobId: jobMatch ? task.id : undefined,
+    blockId,
+    scheduledTime: task.scheduledTime,
     agent: "operational-agent",
     project: task.projectId,
     projectId: task.projectId,

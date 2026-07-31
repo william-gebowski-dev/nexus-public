@@ -50,6 +50,8 @@ export const isMockDataEnabled = (): boolean => USE_MOCK_DATA;
 export interface Page<T> {
   items: T[];
   nextCursor: number | null;
+  /** Total reportado pelo backend, quando aplicável. */
+  totalItems?: number;
 }
 
 async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
@@ -188,6 +190,7 @@ export const nexusApi = {
       return {
         items: page,
         nextCursor: end < MOCK_RECENT_EXECUTIONS.length ? end : null,
+        totalItems: MOCK_RECENT_EXECUTIONS.length,
       };
     }
     const qs = new URLSearchParams({ limit: String(limit) });

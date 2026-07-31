@@ -237,6 +237,9 @@ export const ExecutionSchema = z.object({
   id: z.string(),
   name: z.string(),
   runner: z.string(),
+  jobId: z.string().regex(/^job-30m-\d{1,2}$/).optional(),
+  blockId: z.number().int().min(1).max(12).optional(),
+  scheduledTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
   agent: z.string().optional(),
   project: z.string().optional(),
   projectId: z.string().optional(),
@@ -252,6 +255,7 @@ export type ExecutionParsed = z.infer<typeof ExecutionSchema>;
 export const ExecutionPageSchema = z.object({
   items: z.array(ExecutionSchema),
   nextCursor: z.number().int().nonnegative().nullable(),
+  totalItems: z.number().int().nonnegative().optional(),
 });
 
 // === InfrastructureService =================================================
