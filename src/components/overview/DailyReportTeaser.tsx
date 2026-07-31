@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { DailyReportSummary } from "@/types";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { ROUTES } from "@/lib/routes";
 
 export function DailyReportTeaser({ daily }: { daily: DailyReportSummary | undefined }) {
   if (!daily) return <CardSkeleton />;
@@ -23,7 +24,7 @@ export function DailyReportTeaser({ daily }: { daily: DailyReportSummary | undef
         ]}
       />
       <div className="flex justify-end pt-2">
-        <Link to={`/reports/daily/${daily.date}`} className="nx-btn nx-btn-primary">
+        <Link to={ROUTES.dailyReport(daily.date)} className="nx-btn nx-btn-primary">
           Abrir relatório completo
         </Link>
       </div>

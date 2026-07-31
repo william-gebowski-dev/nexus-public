@@ -173,8 +173,26 @@ export function applyResults(
   blocks: readonly RoutineBlock[],
   results: Record<string, TaskResultEntry>,
 ): RoutineDay {
+  // Conjunto de IDs de execução que existem em /executions (mock). Apenas
+  // esses recebem o link "Abrir logs"; o resto fica sem executionId para
+  // evitar que o card aponte para uma rota 404. Derivado das próprias
+  // tasks, espelhando o filtro que MOCK_RECENT_EXECUTIONS usa logo abaixo
+  // — evita dependência circular.
+  const knownExecutionIds = new Set(
+    ROUTINE_TASKS
+      .filter((t) => t.id !== "job-30m-37")
+      .filter((t) => (MOCK_TASK_RESULTS[t.id]?.status ?? t.status) === "completed")
+      .map((t) => `exec-${t.id}`),
+  );
   const todayBlocks: RoutineBlock[] = blocks.map((b) => {
-    const tasks = b.tasks.map((t) => applyResultsToTask(t, results[t.id]));
+    const tasks = b.tasks.map((t) => {
+      const applied = applyResultsToTask(t, results[t.id]);
+      const candidateId = `exec-${applied.id}`;
+      if (knownExecutionIds.has(candidateId)) {
+        applied.executionId = candidateId;
+      }
+      return applied;
+    });
     const completedCount = tasks.filter((t) => t.status === "completed").length;
     const failedCount = tasks.filter((t) => t.status === "failed").length;
     return {

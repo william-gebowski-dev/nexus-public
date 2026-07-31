@@ -30,6 +30,12 @@ export interface RoutineTask {
   projectId?: string;
   resultSummary?: string;
   artifactIds?: string[];
+  /**
+   * ID da execução correspondente em /executions. Preenchido pelo backend
+   * ou pelo mock para que o card "Abrir logs" só apareça quando existir
+   * de fato (antes caía em 404).
+   */
+  executionId?: string;
 }
 
 export interface RoutineBlock {
