@@ -230,7 +230,23 @@ const shapeOk = checkRoutineShape();
 const mocksOk = checkRoutineMocks();
 const literalsOk = checkRestrictedLiterals();
 
-if (fails > 0 || !shapeOk || !mocksOk) {
+// ── 5. Shape check via Zod (delega ao scripts/check-shapes.ts) ───────────
+//
+// Esse passo valida runtime que cada MOCK_* bate com o schema Zod canônico
+// em `src/lib/schemas.ts`. Drift entre tipo/mocks/schema é detectado aqui.
+import { spawnSync } from "node:child_process";
+
+function checkShapes() {
+  const r = spawnSync("npx", ["tsx", "scripts/check-shapes.ts"], {
+    cwd: repo,
+    stdio: "inherit",
+  });
+  return r.status === 0;
+}
+
+const shapesOk = checkShapes();
+
+if (fails > 0 || !shapeOk || !mocksOk || !shapesOk) {
   console.error(`\n❌ Mocks FALHARAM — ver saída acima.`);
   process.exit(1);
 }

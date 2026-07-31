@@ -4,21 +4,17 @@ import type {
   Alert,
   Automation,
   AvailabilityRecord,
-  CronStatus,
-  DailyReportSummary,
   Execution,
-  GeneratedArtifact,
-  InfrastructureService,
   Mcp,
   ModelInfo,
   NexusSystemStatus,
   Project,
   RoadmapItem,
-  RoutineDay,
   Service,
   Skill,
   SystemSummary,
 } from "@/types";
+import { NEXUS_API_SCHEMAS } from "@/lib/schemas";
 import {
   MOCK_AVAILABILITY,
   MOCK_CRON_STATUS,
@@ -85,6 +81,31 @@ async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/**
+ * Valida runtime a resposta JSON contra um schema Zod. Em falha de shape:
+ *  - loga `console.warn` com método, path e issues do Zod (debugging
+ *    sem quebrar a UI).
+ *  - devolve os dados crus mesmo assim (graceful degrade). O objetivo
+ *    é detectar drift entre mock e backend real, não bloquear render.
+ *
+ * Para mocks que não são inferidos pelo Zod (por exemplo listas onde o
+ * backend retorna envelope `{ ok, data }`), não usar este wrapper.
+ */
+async function jsonGetSafe<T>(
+  method: string,
+  schema: { safeParse: (v: unknown) => { success: true; data: T } | { success: false; error: unknown } },
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
+  const raw = await jsonGet<T>(path, init);
+  const result = schema.safeParse(raw);
+  if (!result.success) {
+    // eslint-disable-next-line no-console
+    console.warn(`[nexus] shape divergente em ${method} (${path}):`, result.error);
+  }
+  return raw;
+}
+
 export function systemStatusToSummary(status: NexusSystemStatus): SystemSummary {
   return {
     overall: status.status,
@@ -106,7 +127,7 @@ export function systemStatusToSummary(status: NexusSystemStatus): SystemSummary 
 }
 
 export const nexusApi = {
-  systemStatus: () => jsonGet<NexusSystemStatus>("/api/system/status"),
+  systemStatus: () => jsonGetSafe("systemStatus", NEXUS_API_SCHEMAS.systemStatus, "/api/system/status"),
   status: async () => systemStatusToSummary(await nexusApi.systemStatus()),
   services: () => jsonGet<Service[]>("/api/services"),
 
@@ -139,25 +160,29 @@ export const nexusApi = {
     }>(`/api/search?q=${encodeURIComponent(q)}`),
 
   cronStatus: async () =>
-    USE_MOCK_DATA ? MOCK_CRON_STATUS : jsonGet<CronStatus>("/api/cron/status"),
+    USE_MOCK_DATA
+      ? MOCK_CRON_STATUS
+      : jsonGetSafe("cronStatus", NEXUS_API_SCHEMAS.cronStatus, "/api/cron/status"),
 
   routineToday: async () =>
-    USE_MOCK_DATA ? MOCK_ROUTINE_TODAY : jsonGet<RoutineDay>("/api/routine/today"),
+    USE_MOCK_DATA
+      ? MOCK_ROUTINE_TODAY
+      : jsonGetSafe("routineToday", NEXUS_API_SCHEMAS.routineToday, "/api/routine/today"),
 
   routine: async (date: string) =>
     USE_MOCK_DATA
       ? { ...MOCK_ROUTINE_TODAY, date }
-      : jsonGet<RoutineDay>(`/api/routine/${encodeURIComponent(date)}`),
+      : jsonGetSafe("routine", NEXUS_API_SCHEMAS.routineToday, `/api/routine/${encodeURIComponent(date)}`),
 
   executionById: async (id: string) =>
     USE_MOCK_DATA
       ? MOCK_RECENT_EXECUTIONS.find((e) => e.id === id) ?? null
-      : jsonGet<Execution>(`/api/executions/${encodeURIComponent(id)}`),
+      : jsonGetSafe("executionById", NEXUS_API_SCHEMAS.executionById, `/api/executions/${encodeURIComponent(id)}`),
 
   dailyReport: async (date: string) =>
     USE_MOCK_DATA
       ? (MOCK_DAILY_REPORT[date] ?? MOCK_DAILY_REPORT[Object.keys(MOCK_DAILY_REPORT)[0]])
-      : jsonGet<DailyReportSummary>(`/api/reports/daily/${encodeURIComponent(date)}`),
+      : jsonGetSafe("dailyReport", NEXUS_API_SCHEMAS.dailyReport, `/api/reports/daily/${encodeURIComponent(date)}`),
 
   recentExecutions: async (limit = 10, cursor: number | null = null) => {
     if (USE_MOCK_DATA) {
@@ -171,14 +196,18 @@ export const nexusApi = {
     }
     const qs = new URLSearchParams({ limit: String(limit) });
     if (cursor !== null) qs.set("cursor", String(cursor));
-    return jsonGet<Page<Execution>>(`/api/executions?${qs}`);
+    return jsonGetSafe("recentExecutions", NEXUS_API_SCHEMAS.recentExecutions, `/api/executions?${qs}`);
   },
 
   artifacts: async () =>
-    USE_MOCK_DATA ? MOCK_GENERATED_ARTIFACTS : jsonGet<GeneratedArtifact[]>("/api/artifacts"),
+    USE_MOCK_DATA
+      ? MOCK_GENERATED_ARTIFACTS
+      : jsonGetSafe("artifacts", NEXUS_API_SCHEMAS.artifacts, "/api/artifacts"),
 
   infrastructure: async () =>
-    USE_MOCK_DATA ? MOCK_INFRASTRUCTURE : jsonGet<InfrastructureService[]>("/api/infrastructure"),
+    USE_MOCK_DATA
+      ? MOCK_INFRASTRUCTURE
+      : jsonGetSafe("infrastructure", NEXUS_API_SCHEMAS.infrastructure, "/api/infrastructure"),
 
   availability: async () =>
     USE_MOCK_DATA ? MOCK_AVAILABILITY : jsonGet<Record<string, AvailabilityRecord[]>>("/api/availability"),
