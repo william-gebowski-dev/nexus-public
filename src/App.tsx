@@ -4,25 +4,29 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Shell } from "@/components/layout/Shell";
 import { Overview } from "@/pages/Overview";
-import { Routine } from "@/pages/Routine";
-import { Executions } from "@/pages/Executions";
-import { ExecutionDetail } from "@/pages/ExecutionDetail";
-import { Infrastructure } from "@/pages/Infrastructure";
-import { Agents } from "@/pages/Agents";
-import { Mcps } from "@/pages/Mcps";
-import { Skills } from "@/pages/Skills";
-import { Automations } from "@/pages/Automations";
-import { Knowledge } from "@/pages/Knowledge";
-import { Projects } from "@/pages/Projects";
-import { Activities } from "@/pages/Activities";
-import { Configs } from "@/pages/Configs";
-import { NotFound } from "@/pages/NotFound";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 
-// Rotas menos acessadas (não fazem parte do fluxo operacional principal)
-// vão em lazy-load — reduz o bundle inicial. `Admin` puxa o cliente
-// Supabase (~70 kB).
+// Todas as rotas além da home vão em lazy-load. O bundle inicial fica só
+// com Shell + Overview + dependências compartilhadas (router, query, layout).
+// Cada lazy fica wrapped em Suspense com o mesmo fallback.
+const Routine = lazy(() => import("@/pages/Routine").then((m) => ({ default: m.Routine })));
+const Executions = lazy(() => import("@/pages/Executions").then((m) => ({ default: m.Executions })));
+const ExecutionDetail = lazy(() =>
+  import("@/pages/ExecutionDetail").then((m) => ({ default: m.ExecutionDetail })),
+);
+const Infrastructure = lazy(() =>
+  import("@/pages/Infrastructure").then((m) => ({ default: m.Infrastructure })),
+);
+const Agents = lazy(() => import("@/pages/Agents").then((m) => ({ default: m.Agents })));
+const Mcps = lazy(() => import("@/pages/Mcps").then((m) => ({ default: m.Mcps })));
+const Skills = lazy(() => import("@/pages/Skills").then((m) => ({ default: m.Skills })));
+const Automations = lazy(() => import("@/pages/Automations").then((m) => ({ default: m.Automations })));
+const Projects = lazy(() => import("@/pages/Projects").then((m) => ({ default: m.Projects })));
+const Activities = lazy(() => import("@/pages/Activities").then((m) => ({ default: m.Activities })));
+const Knowledge = lazy(() => import("@/pages/Knowledge").then((m) => ({ default: m.Knowledge })));
+const Configs = lazy(() => import("@/pages/Configs").then((m) => ({ default: m.Configs })));
 const Admin = lazy(() => import("@/pages/Admin").then((m) => ({ default: m.Admin })));
+const NotFound = lazy(() => import("@/pages/NotFound").then((m) => ({ default: m.NotFound })));
 
 function RouteFallback() {
   return (
@@ -32,6 +36,10 @@ function RouteFallback() {
   );
 }
 
+function lazyRoute(node: React.ReactNode) {
+  return <Suspense fallback={<RouteFallback />}>{node}</Suspense>;
+}
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -39,27 +47,20 @@ export function App() {
         <Routes>
           <Route element={<Shell />}>
             <Route index element={<Overview />} />
-            <Route path="routine" element={<Routine />} />
-            <Route path="executions" element={<Executions />} />
-            <Route path="executions/:id" element={<ExecutionDetail />} />
-            <Route path="infrastructure" element={<Infrastructure />} />
-            <Route path="agents" element={<Agents />} />
-            <Route path="mcps" element={<Mcps />} />
-            <Route path="skills" element={<Skills />} />
-            <Route path="automations" element={<Automations />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="activities" element={<Activities />} />
-            <Route path="knowledge" element={<Knowledge />} />
-            <Route path="configs" element={<Configs />} />
-            <Route
-              path="admin"
-              element={
-                <Suspense fallback={<RouteFallback />}>
-                  <Admin />
-                </Suspense>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
+            <Route path="routine" element={lazyRoute(<Routine />)} />
+            <Route path="executions" element={lazyRoute(<Executions />)} />
+            <Route path="executions/:id" element={lazyRoute(<ExecutionDetail />)} />
+            <Route path="infrastructure" element={lazyRoute(<Infrastructure />)} />
+            <Route path="agents" element={lazyRoute(<Agents />)} />
+            <Route path="mcps" element={lazyRoute(<Mcps />)} />
+            <Route path="skills" element={lazyRoute(<Skills />)} />
+            <Route path="automations" element={lazyRoute(<Automations />)} />
+            <Route path="projects" element={lazyRoute(<Projects />)} />
+            <Route path="activities" element={lazyRoute(<Activities />)} />
+            <Route path="knowledge" element={lazyRoute(<Knowledge />)} />
+            <Route path="configs" element={lazyRoute(<Configs />)} />
+            <Route path="admin" element={lazyRoute(<Admin />)} />
+            <Route path="*" element={lazyRoute(<NotFound />)} />
           </Route>
         </Routes>
       </BrowserRouter>

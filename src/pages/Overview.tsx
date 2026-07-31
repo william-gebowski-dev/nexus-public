@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { useSystemStatus } from "@/hooks/useSystemStatus";
 import { useCronStatus } from "@/hooks/useCronStatus";
 import { useRoutineToday } from "@/hooks/useRoutineToday";
@@ -13,12 +14,8 @@ import { KpiRow } from "@/components/overview/KpiRow";
 import { NowCard } from "@/components/overview/NowCard";
 import { NextExecutionCard } from "@/components/overview/NextExecutionCard";
 import { DailyRoutineTimeline } from "@/components/overview/DailyRoutineTimeline";
-import { RecentExecutionsSection } from "@/components/overview/RecentExecutionsSection";
 import { CronHealthSection } from "@/components/overview/CronHealthSection";
-import { AvailabilitySection } from "@/components/overview/AvailabilitySection";
 import { DailyReportTeaser } from "@/components/overview/DailyReportTeaser";
-import { ActivitiesTimeline } from "@/components/overview/ActivitiesTimeline";
-import { ArtifactsPanel } from "@/components/overview/ArtifactsPanel";
 import { StaleBanner } from "@/components/overview/StaleBanner";
 import { MockDataBadge } from "@/components/overview/MockDataBadge";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -59,8 +56,15 @@ export function Overview() {
     );
   }
 
+  // Resumos para os cards-link da terceira camada.
+  const lastExec = recent.data?.items?.[0] ?? null;
+  const servicesDown =
+    infrastructure.data?.filter((s) => s.status === "down").length ?? 0;
+  const lastArtifact = artifacts.data?.[0] ?? null;
+
   return (
     <div className="space-y-6">
+      {/* Camada 1 — acima do fold: estado, KPIs e o que está rodando agora */}
       <OverviewHeader
         cron={cron.data}
         status={status.data}
@@ -86,16 +90,60 @@ export function Overview() {
         {!routine.data ? <CardSkeleton /> : <NextExecutionCard routine={routine.data} />}
       </section>
 
+      {/* Camada 2 — a timeline 12×4 é o coração do produto */}
       <DailyRoutineTimeline routine={routine.data} />
-      <RecentExecutionsSection />
+
+      {/* Camada 3 — atalhos para páginas dedicadas (mantém sinal, sem duplicar) */}
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <QuickLink
+          to="/executions"
+          title="Execuções"
+          metric={
+            lastExec
+              ? `${lastExec.name} · ${lastExec.status}`
+              : "Sem execuções ainda"
+          }
+        />
+        <QuickLink
+          to="/infrastructure"
+          title="Infraestrutura"
+          metric={
+            servicesDown > 0
+              ? `${servicesDown} serviço(s) indisponíveis`
+              : "Todos os serviços operacionais"
+          }
+        />
+        <QuickLink
+          to="/projects"
+          title="Projetos"
+          metric={
+            lastArtifact
+              ? `Último: ${lastArtifact.name}`
+              : "Sem artefatos hoje"
+          }
+        />
+      </section>
+
       <CronHealthSection cron={cron.data} />
-      <AvailabilitySection availability={availability.data} services={infrastructure.data} />
       <DailyReportTeaser daily={daily.data} />
-      <ActivitiesTimeline routine={routine.data} />
-      <ArtifactsPanel artifacts={artifacts.data} />
 
       <StaleBanner lastUpdate={cron.data?.lastRunAt ?? null} />
       <MockDataBadge />
     </div>
+  );
+}
+
+function QuickLink({ to, title, metric }: { to: string; title: string; metric: string }) {
+  return (
+    <Link
+      to={to}
+      className="nx-card group flex flex-col gap-1 p-4 transition-colors hover:border-geb/40"
+    >
+      <span className="font-mono text-xs uppercase tracking-wider text-text-faint">
+        {title}
+      </span>
+      <span className="text-sm text-text-dim">{metric}</span>
+      <span className="mt-1 text-xs text-link group-hover:underline">Abrir →</span>
+    </Link>
   );
 }
