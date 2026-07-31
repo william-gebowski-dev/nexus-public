@@ -29,10 +29,10 @@ export function Activities() {
 
   const q = useQuery({
     queryKey: ["activities", PAGE_SIZE, cursor, scope],
-    queryFn: () => api.activities(PAGE_SIZE, cursor),
+    queryFn: () => api.activities(PAGE_SIZE, cursor, scope),
   });
 
-  const items = (q.data?.items ?? []).filter((a) => scope === "all" || a.scope === scope);
+  const items = q.data?.items ?? [];
 
   const setCursor = useCallback(
     (next: number) => {

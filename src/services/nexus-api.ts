@@ -148,8 +148,12 @@ export const nexusApi = {
   roadmap: () => jsonGetSafe("roadmap", NEXUS_API_SCHEMAS.roadmap, "/api/roadmap"),
   alerts: () => jsonGetSafe("alerts", NEXUS_API_SCHEMAS.alerts, "/api/alerts"),
 
-  activities: (limit = 10, cursor: number | null = null) =>
-    jsonGetSafe("activities", NEXUS_API_SCHEMAS.activities, `/api/activities?limit=${limit}${cursor !== null ? `&cursor=${cursor}` : ""}`),
+  activities: (limit = 10, cursor: number | null = null, scope?: string) => {
+    const qs = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) qs.set("cursor", String(cursor));
+    if (scope && scope !== "all") qs.set("scope", scope);
+    return jsonGetSafe("activities", NEXUS_API_SCHEMAS.activities, `/api/activities?${qs}`);
+  },
 
   executions: (limit = 10, cursor: number | null = null) =>
     jsonGetSafe("executions", NEXUS_API_SCHEMAS.executions, `/api/executions?limit=${limit}${cursor !== null ? `&cursor=${cursor}` : ""}`),

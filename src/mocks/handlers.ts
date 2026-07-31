@@ -91,7 +91,14 @@ export const handlers = [
     const limit = Number(url.searchParams.get("limit") ?? 10);
     const cursorRaw = url.searchParams.get("cursor");
     const cursor = cursorRaw ? Number(cursorRaw) : null;
-    return jsonResponse(sanitizePayload(paginate(activitiesData, limit, cursor)));
+    const scope = url.searchParams.get("scope");
+    // Filtro é aplicado ANTES da paginação (audit F). Sem isso, a página
+    // atual de 20 itens pode não ter nenhuma atividade de infraestrutura
+    // mesmo existindo várias após o offset.
+    const filtered = scope && scope !== "all"
+      ? activitiesData.filter((a) => a.scope === scope)
+      : activitiesData;
+    return jsonResponse(sanitizePayload(paginate(filtered, limit, cursor)));
   }),
 
   http.get("/api/executions", ({ request }) => {
