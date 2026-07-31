@@ -13,9 +13,12 @@
   }
 
   body {
-    background: var(--bg);
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 18%, transparent) 0, transparent 28rem),
+      var(--bg);
     color: var(--text);
     min-height: 100dvh;
+    overflow-x: hidden;
   }
 
   *,
@@ -27,6 +30,15 @@
   ::selection {
     background: var(--accent-soft);
     color: var(--text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 3px;
+  }
+
+  a {
+    color: inherit;
   }
 
   /* Scrollbar discreto no tema dark. */
@@ -50,7 +62,7 @@
   /* Card base. */
   .nx-card {
     @apply rounded-2xl border bg-surface;
-    box-shadow: 0 1px 0 0 var(--border) inset;
+    box-shadow: 0 1px 0 0 color-mix(in srgb, var(--inverse) 80%, transparent) inset;
   }
 
   .nx-card-hover {
@@ -73,9 +85,9 @@
     background: var(--surface-hover);
   }
   .nx-btn-primary {
-    background: var(--accent);
+    background: var(--primary);
     border-color: transparent;
-    color: var(--bg);
+    color: var(--inverse);
   }
   .nx-btn-primary:hover {
     background: color-mix(in srgb, var(--accent) 85%, white 15%);
@@ -92,5 +104,31 @@
     background-size: 800px 100%;
     animation: shimmer 1.6s linear infinite;
     @apply rounded-lg;
+  }
+
+  /* Atalho de teclado (Ctrl+K, Esc, etc.). */
+  .nx-kbd {
+    @apply rounded-md border border-border-strong bg-surface px-1.5 py-0.5 text-[10px] font-mono;
+  }
+
+  /* Timeline horizontal com scroll snap (visão mobile da rotina). */
+  .nx-timeline-scroll { scroll-snap-type: x mandatory; }
+  .nx-timeline-lane  { scroll-snap-align: start; }
+}
+
+/* Respeita preferência do sistema operacional por reduzir movimento.
+   Desativa shimmer e transições globais para usuários com vestibular
+   disorders ou sensibilidade a animação. */
+@media (prefers-reduced-motion: reduce) {
+  .nx-skeleton {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
