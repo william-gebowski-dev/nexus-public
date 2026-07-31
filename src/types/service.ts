@@ -28,7 +28,10 @@ export type ServiceCategory =
   | "api"
   | "bot"
   | "automation"
-  | "ai";
+  | "ai"
+  | "cloud"
+  | "containers"
+  | "rede-privada";
 
 export type ServiceStatus = "healthy" | "attention" | "down";
 

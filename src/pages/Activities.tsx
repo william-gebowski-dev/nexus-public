@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { api } from "@/lib/api";
 import { ActivityItem } from "@/components/ui/ActivityItem";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { cn } from "@/lib/cn";
 import type { ActivityScope } from "@/types";
 
@@ -20,30 +22,54 @@ const FILTERS: { key: ActivityScope | "all"; label: string }[] = [
 const PAGE_SIZE = 20;
 
 export function Activities() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const cursorParam = Number(searchParams.get("cursor") ?? "0");
+  const cursor = Number.isFinite(cursorParam) && cursorParam >= 0 ? cursorParam : 0;
   const [scope, setScope] = useState<ActivityScope | "all">("all");
-  const [cursor, setCursor] = useState<number | null>(null);
 
   const q = useQuery({
-    queryKey: ["activities", PAGE_SIZE, cursor],
+    queryKey: ["activities", PAGE_SIZE, cursor, scope],
     queryFn: () => api.activities(PAGE_SIZE, cursor),
   });
 
   const items = (q.data?.items ?? []).filter((a) => scope === "all" || a.scope === scope);
 
+  const setCursor = useCallback(
+    (next: number) => {
+      const safe = Math.max(0, next);
+      setSearchParams(
+        (prev) => {
+          const updated = new URLSearchParams(prev);
+          if (safe === 0) updated.delete("cursor");
+          else updated.set("cursor", String(safe));
+          return updated;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  // Reset cursor sempre que o scope mudar — caso contrário o usuário
+  // pode estar paginando eventos de "Projetos" enquanto vê "Todas".
+  useEffect(() => {
+    setCursor(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope]);
+
+  const goNewer = () => setCursor((cursor === 0 ? PAGE_SIZE : cursor) - PAGE_SIZE);
+  const goOlder = () => setCursor(cursor + PAGE_SIZE);
+
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-mono text-2xl font-semibold tracking-tight">Atividades</h1>
-        <p className="mt-1 text-sm text-text-dim">
-          Feed cronológico do ecossistema, com filtros por escopo.
-        </p>
-      </header>
+      <PageHeader title="Atividades" subtitle="Feed cronológico do ecossistema, com filtros por escopo." />
 
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f.key}
             type="button"
+            aria-pressed={scope === f.key}
             onClick={() => setScope(f.key)}
             className={cn(
               "nx-pill border-border-strong text-xs",
@@ -61,7 +87,7 @@ export function Activities() {
           <LoadingSkeleton rows={3} />
         </div>
       ) : q.isError ? (
-        <ErrorState onRetry={() => q.refetch()} />
+        <ErrorState error={q.error} onRetry={() => q.refetch()} />
       ) : items.length === 0 ? (
         <EmptyState title="Nenhuma atividade encontrada" description="Ajuste o filtro para ver mais resultados." />
       ) : (
@@ -75,15 +101,15 @@ export function Activities() {
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={() => setCursor((curr) => (curr === null ? PAGE_SIZE : curr - PAGE_SIZE))}
-          disabled={cursor === null}
+          onClick={goNewer}
+          disabled={cursor === 0}
           className="nx-btn disabled:cursor-not-allowed disabled:opacity-40"
         >
           ← Mais recentes
         </button>
         <button
           type="button"
-          onClick={() => setCursor(() => q.data?.nextCursor ?? null)}
+          onClick={goOlder}
           disabled={!q.data?.nextCursor}
           className="nx-btn disabled:cursor-not-allowed disabled:opacity-40"
         >

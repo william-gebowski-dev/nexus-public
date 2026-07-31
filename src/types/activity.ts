@@ -29,4 +29,16 @@ export interface Activity {
   severity: ActivitySeverity;
   scope: ActivityScope;
   source: DataSource;
+  /** Agente ou serviço responsável pela ação. */
+  actor?: string;
+  /** Ação objetiva realizada. */
+  action?: string;
+  /** Projeto relacionado, quando existir. */
+  project?: string;
+  /** Resultado humano e curto. */
+  result?: string;
+  /** Duração da atividade, quando medida. */
+  durationMs?: number;
+  /** Estado visual operacional. */
+  state?: "success" | "running" | "warning" | "error";
 }

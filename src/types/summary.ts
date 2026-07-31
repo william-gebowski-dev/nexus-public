@@ -11,6 +11,8 @@ import type { DataSource } from "./service";
 export type OverallState =
   | "operational"
   | "attention"
+  | "attention_required"
+  | "maintenance"
   | "unstable"
   | "unavailable"
   | "no_recent_data";

@@ -7,7 +7,8 @@
  *  - IPs (incluindo Tailscale 100.x.x.x)
  *  - chaves (sk-*, sk-ant-*, ghp_*, nvapi-*, tokens Telegram etc.)
  *  - paths internos (/opt/, /home/, hermes-nexus-os)
- *  - qualquer texto que case com esses padrões faz a request falhar
+ *  - hostnames, IPs, tokens e credenciais
+ *  - nomes públicos de produtos/serviços podem aparecer sem revelar topologia
  *    com erro explícito.
  */
 

@@ -1,5 +1,5 @@
 import type { Activity } from "@/types";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatDuration } from "@/lib/format";
 import {
   Activity as ActivityIcon,
   AlertTriangle,
@@ -12,6 +12,8 @@ import {
   Server,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Pill } from "./Pill";
+import type { PillTone } from "@/lib/tones";
 
 const ICONS: Record<Activity["kind"], typeof ActivityIcon> = {
   service_started: Server,
@@ -25,45 +27,46 @@ const ICONS: Record<Activity["kind"], typeof ActivityIcon> = {
   document_updated: FileEdit,
 };
 
-const KIND_LABEL: Record<Activity["kind"], string> = {
-  service_started: "Serviço iniciado",
-  service_stopped: "Serviço interrompido",
-  agent_run: "Agente executado",
-  automation_completed: "Automação concluída",
-  project_updated: "Projeto atualizado",
-  deploy: "Deploy realizado",
-  error_detected: "Erro detectado",
-  integration_added: "Integração adicionada",
-  document_updated: "Documento atualizado",
+const STATE: Record<NonNullable<Activity["state"]>, { label: string; tone: PillTone; icon: string }> = {
+  success: { label: "Sucesso", tone: "green", icon: "●" },
+  running: { label: "Em execução", tone: "accent", icon: "●" },
+  warning: { label: "Aviso", tone: "amber", icon: "●" },
+  error: { label: "Erro", tone: "red", icon: "●" },
 };
 
 const SEVERITY_TONE: Record<Activity["severity"], string> = {
-  info: "text-text-dim",
-  warning: "text-amber",
-  critical: "text-red",
+  info: "text-secondary bg-secondary-soft",
+  warning: "text-amber bg-amber-soft",
+  critical: "text-red bg-red-soft",
 };
 
 export function ActivityItem({ activity }: { activity: Activity }) {
   const Icon = ICONS[activity.kind];
+  const visualState = STATE[activity.state ?? (activity.severity === "critical" ? "error" : activity.severity === "warning" ? "warning" : "success")];
+  const actor = activity.actor ?? activity.origin;
+  const action = activity.action ?? activity.title;
+
   return (
-    <div className="nx-card nx-card-hover p-4">
+    <div className="nx-card nx-card-hover p-3 sm:p-4">
       <div className="flex items-start gap-3">
-        <div className={cn("rounded-lg p-2 bg-surface-hover", SEVERITY_TONE[activity.severity])}>
+        <div className={cn("rounded-xl p-2", SEVERITY_TONE[activity.severity])}>
           <Icon className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-text-faint">
-              {KIND_LABEL[activity.kind]}
-            </span>
-            <span className="text-[11px] font-mono text-text-faint">
-              {formatDateTime(activity.occurredAt)}
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0 text-sm text-text">
+              <span className="font-mono font-medium">{actor}</span>{" "}
+              <span className="text-text-dim">{action}</span>
+            </div>
+            <Pill tone={visualState.tone} size="xs" aria-label={`Resultado: ${visualState.label}`}>
+              <span aria-hidden>{visualState.icon}</span> {visualState.label}
+            </Pill>
           </div>
-          <h3 className="mt-0.5 text-sm text-text">{activity.title}</h3>
-          <p className="mt-0.5 text-xs text-text-dim">{activity.description}</p>
-          <div className="mt-2 text-[11px] text-text-faint">
-            origem: <span className="font-mono">{activity.origin}</span>
+          <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-text-faint">
+            {activity.project && <span>Projeto: <span className="font-mono text-text-dim">{activity.project}</span></span>}
+            {activity.result && <span>Resultado: <span className="text-text-dim">{activity.result}</span></span>}
+            {activity.durationMs !== undefined && <span>Duração: <span className="font-mono text-text-dim">{formatDuration(activity.durationMs)}</span></span>}
+            <span>{formatDateTime(activity.occurredAt)}</span>
           </div>
         </div>
       </div>
@@ -77,7 +80,4 @@ export function ActivityIconInline({ activity }: { activity: Activity }) {
 }
 
 export const ActivityIcons = ICONS;
-
-// Marca explícita para deixar claro que o módulo exporta ActivityIcon por design.
-// (não é warning — apenas para o motor de busca localizar o símbolo.)
 export const __activityMarker = ActivityIcon;

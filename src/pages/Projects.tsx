@@ -5,6 +5,7 @@ import { ProjectCard } from "@/components/ui/ProjectCard";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -57,10 +58,7 @@ export function Projects() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-mono text-2xl font-semibold tracking-tight">Projetos</h1>
-        <p className="mt-1 text-sm text-text-dim">Projetos ativos do ecossistema, com prioridades e fases.</p>
-      </header>
+      <PageHeader title="Projetos" subtitle="Projetos ativos do ecossistema, com prioridades e fases." />
 
       <div className="nx-card flex flex-col gap-3 p-3">
         <div className="flex items-center gap-2 rounded-lg border border-border bg-bg px-3 py-2">
@@ -103,7 +101,7 @@ export function Projects() {
           ))}
         </div>
       ) : q.isError ? (
-        <ErrorState onRetry={() => q.refetch()} />
+        <ErrorState error={q.error} onRetry={() => q.refetch()} />
       ) : filtered.length === 0 ? (
         <EmptyState
           title="Nenhum projeto encontrado"
@@ -141,6 +139,7 @@ function Chip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={cn(
         "nx-pill border-border-strong text-xs",

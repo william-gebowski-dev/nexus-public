@@ -1,5 +1,7 @@
 [
-  { "id": "glm-5.2", "label": "GLM 5.2", "status": "available", "callsLast14d": 612, "source": "periodic" },
-  { "id": "minimax-m3", "label": "MiniMax M3", "status": "available", "callsLast14d": 1443, "source": "periodic" },
-  { "id": "claude-haiku-4-5-20251001", "label": "Claude Haiku 4.5", "status": "rate_limited", "callsLast14d": 97, "source": "periodic" }
+  { "id": "combo", "label": "Combo (roteador)", "status": "available", "callsLast14d": 612, "source": "periodic" },
+  { "id": "MiniMax-M3", "label": "MiniMax M3", "status": "available", "callsLast14d": 1443, "source": "periodic" },
+  { "id": "glm-5.2", "label": "GLM 5.2", "status": "available", "callsLast14d": 488, "source": "periodic" },
+  { "id": "deepseek", "label": "DeepSeek", "status": "available", "callsLast14d": 96, "source": "periodic" },
+  { "id": "kimi", "label": "Kimi", "status": "offline", "callsLast14d": 12, "source": "periodic" }
 ]

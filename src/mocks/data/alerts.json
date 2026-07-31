@@ -3,7 +3,7 @@
     "id": "al-001",
     "category": "limit_near",
     "severity": "warning",
-    "title": "Latência em alta na API administrativa",
+    "title": "Latência elevada na API administrativa",
     "description": "Tempo de resposta acima do baseline — observar tendência.",
     "raisedAt": "2026-07-28T19:30:00Z",
     "read": false,
@@ -16,9 +16,20 @@
     "severity": "info",
     "title": "Agente Entropia sem execução hoje",
     "description": "Próxima execução programada para o ciclo seguinte.",
-    "raisedAt": "2026-07-28T07:00:00Z",
+    "raisedAt": "2026-07-29T07:00:00Z",
     "read": true,
     "ignored": false,
     "source": "periodic"
+  },
+  {
+    "id": "al-003",
+    "category": "automation_error",
+    "severity": "warning",
+    "title": "Roteador local sem unidade de inicialização",
+    "description": "O processo roda solto no desktop — uma pane silenciosa derruba a central de agentes sem recuperação automática. Criar serviço de inicialização para o usuário está pendente.",
+    "raisedAt": "2026-07-29T09:00:00Z",
+    "read": false,
+    "ignored": false,
+    "source": "manual"
   }
 ]

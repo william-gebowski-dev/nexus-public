@@ -15,17 +15,31 @@
     "source": "manual"
   },
   {
-    "id": "hermes-core",
-    "name": "Hermes Nexus OS",
-    "description": "Plataforma de agentes na VPS — Postgres + Redis + LiteLLM + adapters.",
+    "id": "router-local",
+    "name": "Roteador local",
+    "description": "Camada de orquestração dos modelos para a central de agentes.",
     "category": "Plataforma",
     "status": "operational",
     "priority": "critical",
-    "progress": 78,
-    "currentPhase": "Dia 20 — API administrativa",
-    "nextAction": "Implementar FastAPI administrativa sobre as tabelas operacionais",
-    "updatedAt": "2026-07-28T18:30:00Z",
-    "tech": ["FastAPI", "PostgreSQL", "Redis", "LiteLLM", "Docker"],
+    "progress": 80,
+    "currentPhase": "Verificação ponta a ponta — rota ativa para o runner de sessões",
+    "nextAction": "Criar serviço systemd para o roteador não cair silenciosamente",
+    "updatedAt": "2026-07-29T09:00:00Z",
+    "tech": ["Proxy local", "Modelos Combo", "Telegram"],
+    "source": "periodic"
+  },
+  {
+    "id": "agent-platform",
+    "name": "Central de agentes",
+    "description": "Plataforma local de agentes — runner de sessões, memória de longo prazo e integrações.",
+    "category": "Plataforma",
+    "status": "operational",
+    "priority": "high",
+    "progress": 75,
+    "currentPhase": "Operação diária via runner de sessões",
+    "nextAction": "Adicionar watchdog automático para o roteador",
+    "updatedAt": "2026-07-29T08:30:00Z",
+    "tech": ["Runner local", "Roteador", "Memória"],
     "source": "periodic"
   },
   {
@@ -39,7 +53,7 @@
     "currentPhase": "Piloto fechado com primeiros usuários",
     "nextAction": "Coletar feedback e ajustar fluxo principal",
     "updatedAt": "2026-07-28T16:00:00Z",
-    "tech": ["React", "PostgreSQL", "LiteLLM"],
+    "tech": ["React", "Roteador local", "Memória"],
     "source": "manual"
   },
   {
@@ -52,14 +66,14 @@
     "progress": 88,
     "currentPhase": "Operação contínua",
     "nextAction": "Adicionar filtro por tópico técnico",
-    "updatedAt": "2026-07-28T06:00:00Z",
-    "tech": ["LiteLLM", "PostgreSQL"],
+    "updatedAt": "2026-07-29T06:00:00Z",
+    "tech": ["Roteador local", "MiniMax-M3"],
     "source": "periodic"
   },
   {
     "id": "monitoramento-alertas",
     "name": "Monitoramento e Alertas",
-    "description": "Healthchecks do Uptime Kuma + notificações Telegram dedicadas.",
+    "description": "Healthchecks do monitor do sistema e notificações via canal dedicado.",
     "category": "Infraestrutura",
     "status": "validation",
     "priority": "high",
@@ -67,7 +81,7 @@
     "currentPhase": "Configuração dos monitores na UI",
     "nextAction": "Adicionar 4 monitores principais e notificação",
     "updatedAt": "2026-07-28T17:00:00Z",
-    "tech": ["Uptime Kuma", "Telegram", "Docker"],
+    "tech": ["Monitor do sistema", "Notificações"],
     "source": "manual"
   },
   {

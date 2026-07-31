@@ -13,6 +13,14 @@ export interface Execution {
   name: string;
   /** Agente/automação responsável. */
   runner: string;
+  /** Nome público do agente responsável. */
+  agent?: string;
+  /** Projeto relacionado. */
+  project?: string;
+  /** Identificador público do projeto relacionado. */
+  projectId?: string;
+  /** Ação da coluna operacional. */
+  actionLabel?: string;
   /** ISO 8601 — início. */
   startedAt: string;
   /** Duração (ms). */

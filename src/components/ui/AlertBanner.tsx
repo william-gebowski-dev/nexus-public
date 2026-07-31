@@ -2,11 +2,18 @@ import type { Alert } from "@/types";
 import { cn } from "@/lib/cn";
 import { AlertTriangle, AlertCircle, Info } from "lucide-react";
 import { formatRelative } from "@/lib/format";
+import { PILL_TONES, TEXT_TONES, type PillTone } from "@/lib/tones";
 
-const SEVERITY_TONE: Record<Alert["severity"], { tone: string; bg: string; icon: typeof AlertTriangle }> = {
-  info: { tone: "text-text-dim", bg: "bg-surface-hover border-border-strong", icon: Info },
-  warning: { tone: "text-amber", bg: "bg-amber-soft border-amber/40", icon: AlertCircle },
-  critical: { tone: "text-red", bg: "bg-red-soft border-red/40", icon: AlertTriangle },
+const SEVERITY_TONE_KEY: Record<Alert["severity"], PillTone> = {
+  info: "neutral",
+  warning: "amber",
+  critical: "red",
+};
+
+const SEVERITY_ICON: Record<Alert["severity"], typeof AlertTriangle> = {
+  info: Info,
+  warning: AlertCircle,
+  critical: AlertTriangle,
 };
 
 const SEVERITY_LABEL: Record<Alert["severity"], string> = {
@@ -16,14 +23,14 @@ const SEVERITY_LABEL: Record<Alert["severity"], string> = {
 };
 
 export function AlertBanner({ alert }: { alert: Alert }) {
-  const sev = SEVERITY_TONE[alert.severity];
-  const Icon = sev.icon;
+  const tone = SEVERITY_TONE_KEY[alert.severity];
+  const Icon = SEVERITY_ICON[alert.severity];
   return (
-    <div className={cn("nx-card flex items-start gap-3 border p-4", sev.bg)}>
-      <Icon className={cn("h-5 w-5 shrink-0", sev.tone)} aria-hidden />
+    <div className={cn("nx-card flex items-start gap-3 border p-4", PILL_TONES[tone])}>
+      <Icon className={cn("h-5 w-5 shrink-0", TEXT_TONES[tone])} aria-hidden />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className={cn("font-mono text-[10px] uppercase tracking-wider", sev.tone)}>
+          <span className={cn("font-mono text-[10px] uppercase tracking-wider", TEXT_TONES[tone])}>
             {SEVERITY_LABEL[alert.severity]}
           </span>
           <span className="text-[11px] text-text-faint">

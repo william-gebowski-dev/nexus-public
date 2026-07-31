@@ -1,23 +1,20 @@
-import { cn } from "@/lib/cn";
 import type { DataSource } from "@/types";
+import { Pill } from "./Pill";
+import type { PillTone } from "@/lib/tones";
+import { REFRESH_LABEL } from "@/lib/queryClient";
 
-const COPY: Record<DataSource, { label: string; tone: string }> = {
-  live: { label: "Ao vivo", tone: "text-green border-green/40" },
-  periodic: { label: "Atualizado a cada 15 min", tone: "text-accent border-accent/40" },
-  manual: { label: "Manual", tone: "text-geb border-geb/40" },
-  simulated: { label: "Simulado", tone: "text-amber border-amber/40" },
+const COPY: Record<DataSource, { label: string; tone: PillTone }> = {
+  live: { label: "Ao vivo", tone: "green" },
+  periodic: { label: `Atualizado a cada ${REFRESH_LABEL}`, tone: "accent" },
+  manual: { label: "Manual", tone: "geb" },
+  simulated: { label: "Simulado", tone: "amber" },
 };
 
 export function SourceBadge({ source }: { source: DataSource }) {
   const c = COPY[source];
   return (
-    <span
-      className={cn(
-        "nx-pill font-mono text-[10px] uppercase tracking-wider",
-        c.tone,
-      )}
-    >
+    <Pill tone={c.tone} size="xs" className="font-mono uppercase tracking-wider">
       {c.label}
-    </span>
+    </Pill>
   );
 }

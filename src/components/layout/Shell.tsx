@@ -3,10 +3,13 @@ import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { MobileDrawer } from "./MobileDrawer";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+import { REFRESH_LABEL } from "@/lib/queryClient";
 
 export function Shell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  useScrollRestoration();
 
   return (
     <div className="flex min-h-dvh bg-bg">
@@ -37,8 +40,18 @@ export function Shell() {
             <Outlet />
           </div>
         </main>
-        <footer className="border-t border-border px-6 py-4 text-[11px] text-text-faint">
-          Nexus — painel operacional do ecossistema · dados sanitizados · refresh a cada 15 min
+        <footer className="border-t border-border bg-bg-elevated/70 px-6 py-4 text-[11px] text-text-faint">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
+            <span>Nexus — painel operacional vivo do ecossistema · dados sanitizados · refresh a cada {REFRESH_LABEL}</span>
+            <a
+              href="https://github.com/william-gebowski-dev/nexus-public"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-text-dim hover:text-text"
+            >
+              william-gebowski-dev/nexus-public ↗
+            </a>
+          </div>
         </footer>
       </div>
 

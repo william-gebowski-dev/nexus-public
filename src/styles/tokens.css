@@ -1,75 +1,79 @@
 /*
- * Tokens de design extraídos de legacy/css/style.css.
- * Paleta do dashboard — extensão sem substituir:
- *   - accent: teal (técnico / .dev)
- *   - geb: violeta (pessoal / .geb)
- *   - amber: atenção
- *   - green: confirmado / OK
- *   - red (sólido adicionado): falha crítica (antes só existia em versão soft)
- *
- * Variáveis são referenciadas via Tailwind (`tailwind.config.ts`) e via CSS
- * direto (em globals.css). Trocar o tema (dark/light) é feito em runtime
- * trocando `data-theme` em <html>; nada além das variáveis CSS muda.
+ * Identidade visual Nexus.
+ * O painel é light-first: superfícies brancas sobre fundo mineral quente,
+ * terracota como ação/hierarquia e azul como sinal técnico/conexão.
  */
 
 :root,
-[data-theme="dark"] {
-  color-scheme: dark;
-
-  --bg: #0a0b0f;
-  --bg-elevated: #101219;
-  --surface: #14161f;
-  --surface-hover: #1a1d29;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-
-  --text: #e7e9ee;
-  --text-dim: #9aa0ae;
-  --text-faint: #656b7a;
-
-  --accent: #14b8a6;
-  --accent-soft: rgba(20, 184, 166, 0.12);
-  --geb: #a78bfa;
-  --geb-soft: rgba(167, 139, 250, 0.12);
-
-  --amber: #f5a524;
-  --amber-soft: rgba(245, 165, 36, 0.12);
-  --green: #34d399;
-  --green-soft: rgba(52, 211, 153, 0.12);
-
-  --red: #f87171;
-  --red-soft: rgba(248, 113, 113, 0.12);
-
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", "Cascadia Code",
-    "Fira Code", Consolas, Menlo, monospace;
-}
-
 [data-theme="light"] {
   color-scheme: light;
 
-  --bg: #f6f7f9;
-  --bg-elevated: #ffffff;
+  --bg: #f0eee6;
+  --bg-elevated: rgba(255, 255, 255, 0.86);
   --surface: #ffffff;
-  --surface-hover: #f0f1f4;
-  --border: rgba(20, 20, 19, 0.08);
-  --border-strong: rgba(20, 20, 19, 0.16);
+  --surface-hover: #f8f4ee;
+  --border: rgba(20, 20, 19, 0.1);
+  --border-strong: rgba(20, 20, 19, 0.18);
 
-  --text: #14161f;
-  --text-dim: #5b5d6b;
-  --text-faint: #8a8d99;
+  --text: #141413;
+  --text-dim: #6b7280;
+  --text-faint: #9b9a93;
 
-  --accent: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.10);
-  --geb: #6d28d9;
-  --geb-soft: rgba(109, 40, 217, 0.10);
+  --primary: #c6613f;
+  --primary-soft: rgba(198, 97, 63, 0.12);
+  --secondary: #3898ec;
+  --secondary-soft: rgba(56, 152, 236, 0.12);
+  --accent: #d97757;
+  --accent-soft: rgba(217, 119, 87, 0.14);
+  --link: #d97757;
+  --inverse: #ffffff;
 
-  --amber: #b45309;
-  --amber-soft: rgba(180, 83, 9, 0.10);
-  --green: #15803d;
-  --green-soft: rgba(21, 128, 61, 0.10);
+  --geb: #3898ec;
+  --geb-soft: rgba(56, 152, 236, 0.12);
 
-  --red: #dc2626;
-  --red-soft: rgba(220, 38, 38, 0.08);
+  --amber: #b7791f;
+  --amber-soft: rgba(183, 121, 31, 0.12);
+  --green: #168a50;
+  --green-soft: rgba(22, 138, 80, 0.12);
+  --red: #c2413f;
+  --red-soft: rgba(194, 65, 63, 0.1);
+
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, "SFMono-Regular",
+    "Cascadia Code", "Fira Code", Consolas, Menlo, monospace;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #141413;
+  --bg-elevated: rgba(24, 23, 21, 0.9);
+  --surface: #1c1a18;
+  --surface-hover: #25221f;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --text: #f4f1ea;
+  --text-dim: #c2bdb3;
+  --text-faint: #8e887f;
+
+  --primary: #d97757;
+  --primary-soft: rgba(217, 119, 87, 0.18);
+  --secondary: #62aef1;
+  --secondary-soft: rgba(98, 174, 241, 0.16);
+  --accent: #d97757;
+  --accent-soft: rgba(217, 119, 87, 0.18);
+  --link: #f09a79;
+  --inverse: #141413;
+
+  --geb: #62aef1;
+  --geb-soft: rgba(98, 174, 241, 0.16);
+
+  --amber: #f0b95a;
+  --amber-soft: rgba(240, 185, 90, 0.14);
+  --green: #52c58b;
+  --green-soft: rgba(82, 197, 139, 0.14);
+  --red: #ef7771;
+  --red-soft: rgba(239, 119, 113, 0.14);
 }

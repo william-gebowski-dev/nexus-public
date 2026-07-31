@@ -1,12 +1,13 @@
 import type { Agent } from "@/types";
 import { formatDuration, formatRelative } from "@/lib/format";
 import { SourceBadge } from "./SourceBadge";
-import { cn } from "@/lib/cn";
+import { Pill } from "./Pill";
+import type { PillTone } from "@/lib/tones";
 
-const STATUS_TONE: Record<Agent["status"], { label: string; tone: string }> = {
-  active: { label: "Ativo", tone: "text-green bg-green-soft border-green/40" },
-  paused: { label: "Pausado", tone: "text-amber bg-amber-soft border-amber/40" },
-  disabled: { label: "Desabilitado", tone: "text-text-faint bg-surface-hover border-border-strong" },
+const STATUS_TONE: Record<Agent["status"], { label: string; tone: PillTone }> = {
+  active: { label: "Ativo", tone: "green" },
+  paused: { label: "Pausado", tone: "amber" },
+  disabled: { label: "Desabilitado", tone: "neutral" },
 };
 
 export function AgentCard({ agent }: { agent: Agent }) {
@@ -20,7 +21,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs text-text-faint">
-            <span className={cn("nx-pill text-[10px] py-0", status.tone)}>{status.label}</span>
+            <Pill tone={status.tone} size="xs">{status.label}</Pill>
             <span aria-hidden>·</span>
             <span>modelo {agent.model}</span>
           </div>

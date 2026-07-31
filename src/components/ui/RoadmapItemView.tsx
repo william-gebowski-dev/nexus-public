@@ -1,5 +1,7 @@
 import type { RoadmapItem } from "@/types";
 import { cn } from "@/lib/cn";
+import { Pill } from "./Pill";
+import { TEXT_TONES, type PillTone } from "@/lib/tones";
 
 const STATE_LABEL: Record<RoadmapItem["state"], string> = {
   pending: "Pendente",
@@ -8,18 +10,25 @@ const STATE_LABEL: Record<RoadmapItem["state"], string> = {
   done: "Concluído",
 };
 
-const STATE_TONE: Record<RoadmapItem["state"], string> = {
-  pending: "text-text-dim border-border-strong bg-surface-hover",
-  in_progress: "text-accent border-accent/40 bg-accent-soft",
-  blocked: "text-red border-red/40 bg-red-soft",
-  done: "text-green border-green/40 bg-green-soft",
+const STATE_TONE: Record<RoadmapItem["state"], PillTone> = {
+  pending: "neutral",
+  in_progress: "accent",
+  blocked: "red",
+  done: "green",
 };
 
-const PRIORITY_TONE: Record<RoadmapItem["priority"], string> = {
-  critical: "text-red",
-  high: "text-amber",
-  medium: "text-text-dim",
-  low: "text-text-faint",
+const PRIORITY_TONE: Record<RoadmapItem["priority"], PillTone> = {
+  critical: "red",
+  high: "amber",
+  medium: "neutral",
+  low: "neutral",
+};
+
+const PRIORITY_LABEL: Record<RoadmapItem["priority"], string> = {
+  critical: "Crítica",
+  high: "Alta",
+  medium: "Média",
+  low: "Baixa",
 };
 
 export function RoadmapItemView({ item }: { item: RoadmapItem }) {
@@ -27,9 +36,7 @@ export function RoadmapItemView({ item }: { item: RoadmapItem }) {
     <div className="nx-card p-4">
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-mono text-sm text-text">{item.title}</h3>
-        <span className={cn("nx-pill text-[10px] py-0 border", STATE_TONE[item.state])}>
-          {STATE_LABEL[item.state]}
-        </span>
+        <Pill tone={STATE_TONE[item.state]} size="xs">{STATE_LABEL[item.state]}</Pill>
       </div>
       <p className="mt-1 text-xs text-text-dim">{item.objective}</p>
 
@@ -37,8 +44,8 @@ export function RoadmapItemView({ item }: { item: RoadmapItem }) {
         <span>
           {item.dueDate ? `Previsão: ${item.dueDate}` : "Sem data definida"}
         </span>
-        <span className={cn("font-mono uppercase tracking-wider", PRIORITY_TONE[item.priority])}>
-          {item.priority}
+        <span className={cn("font-mono uppercase tracking-wider", TEXT_TONES[PRIORITY_TONE[item.priority]])}>
+          {PRIORITY_LABEL[item.priority]}
         </span>
       </div>
 

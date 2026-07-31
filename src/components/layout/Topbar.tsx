@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useIsFetching, useQuery } from "@tanstack/react-query";
 import { Menu, RefreshCw, Search, Wifi, WifiOff } from "lucide-react";
 import { api } from "@/lib/api";
 import { useCountdownRefresh } from "@/hooks/useCountdownRefresh";
@@ -7,8 +7,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SearchCommand } from "@/components/ui/SearchCommand";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
-
-const REFRESH_MS = 15 * 60 * 1000;
+import { REFRESH_MS } from "@/lib/queryClient";
 
 export function Topbar({ onOpenDrawer }: { onOpenDrawer: () => void }) {
   const { data: status } = useQuery({
@@ -16,6 +15,8 @@ export function Topbar({ onOpenDrawer }: { onOpenDrawer: () => void }) {
     queryFn: api.status,
   });
   const { refresh, label } = useCountdownRefresh(REFRESH_MS);
+  const isFetching = useIsFetching();
+  const isRefreshing = isFetching > 0;
   const [cmdOpen, setCmdOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator !== "undefined" ? navigator.onLine : true,
@@ -49,11 +50,14 @@ export function Topbar({ onOpenDrawer }: { onOpenDrawer: () => void }) {
         <button
           type="button"
           onClick={() => setCmdOpen(true)}
+          aria-label="Buscar"
+          aria-expanded={cmdOpen}
+          aria-haspopup="dialog"
           className="nx-btn w-full max-w-md justify-start gap-2 text-text-faint"
         >
           <Search className="h-4 w-4" aria-hidden />
           <span className="text-xs">Buscar…</span>
-          <kbd className="ml-auto font-mono text-[10px] text-text-faint">Ctrl+K</kbd>
+          <kbd className="nx-kbd ml-auto">Ctrl+K</kbd>
         </button>
       </div>
 
@@ -68,22 +72,27 @@ export function Topbar({ onOpenDrawer }: { onOpenDrawer: () => void }) {
           {isOnline ? "Conectado" : "Offline"}
         </span>
         <DataFreshnessBadge iso={status?.generatedAt ?? null} />
-        <span className="text-[11px] text-text-faint hidden md:inline">{label}</span>
+        <span className="text-[11px] text-text-faint hidden sm:inline">{label}</span>
         <button
           type="button"
           onClick={refresh}
           aria-label="Atualizar agora"
           title="Atualizar agora"
-          className="nx-btn h-9 w-9 px-0"
+          disabled={isRefreshing}
+          aria-busy={isRefreshing}
+          className="nx-btn h-9 w-9 px-0 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <RefreshCw className="h-4 w-4" aria-hidden />
+          <RefreshCw
+            className={cn("h-4 w-4", isRefreshing && "animate-spin")}
+            aria-hidden
+          />
         </button>
         <ThemeToggle />
       </div>
 
       <ThemeToggle className="sm:hidden" />
 
-      {cmdOpen && <SearchCommand />}
+      <SearchCommand open={cmdOpen} onOpenChange={setCmdOpen} />
     </header>
   );
 }

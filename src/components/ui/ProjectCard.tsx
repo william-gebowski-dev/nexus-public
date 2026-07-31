@@ -2,14 +2,16 @@ import type { Project } from "@/types";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { SourceBadge } from "./SourceBadge";
+import { Pill } from "./Pill";
+import { TEXT_TONES, type PillTone } from "@/lib/tones";
 
-const STATUS_TONE: Record<Project["status"], string> = {
-  planning: "text-text-dim bg-surface-hover border-border-strong",
-  development: "text-accent bg-accent-soft border-accent/40",
-  validation: "text-amber bg-amber-soft border-amber/40",
-  operational: "text-green bg-green-soft border-green/40",
-  paused: "text-geb bg-geb-soft border-geb/40",
-  archived: "text-text-faint bg-surface-hover border-border-strong",
+const STATUS_TONE: Record<Project["status"], PillTone> = {
+  planning: "neutral",
+  development: "accent",
+  validation: "amber",
+  operational: "green",
+  paused: "geb",
+  archived: "neutral",
 };
 
 const STATUS_LABEL: Record<Project["status"], string> = {
@@ -21,11 +23,11 @@ const STATUS_LABEL: Record<Project["status"], string> = {
   archived: "Arquivado",
 };
 
-const PRIORITY_TONE: Record<Project["priority"], string> = {
-  critical: "text-red",
-  high: "text-amber",
-  medium: "text-text-dim",
-  low: "text-text-faint",
+const PRIORITY_TONE: Record<Project["priority"], PillTone> = {
+  critical: "red",
+  high: "amber",
+  medium: "neutral",
+  low: "neutral",
 };
 
 const PRIORITY_LABEL: Record<Project["priority"], string> = {
@@ -41,11 +43,9 @@ export function ProjectCard({ project }: { project: Project }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs text-text-faint">
-            <span className="nx-pill border-border-strong">{project.category}</span>
-            <span className={cn("nx-pill border", STATUS_TONE[project.status])}>
-              {STATUS_LABEL[project.status]}
-            </span>
-            <span className={cn("font-mono text-[10px] uppercase tracking-wider", PRIORITY_TONE[project.priority])}>
+            <Pill tone="neutral">{project.category}</Pill>
+            <Pill tone={STATUS_TONE[project.status]}>{STATUS_LABEL[project.status]}</Pill>
+            <span className={cn("font-mono text-[10px] uppercase tracking-wider", TEXT_TONES[PRIORITY_TONE[project.priority]])}>
               {PRIORITY_LABEL[project.priority]}
             </span>
           </div>
