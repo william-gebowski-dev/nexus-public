@@ -23,10 +23,19 @@
 // Anthropic/OpenAI têm 40+ caracteres após o prefixo; o limite de 32 dá
 // folga sem deixar vazar uma chave verdadeira.
 const FORBIDDEN_PATTERNS: { label: string; regex: RegExp }[] = [
-  { label: "Tailscale IP (100.x.x.x)", regex: /100\.1\d\d\./g },
+  // Tailscale (100.64/16 CGNAT). A regex antiga só cobria 100.1xx; agora
+  // pega a faixa inteira alocada ao Tailscale (100.64.0.0/10).
+  { label: "Tailscale IP (100.64/10)", regex: /100\.(?:6[4-9]|[7-9]\d|1[0-1]\d|12[0-7])\.\d{1,3}\.\d{1,3}/g },
+  // IPv4 geral (audit H — só Tailscale estava coberto). Evita 0.0.0.0 e
+  // 255.255.255.255 só por ser match literal, mas é raro vazar.
+  { label: "IPv4 público/privado", regex: /\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b/g },
+  // IPv6 (compacta e completa).
+  { label: "IPv6", regex: /\b(?:[0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{1,4}\b/g },
   { label: "Anthropic/OpenAI key (sk-)", regex: /\bsk-(?:ant-)?[A-Za-z0-9_-]{32,}/g },
   { label: "NVIDIA NIM key (nvapi-)", regex: /\bnvapi-[A-Za-z0-9_-]{16,}/g },
-  { label: "GitHub token (ghp_)", regex: /\bghp_[A-Za-z0-9]{20,}/g },
+  { label: "GitHub PAT clássico (ghp_)", regex: /\bghp_[A-Za-z0-9]{20,}/g },
+  // Fine-grained GitHub PAT (audit H — formato novo).
+  { label: "GitHub fine-grained PAT (github_pat_)", regex: /\bgithub_pat_[A-Za-z0-9_]{40,}/g },
   { label: "Path absoluto Unix (/opt/, /home/)", regex: /\/(?:opt|home)\//g },
   { label: "Repositório hermes-nexus-os", regex: /hermes-nexus-os/g },
   { label: "Hostname srvXXXXX", regex: /srv\d{5,}/g },
@@ -66,10 +75,15 @@ export function safeStringify(value: unknown, space?: number): string {
   const out = JSON.stringify(value, null, space);
   const result = checkPayload(out);
   if (!result.ok) {
-    console.error("[sanitize] vazamento detectado no payload:", result.failures);
+    // NÃO imprimir os matches — o payload pode conter a própria chave
+    // que vazou, e logar isso vaza de novo. Apenas a contagem e o label.
+    console.error(
+      "[sanitize] vazamento detectado:",
+      result.failures.map((f) => ({ label: f.label, count: f.matches.length })),
+    );
     throw new Error(
       `Sanitization gate falhou: ${result.failures
-        .map((f) => `${f.label} (${f.matches.join(", ")})`)
+        .map((f) => `${f.label} (${f.matches.length})`)
         .join("; ")}`,
     );
   }
