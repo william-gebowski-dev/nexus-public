@@ -60,11 +60,17 @@ export function ProjectCard({ project }: { project: Project }) {
           <span>Progresso</span>
           <span className="font-mono text-text">{project.progress}%</span>
         </div>
-        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-hover">
+        <div
+          className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-surface-hover"
+          role="progressbar"
+          aria-label={`Progresso do projeto ${project.name}`}
+          aria-valuenow={project.progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
           <div
             className="h-full rounded-full bg-accent transition-[width]"
             style={{ width: `${project.progress}%` }}
-            aria-label={`Progresso ${project.progress}%`}
           />
         </div>
       </div>

@@ -63,7 +63,11 @@ export function Projects() {
       <div className="nx-card flex flex-col gap-3 p-3">
         <div className="flex items-center gap-2 rounded-lg border border-border bg-bg px-3 py-2">
           <Search className="h-4 w-4 text-text-faint" aria-hidden />
+          <label htmlFor="projects-search" className="sr-only">
+            Buscar projeto por nome
+          </label>
           <input
+            id="projects-search"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
