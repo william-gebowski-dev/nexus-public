@@ -111,6 +111,10 @@
     @apply rounded-md border border-border-strong bg-surface px-1.5 py-0.5 text-[10px] font-mono;
   }
 
+  .nx-card details[open] > summary {
+    background: var(--surface-hover);
+  }
+
   /* Timeline horizontal com scroll snap (visão mobile da rotina). */
   .nx-timeline-scroll { scroll-snap-type: x mandatory; }
   .nx-timeline-lane  { scroll-snap-align: start; }
