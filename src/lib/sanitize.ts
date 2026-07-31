@@ -1,7 +1,12 @@
 /**
  * Gate final de sanitização — análogo ao `FORBIDDEN` regex em
- * hermes-nexus-os/scripts/status-page.py. Chamado em todas as respostas
- * dos handlers MSW antes de devolver ao front.
+ * hermes-nexus-os/scripts/status-page.py.
+ *
+ * Regra de manutenção: qualquer renderização futura com
+ * `dangerouslySetInnerHTML` DEVE passar por `sanitizeHtml` antes. Dados em
+ * texto puro vindos de API/mock devem passar por `sanitizeText` quando forem
+ * interpolados em mensagens de erro, snippets, previews ou conteúdo de origem
+ * externa.
  *
  * Lista do que NUNCA pode aparecer no payload:
  *  - IPs (incluindo Tailscale 100.x.x.x)
@@ -70,4 +75,42 @@ export function safeStringify(value: unknown, space?: number): string {
     );
   }
   return out;
+}
+
+/**
+ * Sanitiza texto que vai ser interpolado em mensagens renderizadas pelo
+ * React (texto puro, não HTML). Remove caracteres de controle e zero-width
+ * que poderiam quebrar terminais ou esconder conteúdo em previews.
+ *
+ * NÃO usa o gate de padrões sensíveis — esse gate é para payloads
+ * completos (resposta de API inteira). Para texto, a checagem fica a cargo
+ * dos sanitizers de payload no caminho do mock/backend.
+ */
+export function sanitizeText(input: string): string {
+  if (typeof input !== "string") return "";
+  return input
+    // Remove C0/C1 control chars exceto \n \r \t
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "")
+    .replace(/​|‌|‍|﻿/g, "");
+}
+
+/**
+ * Sanitiza texto que vai ser interpolado em `dangerouslySetInnerHTML`.
+ * Faz escape HTML completo dos cinco caracteres perigosos para neutralizar
+ * tags e atributos maliciosos, e aplica `sanitizeText` antes para limpar
+ * caracteres de controle.
+ *
+ * IMPORTANTE: este escape é seguro contra XSS para conteúdo puramente
+ * textual. Se você precisa renderizar markup confiável (ex.: markdown
+ * convertido para HTML), use uma biblioteca como DOMPurify antes — escape
+ * puro quebra formatação intencional. Este helper é o piso mínimo.
+ */
+export function sanitizeHtml(input: string): string {
+  const cleaned = sanitizeText(input);
+  return cleaned
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
