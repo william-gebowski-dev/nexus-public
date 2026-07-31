@@ -17,12 +17,12 @@ import { z } from "zod";
 export const CronStatusSchema = z.object({
   gatewayRunning: z.boolean(),
   gatewayPid: z.number().int().nullable(),
-  activeJobs: z.number().int(),
+  activeJobs: z.number().int().nonnegative(),
   totalJobs: z.literal(48),
-  nextRunAt: z.string(),
-  heartbeatSecondsAgo: z.number(),
-  lastRunAt: z.string().nullable(),
-  lastFailureAt: z.string().nullable(),
+  nextRunAt: z.string().datetime({ offset: true }),
+  heartbeatSecondsAgo: z.number().int().nonnegative(),
+  lastRunAt: z.string().datetime({ offset: true }).nullable(),
+  lastFailureAt: z.string().datetime({ offset: true }).nullable(),
   provider: z.literal("custom"),
   model: z.literal("9Router"),
   delivery: z.literal("local"),
@@ -41,37 +41,43 @@ const NexusSystemStateEnum = z.enum([
   "maintenance",
 ]);
 
+/**
+ * Porcentagem 0..100. Usado em CPU/memória/disco/availability/latência
+ * para rejeitar valores absurdos (CPU -40%, memória 340%).
+ */
+const PercentageSchema = z.number().min(0).max(100);
+
 export const TechnicalSummarySchema = z.object({
-  activeMcps: z.number(),
-  activeSkills: z.number(),
-  activeAgents: z.number(),
-  runningAutomations: z.number(),
-  activeContainers: z.number(),
-  lastSyncAt: z.string().nullable(),
-  lastBackupAt: z.string().nullable(),
-  lastFailureAt: z.string().nullable(),
+  activeMcps: z.number().int().nonnegative(),
+  activeSkills: z.number().int().nonnegative(),
+  activeAgents: z.number().int().nonnegative(),
+  runningAutomations: z.number().int().nonnegative(),
+  activeContainers: z.number().int().nonnegative(),
+  lastSyncAt: z.string().datetime({ offset: true }).nullable(),
+  lastBackupAt: z.string().datetime({ offset: true }).nullable(),
+  lastFailureAt: z.string().datetime({ offset: true }).nullable(),
 });
 
 export const NexusSystemStatusSchema = z.object({
   status: NexusSystemStateEnum,
   overall: NexusSystemStateEnum.optional(),
   message: z.string(),
-  generatedAt: z.string(),
-  lastUpdate: z.string(),
-  uptimeSeconds: z.number().nullable(),
-  cpuUsage: z.number().nullable(),
-  memoryUsage: z.number().nullable(),
-  diskUsage: z.number().nullable(),
+  generatedAt: z.string().datetime({ offset: true }),
+  lastUpdate: z.string().datetime({ offset: true }),
+  uptimeSeconds: z.number().int().nonnegative().nullable(),
+  cpuUsage: PercentageSchema.nullable(),
+  memoryUsage: PercentageSchema.nullable(),
+  diskUsage: PercentageSchema.nullable(),
   counts: z.object({
-    servicesOperational: z.number(),
-    servicesAttention: z.number(),
-    servicesUnavailable: z.number(),
-    agentsActive: z.number(),
-    mcpsActive: z.number(),
-    skillsActive: z.number(),
-    automationsActive: z.number(),
-    projectsActive: z.number(),
-    executionsLast24h: z.number(),
+    servicesOperational: z.number().int().nonnegative(),
+    servicesAttention: z.number().int().nonnegative(),
+    servicesUnavailable: z.number().int().nonnegative(),
+    agentsActive: z.number().int().nonnegative(),
+    mcpsActive: z.number().int().nonnegative(),
+    skillsActive: z.number().int().nonnegative(),
+    automationsActive: z.number().int().nonnegative(),
+    projectsActive: z.number().int().nonnegative(),
+    executionsLast24h: z.number().int().nonnegative(),
   }),
   technicalSummary: TechnicalSummarySchema,
   source: DataSourceEnum,
@@ -79,6 +85,9 @@ export const NexusSystemStatusSchema = z.object({
 export type NexusSystemStatusParsed = z.infer<typeof NexusSystemStatusSchema>;
 
 // === RoutineDay ============================================================
+//
+// A regra 12×4 é o coração do produto e o schema precisa garantir
+// integridade estrutural, não só literais nos totais declarados.
 
 const BlockExecutionStateEnum = z.enum([
   "scheduled",
@@ -104,69 +113,113 @@ const ArtifactKindEnum = z.enum([
   "daily-report",
 ]);
 
+/** `HH:00` ou `HH:30` — granularidade semianual (00:00, 00:30, …, 23:30). */
+const SEMIHOURLY_TIME = /^([01]\d|2[0-3]):(00|30)$/;
+
+/** IDs canônicos `job-30m-01`..`job-30m-48`. */
+const JOB_ID = /^job-30m-(0[1-9]|[1-3][0-9]|4[0-8])$/;
+
 export const GeneratedArtifactSchema = z.object({
   id: z.string(),
   name: z.string(),
   kind: ArtifactKindEnum,
   sourceJobId: z.string(),
-  createdAt: z.string(),
+  createdAt: z.string().datetime({ offset: true }),
   projectId: z.string().optional(),
-  sizeBytes: z.number().optional(),
+  sizeBytes: z.number().int().nonnegative().optional(),
   publicPath: z.string(),
 });
 export type GeneratedArtifactParsed = z.infer<typeof GeneratedArtifactSchema>;
 
 export const RoutineTaskSchema = z.object({
-  id: z.string(),
+  id: z.string().regex(JOB_ID, "id deve seguir padrão job-30m-01..48"),
   jobName: z.string(),
-  blockId: z.number().int(),
+  blockId: z.number().int().min(1).max(12),
   slot: RoutineSlotEnum,
-  scheduledTime: z.string(),
+  scheduledTime: z.string().regex(SEMIHOURLY_TIME, "horário deve ser HH:00 ou HH:30"),
   title: z.string(),
   description: z.string(),
   status: BlockExecutionStateEnum,
   provider: z.string(),
   model: z.string(),
   delivery: z.string(),
-  startedAt: z.string().optional(),
-  finishedAt: z.string().optional(),
-  durationSeconds: z.number().optional(),
+  startedAt: z.string().datetime({ offset: true }).optional(),
+  finishedAt: z.string().datetime({ offset: true }).optional(),
+  durationSeconds: z.number().int().nonnegative().optional(),
   dependsOn: z.array(z.string()),
   projectId: z.string().optional(),
   resultSummary: z.string().optional(),
   artifactIds: z.array(z.string()).optional(),
 });
 
+/**
+ * Cada bloco tem exatamente 4 tarefas (coletar → analisar → produzir → consolidar).
+ * A contagem rígida garante a regra 12×4 no nível de schema, não só na rotina
+ * de geração.
+ */
 export const RoutineBlockSchema = z.object({
-  id: z.number().int(),
+  id: z.number().int().min(1).max(12),
   name: z.string(),
-  windowStart: z.string(),
-  windowEnd: z.string(),
-  tasks: z.array(RoutineTaskSchema),
+  windowStart: z.string().regex(SEMIHOURLY_TIME),
+  windowEnd: z.string().regex(SEMIHOURLY_TIME),
+  tasks: z.array(RoutineTaskSchema).length(4),
   status: BlockExecutionStateEnum,
-  completedCount: z.number().int(),
-  failedCount: z.number().int(),
+  completedCount: z.number().int().min(0).max(4),
+  failedCount: z.number().int().min(0).max(4),
 });
 
 export const DailyActivitySchema = z.object({
   id: z.string(),
   text: z.string(),
-  at: z.string(),
+  at: z.string().datetime({ offset: true }),
   state: z.enum(["success", "running", "warning", "error"]),
 });
 
+/** `America/Sao_Paulo` pinado; totalBlocks=12 e totalJobs=48 são literais. */
 export const RoutineDaySchema = z.object({
   date: z.string(),
   timezone: z.literal("America/Sao_Paulo"),
   totalBlocks: z.literal(12),
   totalJobs: z.literal(48),
-  completedJobs: z.number().int(),
-  failedJobs: z.number().int(),
-  runningJobs: z.number().int(),
-  nextExecutionAt: z.string(),
-  blocks: z.array(RoutineBlockSchema),
+  completedJobs: z.number().int().nonnegative(),
+  failedJobs: z.number().int().nonnegative(),
+  runningJobs: z.number().int().nonnegative(),
+  nextExecutionAt: z.string().datetime({ offset: true }),
+  blocks: z.array(RoutineBlockSchema).length(12),
   artifacts: z.array(GeneratedArtifactSchema),
   recentActivities: z.array(DailyActivitySchema),
+}).superRefine((routine, ctx) => {
+  const blockIds = new Set<number>();
+  const jobIds = new Set<string>();
+
+  routine.blocks.forEach((block, blockIndex) => {
+    if (blockIds.has(block.id)) {
+      ctx.addIssue({
+        code: "custom",
+        message: `block id duplicado: ${block.id}`,
+        path: ["blocks", blockIndex, "id"],
+      });
+    }
+    blockIds.add(block.id);
+
+    block.tasks.forEach((task, taskIndex) => {
+      if (task.blockId !== block.id) {
+        ctx.addIssue({
+          code: "custom",
+          message: `blockId ${task.blockId} não corresponde ao bloco ${block.id}`,
+          path: ["blocks", blockIndex, "tasks", taskIndex, "blockId"],
+        });
+      }
+      if (jobIds.has(task.id)) {
+        ctx.addIssue({
+          code: "custom",
+          message: `job id duplicado: ${task.id}`,
+          path: ["blocks", blockIndex, "tasks", taskIndex, "id"],
+        });
+      }
+      jobIds.add(task.id);
+    });
+  });
 });
 export type RoutineDayParsed = z.infer<typeof RoutineDaySchema>;
 
@@ -188,7 +241,7 @@ export const ExecutionSchema = z.object({
   project: z.string().optional(),
   projectId: z.string().optional(),
   actionLabel: z.string().optional(),
-  startedAt: z.string(),
+  startedAt: z.string().datetime({ offset: true }),
   durationMs: z.number().nonnegative(),
   status: ExecutionStatusEnum,
   summary: z.string(),
@@ -198,7 +251,7 @@ export type ExecutionParsed = z.infer<typeof ExecutionSchema>;
 
 export const ExecutionPageSchema = z.object({
   items: z.array(ExecutionSchema),
-  nextCursor: z.number().nullable(),
+  nextCursor: z.number().int().nonnegative().nullable(),
 });
 
 // === InfrastructureService =================================================
@@ -215,35 +268,220 @@ export const InfrastructureServiceSchema = z.object({
   id: z.string(),
   name: z.string(),
   // Campos do Service base (opcionais — mocks rotina não preenchem)
-  category: z.enum(["ia", "api", "web"]).optional(),
+  category: z.string().optional(),
   status: ServiceStatusEnum.optional(),
   description: z.string().optional(),
   trend: z.enum(["up", "down", "flat"]).optional(),
   source: DataSourceEnum.optional(),
   // Campos do RoutineInfrastructureService (obrigatórios)
-  latencyMs: z.number(),
-  availabilityPct: z.number(),
-  lastCheckedAt: z.string(),
-  sparkline24h: z.array(z.number()).length(12),
+  latencyMs: z.number().nonnegative(),
+  availabilityPct: PercentageSchema,
+  lastCheckedAt: z.string().datetime({ offset: true }),
+  sparkline24h: z.array(PercentageSchema).length(12),
   uptime7d: z.array(z.boolean()).length(7),
   version: z.string(),
   // Campos estendidos
   publicLabel: z.string().optional(),
   usageLabel: z.string().optional(),
-  availability24hPct: z.number().optional(),
-  availability7dPct: z.number().optional(),
-  lastFailureAt: z.string().nullable().optional(),
+  availability24hPct: PercentageSchema.optional(),
+  availability7dPct: PercentageSchema.optional(),
+  lastFailureAt: z.string().datetime({ offset: true }).nullable().optional(),
   detailsHref: z.string().optional(),
   availabilityChecks: z
     .array(
       z.object({
         id: z.string(),
-        checkedAt: z.string(),
+        checkedAt: z.string().datetime({ offset: true }),
         state: z.enum(["operational", "instability", "unavailable", "no_data"]),
       }),
     )
     .optional(),
 });
+
+// === Agents / MCPs / Skills / Automations / Models ========================
+
+export const AgentStatusEnum = z.enum(["active", "paused", "disabled"]);
+export const AgentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  role: z.string(),
+  status: AgentStatusEnum,
+  model: z.string(),
+  lastActivityAt: z.string().datetime({ offset: true }),
+  completedCount: z.number().int().nonnegative(),
+  errorCount: z.number().int().nonnegative(),
+  avgDurationMs: z.number().nonnegative(),
+  source: DataSourceEnum,
+});
+
+export const McpStatusEnum = z.enum(["connected", "unavailable"]);
+export const McpSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.string(),
+  status: McpStatusEnum,
+  lastActivityAt: z.string().datetime({ offset: true }),
+  source: DataSourceEnum,
+});
+
+export const SkillSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  purpose: z.string(),
+  active: z.boolean(),
+  source: DataSourceEnum,
+});
+
+export const AutomationStatusEnum = z.enum(["running", "paused", "failed", "scheduled"]);
+export const AutomationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  purpose: z.string(),
+  status: AutomationStatusEnum,
+  project: z.string().optional(),
+  lastRunAt: z.string().datetime({ offset: true }).nullable(),
+  nextRunAt: z.string().datetime({ offset: true }).nullable(),
+  successRatePct: PercentageSchema,
+  source: DataSourceEnum,
+});
+
+export const ModelStatusEnum = z.enum(["available", "rate_limited", "offline"]);
+export const ModelInfoSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  status: ModelStatusEnum,
+  callsLast14d: z.number().int().nonnegative(),
+  source: DataSourceEnum,
+});
+
+// === Projects / Roadmap / Alerts / Activities / Search ====================
+
+export const ProjectStatusEnum = z.enum([
+  "planning",
+  "development",
+  "validation",
+  "operational",
+  "paused",
+  "archived",
+]);
+export const PriorityEnum = z.enum(["critical", "high", "medium", "low"]);
+
+export const ProjectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().max(140),
+  category: z.string(),
+  status: ProjectStatusEnum,
+  priority: PriorityEnum,
+  progress: PercentageSchema,
+  currentPhase: z.string(),
+  nextAction: z.string(),
+  updatedAt: z.string().datetime({ offset: true }),
+  tech: z.array(z.string()),
+  publicUrl: z.string().optional(),
+  source: DataSourceEnum,
+});
+
+export const RoadmapPhaseEnum = z.enum(["now", "next", "future", "done"]);
+export const RoadmapStateEnum = z.enum(["pending", "in_progress", "blocked", "done"]);
+export const RoadmapItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  objective: z.string(),
+  projectSlug: z.string().optional(),
+  priority: PriorityEnum,
+  state: RoadmapStateEnum,
+  progress: PercentageSchema,
+  dueDate: z.string().nullable(),
+  dependencies: z.array(z.string()),
+  doneCriteria: z.string(),
+  phase: RoadmapPhaseEnum,
+  source: DataSourceEnum,
+});
+
+export const AlertCategoryEnum = z.enum([
+  "service_down",
+  "data_stale",
+  "automation_error",
+  "agent_idle",
+  "deploy_failed",
+  "limit_near",
+  "integration_offline",
+]);
+export const AlertSeverityEnum = z.enum(["info", "warning", "critical"]);
+export const AlertSchema = z.object({
+  id: z.string(),
+  category: AlertCategoryEnum,
+  severity: AlertSeverityEnum,
+  title: z.string(),
+  description: z.string(),
+  raisedAt: z.string().datetime({ offset: true }),
+  read: z.boolean(),
+  ignored: z.boolean(),
+  source: DataSourceEnum,
+});
+
+export const ActivityKindEnum = z.enum([
+  "service_started",
+  "service_stopped",
+  "agent_run",
+  "automation_completed",
+  "project_updated",
+  "deploy",
+  "error_detected",
+  "integration_added",
+  "document_updated",
+]);
+export const ActivityScopeEnum = z.enum([
+  "infrastructure",
+  "ai",
+  "projects",
+  "deploys",
+  "alerts",
+]);
+export const ActivityStateEnum = z.enum(["success", "running", "warning", "error"]);
+export const ActivitySchema = z.object({
+  id: z.string(),
+  kind: ActivityKindEnum,
+  title: z.string(),
+  description: z.string(),
+  occurredAt: z.string().datetime({ offset: true }),
+  origin: z.string(),
+  severity: AlertSeverityEnum,
+  scope: ActivityScopeEnum,
+  source: DataSourceEnum,
+  actor: z.string().optional(),
+  action: z.string().optional(),
+  project: z.string().optional(),
+  result: z.string().optional(),
+  durationMs: z.number().nonnegative().optional(),
+  state: ActivityStateEnum.optional(),
+});
+
+export const ActivityPageSchema = z.object({
+  items: z.array(ActivitySchema),
+  nextCursor: z.number().int().nonnegative().nullable(),
+});
+
+export const SearchResultSchema = z.object({
+  projects: z.array(ProjectSchema),
+  services: z.array(InfrastructureServiceSchema),
+  agents: z.array(AgentSchema),
+  mcps: z.array(McpSchema),
+  skills: z.array(SkillSchema),
+  automations: z.array(AutomationSchema),
+  activities: z.array(ActivitySchema),
+  roadmap: z.array(RoadmapItemSchema),
+});
+
+// === Availability =========================================================
+
+export const AvailabilityCheckSchema = z.object({
+  id: z.string(),
+  checkedAt: z.string().datetime({ offset: true }),
+  state: z.enum(["operational", "instability", "unavailable", "no_data"]),
+});
+export const AvailabilitySchema = z.record(z.string(), z.array(AvailabilityCheckSchema));
 
 // === Map de schemas por método do nexusApi ================================
 //
@@ -255,6 +493,7 @@ export const NEXUS_API_SCHEMAS = {
   cronStatus: CronStatusSchema,
   systemStatus: NexusSystemStatusSchema,
   routineToday: RoutineDaySchema,
+  executions: ExecutionPageSchema,
   recentExecutions: ExecutionPageSchema,
   executionById: ExecutionSchema.nullable(),
   dailyReport: z.object({
@@ -271,7 +510,19 @@ export const NEXUS_API_SCHEMAS = {
   }),
   artifacts: z.array(GeneratedArtifactSchema),
   infrastructure: z.array(InfrastructureServiceSchema),
-  availability: z.record(z.string(), z.array(z.unknown())),
+  // Endpoints adicionais — Fase 19
+  services: z.array(InfrastructureServiceSchema),
+  agents: z.array(AgentSchema),
+  mcps: z.array(McpSchema),
+  skills: z.array(SkillSchema),
+  automations: z.array(AutomationSchema),
+  models: z.array(ModelInfoSchema),
+  projects: z.array(ProjectSchema),
+  roadmap: z.array(RoadmapItemSchema),
+  alerts: z.array(AlertSchema),
+  activities: ActivityPageSchema,
+  search: SearchResultSchema,
+  availability: AvailabilitySchema,
 } as const;
 
 export type NexusApiMethod = keyof typeof NEXUS_API_SCHEMAS;
