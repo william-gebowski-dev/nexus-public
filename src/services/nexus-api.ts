@@ -1,17 +1,5 @@
 import type {
-  Activity,
-  Agent,
-  Alert,
-  Automation,
-  AvailabilityRecord,
-  Execution,
-  Mcp,
-  ModelInfo,
   NexusSystemStatus,
-  Project,
-  RoadmapItem,
-  Service,
-  Skill,
   SystemSummary,
 } from "@/types";
 import { NEXUS_API_SCHEMAS } from "@/lib/schemas";
@@ -62,6 +50,8 @@ export const isMockDataEnabled = (): boolean => USE_MOCK_DATA;
 export interface Page<T> {
   items: T[];
   nextCursor: number | null;
+  /** Total reportado pelo backend, quando aplicável. */
+  totalItems?: number;
 }
 
 async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
@@ -82,14 +72,32 @@ async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 /**
+ * Erro lançado quando a resposta de um endpoint viola o schema Zod.
+ * Sinaliza para a UI (via ErrorState) que o contrato da API quebrou.
+ */
+export class ApiContractError extends Error {
+  public readonly method: string;
+  public readonly path: string;
+  public readonly issues: unknown;
+
+  constructor(method: string, path: string, issues: unknown) {
+    super(`[nexus] contrato violado em ${method} (${path})`);
+    this.name = "ApiContractError";
+    this.method = method;
+    this.path = path;
+    this.issues = issues;
+  }
+}
+
+/**
  * Valida runtime a resposta JSON contra um schema Zod. Em falha de shape:
- *  - loga `console.warn` com método, path e issues do Zod (debugging
- *    sem quebrar a UI).
- *  - devolve os dados crus mesmo assim (graceful degrade). O objetivo
- *    é detectar drift entre mock e backend real, não bloquear render.
+ *  - lança `ApiContractError`. O componente consumidor deve tratar via
+ *    ErrorState do React Query.
+ *  - em modo `mock`, o caminho bypassa este wrapper (usa MOCK_* direto),
+ *    então a validação runtime fica a cargo de `check-shapes.ts` no build.
  *
- * Para mocks que não são inferidos pelo Zod (por exemplo listas onde o
- * backend retorna envelope `{ ok, data }`), não usar este wrapper.
+ * Erro duro é intencional: dados inválidos chegando na UI causam bugs
+ * silenciosos muito piores que um erro de carregamento visível.
  */
 async function jsonGetSafe<T>(
   method: string,
@@ -100,10 +108,9 @@ async function jsonGetSafe<T>(
   const raw = await jsonGet<T>(path, init);
   const result = schema.safeParse(raw);
   if (!result.success) {
-    // eslint-disable-next-line no-console
-    console.warn(`[nexus] shape divergente em ${method} (${path}):`, result.error);
+    throw new ApiContractError(method, path, result.error);
   }
-  return raw;
+  return result.data;
 }
 
 export function systemStatusToSummary(status: NexusSystemStatus): SystemSummary {
@@ -129,35 +136,30 @@ export function systemStatusToSummary(status: NexusSystemStatus): SystemSummary 
 export const nexusApi = {
   systemStatus: () => jsonGetSafe("systemStatus", NEXUS_API_SCHEMAS.systemStatus, "/api/system/status"),
   status: async () => systemStatusToSummary(await nexusApi.systemStatus()),
-  services: () => jsonGet<Service[]>("/api/services"),
+  services: () => jsonGetSafe("services", NEXUS_API_SCHEMAS.services, "/api/services"),
 
-  agents: () => jsonGet<Agent[]>("/api/agents"),
-  mcps: () => jsonGet<Mcp[]>("/api/mcps"),
-  skills: () => jsonGet<Skill[]>("/api/skills"),
-  automations: () => jsonGet<Automation[]>("/api/automations"),
-  models: () => jsonGet<ModelInfo[]>("/api/models"),
+  agents: () => jsonGetSafe("agents", NEXUS_API_SCHEMAS.agents, "/api/agents"),
+  mcps: () => jsonGetSafe("mcps", NEXUS_API_SCHEMAS.mcps, "/api/mcps"),
+  skills: () => jsonGetSafe("skills", NEXUS_API_SCHEMAS.skills, "/api/skills"),
+  automations: () => jsonGetSafe("automations", NEXUS_API_SCHEMAS.automations, "/api/automations"),
+  models: () => jsonGetSafe("models", NEXUS_API_SCHEMAS.models, "/api/models"),
 
-  projects: () => jsonGet<Project[]>("/api/projects"),
-  roadmap: () => jsonGet<RoadmapItem[]>("/api/roadmap"),
-  alerts: () => jsonGet<Alert[]>("/api/alerts"),
+  projects: () => jsonGetSafe("projects", NEXUS_API_SCHEMAS.projects, "/api/projects"),
+  roadmap: () => jsonGetSafe("roadmap", NEXUS_API_SCHEMAS.roadmap, "/api/roadmap"),
+  alerts: () => jsonGetSafe("alerts", NEXUS_API_SCHEMAS.alerts, "/api/alerts"),
 
-  activities: (limit = 10, cursor: number | null = null) =>
-    jsonGet<Page<Activity>>(`/api/activities?limit=${limit}${cursor !== null ? `&cursor=${cursor}` : ""}`),
+  activities: (limit = 10, cursor: number | null = null, scope?: string) => {
+    const qs = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) qs.set("cursor", String(cursor));
+    if (scope && scope !== "all") qs.set("scope", scope);
+    return jsonGetSafe("activities", NEXUS_API_SCHEMAS.activities, `/api/activities?${qs}`);
+  },
 
   executions: (limit = 10, cursor: number | null = null) =>
-    jsonGet<Page<Execution>>(`/api/executions?limit=${limit}${cursor !== null ? `&cursor=${cursor}` : ""}`),
+    jsonGetSafe("executions", NEXUS_API_SCHEMAS.executions, `/api/executions?limit=${limit}${cursor !== null ? `&cursor=${cursor}` : ""}`),
 
   search: (q: string) =>
-    jsonGet<{
-      projects: Project[];
-      services: Service[];
-      agents: Agent[];
-      mcps: Mcp[];
-      skills: Skill[];
-      automations: Automation[];
-      activities: Activity[];
-      roadmap: RoadmapItem[];
-    }>(`/api/search?q=${encodeURIComponent(q)}`),
+    jsonGetSafe("search", NEXUS_API_SCHEMAS.search, `/api/search?q=${encodeURIComponent(q)}`),
 
   cronStatus: async () =>
     USE_MOCK_DATA
@@ -192,6 +194,7 @@ export const nexusApi = {
       return {
         items: page,
         nextCursor: end < MOCK_RECENT_EXECUTIONS.length ? end : null,
+        totalItems: MOCK_RECENT_EXECUTIONS.length,
       };
     }
     const qs = new URLSearchParams({ limit: String(limit) });
@@ -210,7 +213,9 @@ export const nexusApi = {
       : jsonGetSafe("infrastructure", NEXUS_API_SCHEMAS.infrastructure, "/api/infrastructure"),
 
   availability: async () =>
-    USE_MOCK_DATA ? MOCK_AVAILABILITY : jsonGet<Record<string, AvailabilityRecord[]>>("/api/availability"),
+    USE_MOCK_DATA
+      ? MOCK_AVAILABILITY
+      : jsonGetSafe("availability", NEXUS_API_SCHEMAS.availability, "/api/availability"),
 };
 
 export const api = nexusApi;

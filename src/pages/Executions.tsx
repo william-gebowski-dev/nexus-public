@@ -13,9 +13,14 @@ import { PaginationBar } from "@/components/executions/PaginationBar";
 const PAGE_SIZE = 25;
 
 export function Executions() {
-  const [page, setPage] = useState(0);
+  // Pilha de cursors: cursorStack[i] é o cursor usado para a página i.
+  // A página 0 sempre usa cursor=null. Avançar guarda o nextCursor
+  // retornado pela API; voltar volta um nível na pilha.
+  const [cursorStack, setCursorStack] = useState<Array<number | null>>([null]);
+  const [pageIndex, setPageIndex] = useState(0);
   const [filters, setFilters] = useState<ExecutionFilters>({});
-  const cursor = page === 0 ? null : page;     // mock aceita Number | null
+
+  const cursor = cursorStack[pageIndex] ?? null;
   const recent = useRecentExecutions(PAGE_SIZE, cursor);
 
   const filtered = useMemo(() => {
@@ -27,7 +32,26 @@ export function Executions() {
   if (recent.isError)
     return <ErrorState error={recent.error} onRetry={() => void recent.refetch()} />;
 
-  const total = recent.data?.items.length ?? 0;
+  // Total reportado pelo backend, ou fallback para o tamanho da página
+  // (modo mock com totalItems explícito).
+  const total = recent.data?.totalItems ?? recent.data?.items.length ?? 0;
+  const nextCursor = recent.data?.nextCursor ?? null;
+  const canGoNext = nextCursor !== null;
+
+  const goNext = () => {
+    if (nextCursor === null) return;
+    const nextIdx = pageIndex + 1;
+    setCursorStack((stack) => {
+      const out = stack.slice(0, nextIdx);
+      out[nextIdx] = nextCursor;
+      return out;
+    });
+    setPageIndex(nextIdx);
+  };
+  const goPrev = () => {
+    if (pageIndex === 0) return;
+    setPageIndex((p) => p - 1);
+  };
 
   return (
     <div className="space-y-6">
@@ -52,13 +76,16 @@ export function Executions() {
             <ExecutionCardList items={filtered} />
           </div>
           <PaginationBar
-            page={page}
+            page={pageIndex}
             pageSize={PAGE_SIZE}
             total={total}
-            onChange={setPage}
+            canPrev={pageIndex > 0}
+            canNext={canGoNext}
+            onPrev={goPrev}
+            onNext={goNext}
           />
         </>
       )}
-    </div>
+   </div>
   );
 }

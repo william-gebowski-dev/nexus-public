@@ -13,14 +13,30 @@ import type {
 } from "@/types";
 import { ROUTINE_BLOCKS, ROUTINE_TASKS } from "./routine-definition";
 
-const NOW = "2026-07-30T18:00:00-03:00";
-const NEXT_RUN = "2026-07-30T18:30:00-03:00";
-const LAST_RUN = "2026-07-30T18:00:00-03:00";
-const LAST_FAILURE = "2026-07-30T05:00:00-03:00";
+// "Hoje" dinâmico em BRT (-03:00) — antes era congelado em 2026-07-30, o
+// que fazia a tarefa 37 ficar permanentemente em execução e os relatórios
+// ficarem fora do relógio. Anchors derivados de mockNow() para que o
+// dashboard acompanhe o calendário real quando rodando em modo mock.
+function todayBRTDate(): string {
+  // Intl com timeZone fixo e en-CA (YYYY-MM-DD) para evitar deriva por locale.
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+}
+
+function nowBRTAt(hhmm: string): string {
+  return `${todayBRTDate()}T${hhmm}:00-03:00`;
+}
+
+// Fallback legacy: anchors congelados só se algo realmente exigir 30/07.
+// Mantidos por retrocompatibilidade com testes que possam depender deles.
+// (LEGACY_NOW removido por estar sem consumidores no momento.)
 
 export function mockNow(): string {
-  return NOW;
+  return nowBRTAt("18:00");
 }
+
+const NEXT_RUN = nowBRTAt("18:30");
+const LAST_RUN = mockNow();
+const LAST_FAILURE = nowBRTAt("05:00");
 
 interface TaskResultEntry {
   status: BlockExecutionState;
@@ -32,7 +48,7 @@ interface TaskResultEntry {
 }
 
 function isoTodayAt(time: string): string {
-  return `2026-07-30T${time}:00-03:00`;
+  return `${todayBRTDate()}T${time}:00-03:00`;
 }
 
 function isoTodayEnd(time: string): string {
@@ -40,7 +56,7 @@ function isoTodayEnd(time: string): string {
   const total = h * 60 + m + 30;
   const eh = String(Math.floor(total / 60) % 24).padStart(2, "0");
   const em = String(total % 60).padStart(2, "0");
-  return `2026-07-30T${eh}:${em}:00-03:00`;
+  return `${todayBRTDate()}T${eh}:${em}:00-03:00`;
 }
 
 function buildTaskResults(): Record<string, TaskResultEntry> {
@@ -82,9 +98,9 @@ function buildTaskResults(): Record<string, TaskResultEntry> {
     if (t > "18:00") {
       results[task.id] = {
         status: "scheduled",
-        startedAt: isoTodayAt(t),
-        finishedAt: isoTodayEnd(t),
-        durationSeconds: 180,
+        // Não inventar startedAt/finishedAt/durationSeconds para tarefas
+        // agendadas: o status "scheduled" significa que ainda não rodaram
+        // (audit E.3).
       };
       continue;
     }
@@ -173,8 +189,26 @@ export function applyResults(
   blocks: readonly RoutineBlock[],
   results: Record<string, TaskResultEntry>,
 ): RoutineDay {
+  // Conjunto de IDs de execução que existem em /executions (mock). Apenas
+  // esses recebem o link "Abrir logs"; o resto fica sem executionId para
+  // evitar que o card aponte para uma rota 404. Derivado das próprias
+  // tasks, espelhando o filtro que MOCK_RECENT_EXECUTIONS usa logo abaixo
+  // — evita dependência circular.
+  const knownExecutionIds = new Set(
+    ROUTINE_TASKS
+      .filter((t) => t.id !== "job-30m-37")
+      .filter((t) => (MOCK_TASK_RESULTS[t.id]?.status ?? t.status) === "completed")
+      .map((t) => `exec-${t.id}`),
+  );
   const todayBlocks: RoutineBlock[] = blocks.map((b) => {
-    const tasks = b.tasks.map((t) => applyResultsToTask(t, results[t.id]));
+    const tasks = b.tasks.map((t) => {
+      const applied = applyResultsToTask(t, results[t.id]);
+      const candidateId = `exec-${applied.id}`;
+      if (knownExecutionIds.has(candidateId)) {
+        applied.executionId = candidateId;
+      }
+      return applied;
+    });
     const completedCount = tasks.filter((t) => t.status === "completed").length;
     const failedCount = tasks.filter((t) => t.status === "failed").length;
     return {
@@ -190,7 +224,7 @@ export function applyResults(
   const failedJobs = flatTasks.filter((t) => t.status === "failed").length;
   const runningJobs = flatTasks.filter((t) => t.status === "running").length;
   return {
-    date: "2026-07-30",
+    date: todayBRTDate(),
     timezone: "America/Sao_Paulo",
     totalBlocks: 12,
     totalJobs: 48,
@@ -211,6 +245,8 @@ export const MOCK_ROUTINE_TODAY: RoutineDay = applyResults(ROUTINE_BLOCKS, MOCK_
 function buildExecutionFromTask(task: RoutineTask): Execution {
   const startedAt = task.startedAt ?? isoTodayAt(task.scheduledTime);
   const durationMs = (task.durationSeconds ?? 180) * 1000;
+  // partial ≠ success (audit E.4): manter a granularidade para que a UI
+  // consiga mostrar resultado incompleto em vez de "OK".
   const baseStatus: Execution["status"] = task.status === "completed"
     ? "success"
     : task.status === "running"
@@ -218,14 +254,22 @@ function buildExecutionFromTask(task: RoutineTask): Execution {
       : task.status === "failed"
         ? "failed"
         : task.status === "partial"
-          ? "success"
+          ? "partial"
           : task.status === "cancelled"
             ? "cancelled"
             : "queued";
+  // Extrai o número do job a partir do id (formato job-30m-NN) e calcula
+  // o bloco correspondente: bloco = floor((N-1)/4) + 1, com N ∈ [1..48].
+  const jobMatch = task.id.match(/^job-30m-(\d{1,2})$/);
+  const jobNumber = jobMatch ? Number(jobMatch[1]) : undefined;
+  const blockId = jobNumber !== undefined ? Math.floor((jobNumber - 1) / 4) + 1 : undefined;
   return {
     id: `exec-${task.id}`,
     name: task.title,
     runner: "scheduler-cron",
+    jobId: jobMatch ? task.id : undefined,
+    blockId,
+    scheduledTime: task.scheduledTime,
     agent: "operational-agent",
     project: task.projectId,
     projectId: task.projectId,
@@ -286,11 +330,12 @@ function buildInfra(
   latencyMs: number,
   availabilityPct: number,
   uptime7d: readonly boolean[],
+  status: "healthy" | "attention" = "healthy",
 ): RoutineInfrastructureService {
   return {
     id,
     name,
-    status: "healthy",
+    status,
     latencyMs,
     availabilityPct,
     lastCheckedAt: "2026-07-30T17:58:00-03:00",
@@ -309,7 +354,9 @@ export const MOCK_INFRASTRUCTURE: RoutineInfrastructureService[] = [
   buildInfra("rede-privada", "Rede Privada", "1.78", 35, 99.7, [true, true, true, true, true, true, true]),
   buildInfra("modelo-local", "Modelo Local", "0.5.7", 145, 98.3, [true, false, true, true, true, true, true]),
   buildInfra("banco-dados", "Banco de Dados", "16.3", 8, 99.95, [true, true, true, true, true, true, true]),
-  buildInfra("scheduler-cron", "Scheduler Cron", "v2.4.1", 5, 99.6, [true, true, true, false, true, true, true]),
+  // Scheduler-cron em "attention" para casar com o systemStatus mock
+  // (1 serviço em atenção). Audit E.5: status geral e infra discordavam.
+  buildInfra("scheduler-cron", "Scheduler Cron", "v2.4.1", 5, 99.6, [true, true, true, false, true, true, true], "attention"),
   buildInfra("armazenamento-local", "Armazenamento Local", "ZFS 2.2", 11, 99.99, [true, true, true, true, true, true, true]),
 ];
 

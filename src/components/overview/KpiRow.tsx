@@ -25,18 +25,29 @@ export function KpiRow({
   routine: RoutineDay | undefined;
   status: NexusSystemStatus | undefined;
 }) {
-  const totalJobs = cron?.totalJobs ?? 48;
-  const activeJobs = cron?.activeJobs ?? 48;
-  const completedJobs = routine?.completedJobs ?? 0;
-  const failedJobs = routine?.failedJobs ?? 0;
-  const completeBlocks = routine ? Math.floor(completedJobs / 4) : 0;
+  // Sem dados: mostrar "—" em vez de defaults otimistas (audit D.8 — antes
+  // o card "Jobs ativos" mostrava "48 de 48" mesmo com cron indefinido).
+  const totalJobs = cron?.totalJobs;
+  const activeJobs = cron?.activeJobs;
+  const completedJobs = routine?.completedJobs;
+  const failedJobs = routine?.failedJobs;
+  // Bloco completo = bloco cujas 4 tarefas estão todas concluídas.
+  // Antes: `Math.floor(completedJobs / 4)` que errava quando as 4 tarefas
+  // concluídas estavam em blocos diferentes.
+  const completeBlocks = routine
+    ? routine.blocks.filter((b) => b.completedCount === b.tasks.length).length
+    : undefined;
+
+  const fmtPair = (a: number | undefined, b: number | undefined) =>
+    a !== undefined && b !== undefined ? `${a} de ${b}` : "—";
+  const fmtNum = (n: number | undefined) => (n !== undefined ? n : "—");
 
   return (
     <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
       <KpiSlot>
         <KpiCard
           label="Jobs ativos"
-          value={`${activeJobs} de ${totalJobs}`}
+          value={fmtPair(activeJobs, totalJobs)}
           description="Rotinas agendadas em execução."
           href="/routine"
           icon={<ListChecks className="h-4 w-4" />}
@@ -45,7 +56,7 @@ export function KpiRow({
       <KpiSlot>
         <KpiCard
           label="Execuções hoje"
-          value={`${completedJobs} de ${totalJobs}`}
+          value={fmtPair(completedJobs, totalJobs)}
           description="Tarefas concluídas até agora."
           href="/executions"
           icon={<ListChecks className="h-4 w-4" />}
@@ -54,7 +65,7 @@ export function KpiRow({
       <KpiSlot>
         <KpiCard
           label="Falhas hoje"
-          value={failedJobs}
+          value={fmtNum(failedJobs)}
           description="Tarefas que terminaram com erro."
           href="/executions?state=failed"
           icon={<AlertCircle className="h-4 w-4" />}
@@ -63,7 +74,7 @@ export function KpiRow({
       <KpiSlot>
         <KpiCard
           label="Blocos concluídos"
-          value={`${completeBlocks} de 12`}
+          value={completeBlocks !== undefined ? `${completeBlocks} de 12` : "—"}
           description="Janelas finalizadas com sucesso."
           href="/routine"
           icon={<Blocks className="h-4 w-4" />}

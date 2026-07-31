@@ -17,7 +17,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "LTS",
     "usageLabel": "Disponível",
-    "detailsHref": "/infraestrutura?service=cloud-server",
+    "detailsHref": "/infrastructure?service=cloud-server",
     "availabilityChecks": [
       { "id": "vps-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "vps-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -46,7 +46,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "24.x",
     "usageLabel": "6 containers ativos",
-    "detailsHref": "/infraestrutura?service=containers-runtime",
+    "detailsHref": "/infrastructure?service=containers-runtime",
     "availabilityChecks": [
       { "id": "docker-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "docker-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -75,7 +75,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "Estável",
     "usageLabel": "Conectada",
-    "detailsHref": "/infraestrutura?service=private-network",
+    "detailsHref": "/infrastructure?service=private-network",
     "availabilityChecks": [
       { "id": "net-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "net-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -104,7 +104,7 @@
     "uptime7d": [true, true, true, true, true, false, true],
     "version": "2026.07",
     "usageLabel": "Instabilidade observada",
-    "detailsHref": "/infraestrutura?service=agent-core",
+    "detailsHref": "/infrastructure?service=agent-core",
     "availabilityChecks": [
       { "id": "core-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "core-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "instability" },
@@ -133,7 +133,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "0.x",
     "usageLabel": "Disponível",
-    "detailsHref": "/infraestrutura?service=local-models",
+    "detailsHref": "/infrastructure?service=local-models",
     "availabilityChecks": [
       { "id": "ollama-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "ollama-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -161,7 +161,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "Relacional",
     "usageLabel": "34% memória",
-    "detailsHref": "/infraestrutura?service=database",
+    "detailsHref": "/infrastructure?service=database",
     "availabilityChecks": [
       { "id": "db-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "db-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -189,7 +189,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "v1",
     "usageLabel": "64ms mediana",
-    "detailsHref": "/infraestrutura?service=public-apis",
+    "detailsHref": "/infrastructure?service=public-apis",
     "availabilityChecks": [
       { "id": "api-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "api-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },
@@ -217,7 +217,7 @@
     "uptime7d": [true, true, true, true, true, true, true],
     "version": "Rotinas ativas",
     "usageLabel": "3 em execução",
-    "detailsHref": "/automacoes",
+    "detailsHref": "/automations",
     "availabilityChecks": [
       { "id": "auto-01", "checkedAt": "2026-07-29T04:00:00Z", "state": "operational" },
       { "id": "auto-02", "checkedAt": "2026-07-29T05:00:00Z", "state": "operational" },

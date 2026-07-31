@@ -6,6 +6,7 @@ import { Search, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useNavigate } from "react-router-dom";
 import { restoreFocus, useRememberFocus } from "@/lib/focus";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * Command palette (Ctrl+K) — busca em projetos, serviços, agentes, MCPs,
@@ -49,14 +50,14 @@ export function SearchCommand({
 
   const groups = useMemo(
     () => [
-      { key: "projects", label: "Projetos", items: data?.projects ?? [], href: (it: { id: string }) => `/projetos?id=${it.id}` },
-      { key: "services", label: "Serviços", items: data?.services ?? [], href: () => "/infraestrutura" },
-      { key: "agents", label: "Agentes", items: data?.agents ?? [], href: () => "/agentes" },
-      { key: "mcps", label: "MCPs", items: data?.mcps ?? [], href: () => "/mcps" },
-      { key: "skills", label: "Skills", items: data?.skills ?? [], href: () => "/skills" },
-      { key: "automations", label: "Automações", items: data?.automations ?? [], href: () => "/automacoes" },
-      { key: "activities", label: "Atividades", items: data?.activities ?? [], href: () => "/atividades" },
-      { key: "roadmap", label: "Roadmap", items: data?.roadmap ?? [], href: () => "/roadmap" },
+      { key: "projects", label: "Projetos", items: data?.projects ?? [], href: (it: { id: string }) => `${ROUTES.projects}?id=${encodeURIComponent(it.id)}` },
+      { key: "services", label: "Serviços", items: data?.services ?? [], href: () => ROUTES.infrastructure },
+      { key: "agents", label: "Agentes", items: data?.agents ?? [], href: () => ROUTES.agents },
+      { key: "mcps", label: "MCPs", items: data?.mcps ?? [], href: () => ROUTES.mcps },
+      { key: "skills", label: "Skills", items: data?.skills ?? [], href: () => ROUTES.skills },
+      { key: "automations", label: "Automações", items: data?.automations ?? [], href: () => ROUTES.automations },
+      { key: "activities", label: "Atividades", items: data?.activities ?? [], href: () => ROUTES.activities },
+      { key: "roadmap", label: "Roadmap", items: data?.roadmap ?? [], href: () => ROUTES.projects },
     ],
     [data],
   );

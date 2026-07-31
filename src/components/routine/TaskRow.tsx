@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { RoutineTask } from "@/types";
 import { TaskStatusPill } from "@/components/shared/TaskStatusPill";
 import { formatDuration } from "@/lib/format";
+import { ROUTES } from "@/lib/routes";
 import { TaskDetails } from "./TaskDetails";
 
 export function TaskRow({ task }: { task: RoutineTask }) {
@@ -16,7 +17,15 @@ export function TaskRow({ task }: { task: RoutineTask }) {
         <div className="ml-auto shrink-0 flex items-center gap-2">
           <TaskStatusPill status={task.status} />
           {task.durationSeconds !== undefined && <span className="font-mono text-[10px] text-text-faint">{formatDuration(task.durationSeconds * 1000)}</span>}
-          <Link to={`/executions/${task.id}`} className="text-xs text-link hover:underline" onClick={(event) => event.stopPropagation()}>Abrir logs</Link>
+          {task.executionId && (
+            <Link
+              to={ROUTES.executionDetail(task.executionId)}
+              className="text-xs text-link hover:underline"
+              onClick={(event) => event.stopPropagation()}
+            >
+              Abrir logs
+            </Link>
+          )}
         </div>
       </summary>
       <TaskDetails task={task} />

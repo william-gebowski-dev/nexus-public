@@ -33,6 +33,16 @@ export function MobileDrawer({
     }
   }, [open, previousFocusRef]);
 
+  // Trava o scroll do body enquanto o drawer estiver aberto.
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
   return (
     <div
       className={cn(
@@ -52,6 +62,10 @@ export function MobileDrawer({
         onClick={onClose}
       />
       <div
+        // `inert` quando fechado remove a sub-árvore inteira do tab
+        // order e da acessibilidade — antes só `pointer-events-none`
+        // bloqueava cliques, mas Tab ainda passava pelos links.
+        {...(!open ? { inert: "" } : {})}
         className={cn(
           "absolute inset-y-0 left-0 w-80 max-w-[86vw] transform border-r border-border bg-bg-elevated transition-transform",
           open ? "translate-x-0" : "-translate-x-full",

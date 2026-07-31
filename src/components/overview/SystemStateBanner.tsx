@@ -1,5 +1,6 @@
 import { cn } from "@/lib/cn";
 import type { CronStatus } from "@/types";
+import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 
 const TONE_DOT: Record<"green" | "amber" | "red", string> = {
   green: "bg-green",
@@ -7,16 +8,31 @@ const TONE_DOT: Record<"green" | "amber" | "red", string> = {
   red: "bg-red",
 };
 
+/**
+ * Banner de estado geral. Três modos:
+ * - `cron === undefined` (carregando): mostra esqueleto, NÃO fala que
+ *   o gateway caiu (audit D.7 — antes exibia "gateway indisponível"
+ *   durante o loading).
+ * - cron carregado + sem falhas: verde.
+ * - cron carregado + falhas nas últimas 24h: âmbar com contagem.
+ * - gateway caiu: vermelho.
+ */
 export function SystemStateBanner({
   cron,
   recentFailures,
+  isLoading,
 }: {
   cron: CronStatus | undefined;
   recentFailures?: number;
+  isLoading?: boolean;
 }) {
+  if (isLoading || !cron) {
+    return <CardSkeleton />;
+  }
+
   let message: string;
-  let tone: "green" | "amber" | "red" = "green";
-  if (!cron?.gatewayRunning) {
+  let tone: "green" | "amber" | "red";
+  if (!cron.gatewayRunning) {
     message = "O gateway não respondeu à última verificação";
     tone = "red";
   } else if ((recentFailures ?? 0) > 0) {

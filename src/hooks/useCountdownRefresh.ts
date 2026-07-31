@@ -9,36 +9,19 @@ import { useQueryClient } from "@tanstack/react-query";
  * não a cada segundo — o efeito colateral é medido, não carimbado.
  */
 
-const REFRESH_KEYS = [
-  ["status"],
-  ["services"],
-  ["agents"],
-  ["mcps"],
-  ["skills"],
-  ["automations"],
-  ["models"],
-  ["projects"],
-  ["roadmap"],
-  ["alerts"],
-  ["activities"],
-  ["executions"],
-] as const;
-
 export function useCountdownRefresh(refreshMs: number): {
   remainingMs: number;
   label: string;
   refresh: () => void;
 } {
   const qc = useQueryClient();
-  const [lastTick, setLastTick] = useState(() => Date.now());
+  // `tickRef` é a única fonte de verdade para "quando começou o ciclo
+  // atual". Antes, atualizar lastTick quando o label mudava realimentava
+  // o cálculo do elapsed, fazendo o contador reiniciar/oscilar (audit
+  // D.9). O ref evita esse loop e o label só serve para o re-render.
+  const tickRef = useRef<number>(Date.now());
   const lastLabelRef = useRef<string>("");
-  const tickRef = useRef(lastTick);
 
-  useEffect(() => {
-    tickRef.current = lastTick;
-  }, [lastTick]);
-
-  // Médi o label atual no instantâneo; só forcechange render quando muda.
   const computeLabel = (now: number) => {
     const elapsed = (now - tickRef.current) % refreshMs;
     const remainingMs = Math.max(0, refreshMs - elapsed);
@@ -65,7 +48,6 @@ export function useCountdownRefresh(refreshMs: number): {
       const { label: nextLabel } = computeLabel(now);
       if (nextLabel !== lastLabelRef.current) {
         lastLabelRef.current = nextLabel;
-        setLastTick(now);
         setLabel(nextLabel);
       }
     }, 1000);
@@ -78,16 +60,16 @@ export function useCountdownRefresh(refreshMs: number): {
   }, [refreshMs]);
 
   const refresh = useCallback(() => {
-    // Invalida apenas as queries do dashboard — não derruba caches que
-    // outras rotas possam ter (ex.: /search).
-    for (const key of REFRESH_KEYS) {
-      void qc.invalidateQueries({ queryKey: key as unknown as readonly unknown[] });
-    }
+    // Invalida todas as queries ativas — antes isto usava uma lista
+    // hardcoded de chaves que ficava dessincronizada das chaves reais
+    // (audit D.9). Sem predicate, qualquer refetch com refetchInterval
+    // também é resetado pelo TanStack Query.
+    void qc.invalidateQueries();
     const now = Date.now();
     tickRef.current = now;
-    lastLabelRef.current = computeLabel(now).label;
-    setLastTick(now);
-    setLabel(lastLabelRef.current);
+    const v = computeLabel(now);
+    lastLabelRef.current = v.label;
+    setLabel(v.label);
   }, [qc]);
 
   const { remainingMs } = computeLabel(Date.now());

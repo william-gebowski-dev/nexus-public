@@ -2,20 +2,26 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { cn } from "@/lib/cn";
-import { REFRESH_LABEL } from "@/lib/queryClient";
+import { queryClient, REFRESH_LABEL } from "@/lib/queryClient";
+import { USE_MOCK_DATA } from "@/services/nexus-api";
 
 const REFRESH_KEY = "nexus-refresh-min";
-const SHOW_SIM_KEY = "nexus-show-simulated";
+const DEFAULT_REFRESH_MIN = 15;
+
+function readStoredRefresh(): number {
+  if (typeof window === "undefined") return DEFAULT_REFRESH_MIN;
+  const raw = window.localStorage.getItem(REFRESH_KEY);
+  const n = raw === null ? DEFAULT_REFRESH_MIN : Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_REFRESH_MIN;
+}
 
 export function Configs() {
   const { theme, setTheme } = useTheme();
-  const [refreshMin, setRefreshMin] = useState<number>(() => {
-    const stored = Number(window.localStorage.getItem(REFRESH_KEY) ?? 15);
-    return Number.isFinite(stored) ? stored : 15;
-  });
-  const [showSimulated, setShowSimulated] = useState<boolean>(() => {
-    return window.localStorage.getItem(SHOW_SIM_KEY) === "1";
-  });
+  // O intervalo do refetchInterval é definido no queryClient; a escolha
+  // aqui aplica via setDefaultOptions e persiste em localStorage. Queries
+  // já em cache continuam usando o intervalo antigo até o próximo refetch
+  // montar com o novo valor (TanStack Query honra o default na criação).
+  const [refreshMin, setRefreshMin] = useState<number>(() => readStoredRefresh());
 
   useEffect(() => {
     try {
@@ -23,15 +29,10 @@ export function Configs() {
     } catch {
       /* ignore */
     }
+    queryClient.setDefaultOptions({
+      queries: { refetchInterval: refreshMin * 60 * 1000 },
+    });
   }, [refreshMin]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(SHOW_SIM_KEY, showSimulated ? "1" : "0");
-    } catch {
-      /* ignore */
-    }
-  }, [showSimulated]);
 
   return (
     <div className="space-y-6">
@@ -64,7 +65,8 @@ export function Configs() {
           Frequência de refresh
         </h2>
         <p className="text-xs text-text-dim">
-          Apenas referência visual — a sincronização real do servidor acontece a cada {REFRESH_LABEL}.
+          Aplica a partir do próximo refetch. Queries já em cache usam o intervalo
+          anterior; mude para forçar uma nova sincronização.
         </p>
         <div className="flex flex-wrap gap-1.5">
           {[5, 10, 15, 30, 60].map((m) => (
@@ -82,21 +84,20 @@ export function Configs() {
             </button>
           ))}
         </div>
+        <p className="text-[11px] text-text-faint">
+          Padrão do app: {REFRESH_LABEL}.
+        </p>
       </section>
 
       <section className="nx-card space-y-3 p-4">
         <h2 className="font-mono text-sm uppercase tracking-wider text-text-faint">
           Fontes de dados
         </h2>
-        <label className="flex items-center gap-2 text-sm text-text-dim">
-          <input
-            type="checkbox"
-            checked={showSimulated}
-            onChange={(e) => setShowSimulated(e.target.checked)}
-            className="h-4 w-4"
-          />
-          Mostrar dados marcados como simulados
-        </label>
+        <p className="text-xs text-text-dim">
+          {USE_MOCK_DATA
+            ? "O painel está rodando em modo demonstração (mocks). Para dados reais é necessário um backend e a variável VITE_USE_MOCKS desativada no build."
+            : "O painel está conectado ao backend real."}
+        </p>
       </section>
     </div>
   );

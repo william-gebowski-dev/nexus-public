@@ -7,7 +7,8 @@ import { useRecentExecutions } from "@/hooks/useRecentExecutions";
 import { useDailyReport } from "@/hooks/useDailyReport";
 import { useGeneratedArtifacts } from "@/hooks/useGeneratedArtifacts";
 import { useInfrastructureStatus } from "@/hooks/useInfrastructureStatus";
-import { useAvailability } from "@/hooks/useAvailability";
+import { useProjects } from "@/hooks/useProjects";
+import type { Project } from "@/types";
 import { OverviewHeader } from "@/components/overview/OverviewHeader";
 import { SystemStateBanner } from "@/components/overview/SystemStateBanner";
 import { KpiRow } from "@/components/overview/KpiRow";
@@ -17,7 +18,6 @@ import { DailyRoutineTimeline } from "@/components/overview/DailyRoutineTimeline
 import { CronHealthSection } from "@/components/overview/CronHealthSection";
 import { DailyReportTeaser } from "@/components/overview/DailyReportTeaser";
 import { StaleBanner } from "@/components/overview/StaleBanner";
-import { MockDataBadge } from "@/components/overview/MockDataBadge";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 
@@ -31,17 +31,11 @@ export function Overview() {
   const daily = useDailyReport(todayBRT);
   const artifacts = useGeneratedArtifacts();
   const infrastructure = useInfrastructureStatus();
-  const availability = useAvailability();
+  const projects = useProjects();
 
   const onRefresh = () => {
-    void qc.invalidateQueries({ queryKey: ["systemStatus"] });
-    void qc.invalidateQueries({ queryKey: ["cronStatus"] });
-    void qc.invalidateQueries({ queryKey: ["routineToday"] });
-    void qc.invalidateQueries({ queryKey: ["recentExecutions"] });
-    void qc.invalidateQueries({ queryKey: ["dailyReport"] });
-    void qc.invalidateQueries({ queryKey: ["generatedArtifacts"] });
-    void qc.invalidateQueries({ queryKey: ["infrastructureStatus"] });
-    void qc.invalidateQueries({ queryKey: ["availability"] });
+    // Sem predicate — invalida todas as queries ativas (audit D.9).
+    void qc.invalidateQueries();
   };
 
   if (status.isError && !status.data) {
@@ -77,11 +71,15 @@ export function Overview() {
           daily.isFetching ||
           artifacts.isFetching ||
           infrastructure.isFetching ||
-          availability.isFetching
+          projects.isFetching
         }
       />
 
-      <SystemStateBanner cron={cron.data} />
+      <SystemStateBanner
+        cron={cron.data}
+        isLoading={cron.isLoading}
+        recentFailures={routine.data?.failedJobs}
+      />
 
       <KpiRow cron={cron.data} routine={routine.data} status={status.data} />
 
@@ -94,7 +92,7 @@ export function Overview() {
       <DailyRoutineTimeline routine={routine.data} />
 
       {/* Camada 3 — atalhos para páginas dedicadas (mantém sinal, sem duplicar) */}
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <QuickLink
           to="/executions"
           title="Execuções"
@@ -116,6 +114,11 @@ export function Overview() {
         <QuickLink
           to="/projects"
           title="Projetos"
+          metric={projectsMetric(projects.data)}
+        />
+        <QuickLink
+          to="/activities"
+          title="Resultados gerados"
           metric={
             lastArtifact
               ? `Último: ${lastArtifact.name}`
@@ -128,7 +131,6 @@ export function Overview() {
       <DailyReportTeaser daily={daily.data} />
 
       <StaleBanner lastUpdate={cron.data?.lastRunAt ?? null} />
-      <MockDataBadge />
     </div>
   );
 }
@@ -146,4 +148,26 @@ function QuickLink({ to, title, metric }: { to: string; title: string; metric: s
       <span className="mt-1 text-xs text-link group-hover:underline">Abrir →</span>
     </Link>
   );
+}
+
+/**
+ * Resumo de projetos para o card-link do Overview.
+ *
+ * Status considerados "ativos": planning, development, validation, operational.
+ * Status "pausados": paused — pausa explícita do projeto, não um bloqueio.
+ * Bloqueios concretos (impedimentos) vivem no roadmap (state "blocked"), não aqui.
+ * Status "arquivados" são excluídos das duas contagens.
+ */
+function projectsMetric(items: Project[] | undefined): string {
+  if (!items || items.length === 0) return "Sem projetos cadastrados";
+  const active = items.filter((p) =>
+    p.status === "planning" || p.status === "development" ||
+    p.status === "validation" || p.status === "operational",
+  );
+  const paused = items.filter((p) => p.status === "paused");
+  const parts = [`${active.length} ativo${active.length === 1 ? "" : "s"}`];
+  if (paused.length > 0) {
+    parts.push(`${paused.length} pausado${paused.length === 1 ? "" : "s"}`);
+  }
+  return parts.join(" · ");
 }

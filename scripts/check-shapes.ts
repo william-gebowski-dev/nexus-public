@@ -13,6 +13,8 @@
  *
  * Uso: npx tsx scripts/check-shapes.ts
  */
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import {
   NEXUS_API_SCHEMAS,
   CronStatusSchema,
@@ -20,6 +22,15 @@ import {
   RoutineDaySchema,
   GeneratedArtifactSchema,
   InfrastructureServiceSchema,
+  AgentSchema,
+  McpSchema,
+  SkillSchema,
+  AutomationSchema,
+  ModelInfoSchema,
+  ProjectSchema,
+  RoadmapItemSchema,
+  AlertSchema,
+  ActivitySchema,
 } from "../src/lib/schemas";
 import {
   MOCK_CRON_STATUS,
@@ -55,6 +66,33 @@ for (const [i, svc] of MOCK_INFRASTRUCTURE.entries()) {
     name: `MOCK_INFRASTRUCTURE[${i}]`,
     result: InfrastructureServiceSchema.safeParse(svc),
   });
+}
+
+// Mocks JSON legados — lidos do disco e validados contra os schemas.
+const dataDir = join(import.meta.dirname ?? ".", "..", "src", "mocks", "data");
+
+const jsonSchemas: Record<string, { schema: { safeParse: (v: unknown) => { success: boolean; error?: unknown } } }> = {
+  "services.json": { schema: { safeParse: (v) => InfrastructureServiceSchema.array().safeParse(v) } },
+  "agents.json": { schema: { safeParse: (v) => AgentSchema.array().safeParse(v) } },
+  "mcps.json": { schema: { safeParse: (v) => McpSchema.array().safeParse(v) } },
+  "skills.json": { schema: { safeParse: (v) => SkillSchema.array().safeParse(v) } },
+  "automations.json": { schema: { safeParse: (v) => AutomationSchema.array().safeParse(v) } },
+  "models.json": { schema: { safeParse: (v) => ModelInfoSchema.array().safeParse(v) } },
+  "projects.json": { schema: { safeParse: (v) => ProjectSchema.array().safeParse(v) } },
+  "roadmap.json": { schema: { safeParse: (v) => RoadmapItemSchema.array().safeParse(v) } },
+  "alerts.json": { schema: { safeParse: (v) => AlertSchema.array().safeParse(v) } },
+  "activities.json": { schema: { safeParse: (v) => ActivitySchema.array().safeParse(v) } },
+};
+
+for (const file of Object.keys(jsonSchemas)) {
+  try {
+    const raw = readFileSync(join(dataDir, file), "utf8");
+    const data = JSON.parse(raw);
+    const result = jsonSchemas[file].schema.safeParse(data);
+    cases.push({ name: file, result });
+  } catch (err) {
+    cases.push({ name: file, result: { success: false, error: String(err) } });
+  }
 }
 
 // Apenas confere que NEXUS_API_SCHEMAS é importável — não roda contra dados.
