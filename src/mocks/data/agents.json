@@ -1,0 +1,50 @@
+[
+  {
+    "id": "claude-cli",
+    "name": "Runner de sessões",
+    "role": "Executor local de sessões de chat — invoca o roteador local e devolve a resposta final.",
+    "status": "active",
+    "model": "Combo",
+    "lastActivityAt": "2026-07-29T09:28:00Z",
+    "completedCount": 96,
+    "errorCount": 2,
+    "avgDurationMs": 17640,
+    "source": "periodic"
+  },
+  {
+    "id": "agent-core",
+    "name": "Central de agentes",
+    "role": "Orquestrador conversacional — recebe comandos, despacha para o runner e mantém a memória de longo prazo.",
+    "status": "active",
+    "model": "MiniMax-M3",
+    "lastActivityAt": "2026-07-29T09:25:00Z",
+    "completedCount": 87,
+    "errorCount": 1,
+    "avgDurationMs": 9860,
+    "source": "periodic"
+  },
+  {
+    "id": "system-monitor",
+    "name": "Monitor do sistema",
+    "role": "Coleta métricas do roteador local e dos serviços monitorados.",
+    "status": "active",
+    "model": "MiniMax-M3",
+    "lastActivityAt": "2026-07-29T09:30:00Z",
+    "completedCount": 720,
+    "errorCount": 0,
+    "avgDurationMs": 1240,
+    "source": "periodic"
+  },
+  {
+    "id": "entropia",
+    "name": "Entropia",
+    "role": "Pesquisa tecnológica contínua — curadoria diária de novidades em IA, segurança e infraestrutura.",
+    "status": "active",
+    "model": "MiniMax-M3",
+    "lastActivityAt": "2026-07-29T06:00:00Z",
+    "completedCount": 24,
+    "errorCount": 0,
+    "avgDurationMs": 41200,
+    "source": "periodic"
+  }
+]

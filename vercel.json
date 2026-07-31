@@ -1,0 +1,11 @@
+{
+  "outputDirectory": "dist",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/legacy/:path*", "destination": "/legacy/:path*" },
+    { "source": "/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/(.*\\.(?:js|css|map|png|jpg|jpeg|svg|ico|woff2))", "destination": "/:1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

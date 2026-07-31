@@ -1,0 +1,35 @@
+[
+  {
+    "id": "auto-health-check",
+    "name": "Monitoramento operacional",
+    "purpose": "Verifica serviços críticos e registra alertas objetivos.",
+    "status": "running",
+    "project": "Nexus",
+    "lastRunAt": "2026-07-29T09:25:00Z",
+    "nextRunAt": "2026-07-29T09:35:00Z",
+    "successRatePct": 99.2,
+    "source": "periodic"
+  },
+  {
+    "id": "auto-memory-backup",
+    "name": "Backup da base de memória",
+    "purpose": "Gera cópia de segurança dos registros de conhecimento autorizados.",
+    "status": "scheduled",
+    "project": "Conhecimento",
+    "lastRunAt": "2026-07-29T07:30:00Z",
+    "nextRunAt": "2026-07-30T07:30:00Z",
+    "successRatePct": 100,
+    "source": "periodic"
+  },
+  {
+    "id": "auto-deploy-watch",
+    "name": "Acompanhamento de deploy",
+    "purpose": "Observa publicações e registra resultado de versões recentes.",
+    "status": "running",
+    "project": "Nexus Public",
+    "lastRunAt": "2026-07-28T20:00:00Z",
+    "nextRunAt": null,
+    "successRatePct": 98.4,
+    "source": "manual"
+  }
+]

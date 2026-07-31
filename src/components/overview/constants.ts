@@ -1,0 +1,1 @@
+export const MAX_RECENT_EXECUTIONS_DISPLAY = 10;

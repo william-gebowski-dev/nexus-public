@@ -1,0 +1,9 @@
+[
+  { "id": "sk-status-page", "name": "status-page", "purpose": "Renderizar snapshot público de status.", "active": false, "source": "manual" },
+  { "id": "sk-status-publish", "name": "status-page-publish", "purpose": "Pipeline de publicação do status — aposentada.", "active": false, "source": "manual" },
+  { "id": "sk-memory-sync", "name": "memory-sync", "purpose": "Sincronizar memórias entre projetos.", "active": true, "source": "periodic" },
+  { "id": "sk-usage-dashboard", "name": "usage-dashboard", "purpose": "Dashboard de uso do roteador local.", "active": true, "source": "periodic" },
+  { "id": "sk-healthcheck", "name": "healthcheck", "purpose": "Verificação de saúde dos serviços monitorados.", "active": true, "source": "periodic" },
+  { "id": "sk-router-watchdog", "name": "router-watchdog", "purpose": "Sentinela do roteador local — reinicia o processo se a porta 20128 cair.", "active": true, "source": "periodic" },
+  { "id": "sk-txt-pdf", "name": "txt-to-pdf", "purpose": "Conversão de texto para PDF.", "active": true, "source": "periodic" }
+]

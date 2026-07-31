@@ -1,0 +1,33 @@
+{
+  "status": "attention_required",
+  "overall": "attention_required",
+  "message": "Um serviço apresenta instabilidade",
+  "generatedAt": "2026-07-29T09:30:00Z",
+  "lastUpdate": "2026-07-29T09:30:00Z",
+  "uptimeSeconds": null,
+  "cpuUsage": null,
+  "memoryUsage": null,
+  "diskUsage": null,
+  "counts": {
+    "servicesOperational": 7,
+    "servicesAttention": 1,
+    "servicesUnavailable": 0,
+    "agentsActive": 4,
+    "mcpsActive": 2,
+    "skillsActive": 5,
+    "automationsActive": 3,
+    "projectsActive": 7,
+    "executionsLast24h": 10
+  },
+  "technicalSummary": {
+    "activeMcps": 2,
+    "activeSkills": 5,
+    "activeAgents": 4,
+    "runningAutomations": 3,
+    "activeContainers": 6,
+    "lastSyncAt": "2026-07-29T09:20:00Z",
+    "lastBackupAt": "2026-07-29T07:30:00Z",
+    "lastFailureAt": "2026-07-28T19:30:00Z"
+  },
+  "source": "periodic"
+}
