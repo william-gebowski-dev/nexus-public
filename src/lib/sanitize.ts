@@ -66,7 +66,6 @@ export function safeStringify(value: unknown, space?: number): string {
   const out = JSON.stringify(value, null, space);
   const result = checkPayload(out);
   if (!result.ok) {
-    // eslint-disable-next-line no-console
     console.error("[sanitize] vazamento detectado no payload:", result.failures);
     throw new Error(
       `Sanitization gate falhou: ${result.failures
@@ -88,10 +87,12 @@ export function safeStringify(value: unknown, space?: number): string {
  */
 export function sanitizeText(input: string): string {
   if (typeof input !== "string") return "";
-  return input
-    // Remove C0/C1 control chars exceto \n \r \t
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, "")
-    .replace(/​|‌|‍|﻿/g, "");
+  return Array.from(input)
+    .filter((char) => {
+      if (char === "\n" || char === "\r" || char === "\t") return true;
+      return !/[\p{Cc}\p{Cf}]/u.test(char);
+    })
+    .join("");
 }
 
 /**
