@@ -34,14 +34,8 @@ export function Overview() {
   const projects = useProjects();
 
   const onRefresh = () => {
-    void qc.invalidateQueries({ queryKey: ["systemStatus"] });
-    void qc.invalidateQueries({ queryKey: ["cronStatus"] });
-    void qc.invalidateQueries({ queryKey: ["routineToday"] });
-    void qc.invalidateQueries({ queryKey: ["recentExecutions"] });
-    void qc.invalidateQueries({ queryKey: ["dailyReport"] });
-    void qc.invalidateQueries({ queryKey: ["generatedArtifacts"] });
-    void qc.invalidateQueries({ queryKey: ["infrastructureStatus"] });
-    void qc.invalidateQueries({ queryKey: ["projects"] });
+    // Sem predicate — invalida todas as queries ativas (audit D.9).
+    void qc.invalidateQueries();
   };
 
   if (status.isError && !status.data) {

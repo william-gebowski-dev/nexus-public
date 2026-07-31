@@ -55,14 +55,16 @@ describe("Overview refresh", () => {
     vi.clearAllMocks();
   });
 
-  it("invalida a consulta de projetos ao atualizar o painel", () => {
+  it("invalida todas as queries ao atualizar o painel (sem lista hardcoded)", () => {
     const queryClient = new QueryClient();
     const invalidate = vi.spyOn(queryClient, "invalidateQueries").mockResolvedValue();
     renderOverview(queryClient);
 
     fireEvent.click(screen.getByRole("button", { name: "Atualizar" }));
 
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["projects"] });
+    // Sem predicate — invalida qualquer query ativa, independente do
+    // nome da chave (audit D.9: a lista manual ficava dessincronizada).
+    expect(invalidate).toHaveBeenCalledWith();
   });
 
   it("mantém o botão ocupado enquanto projetos estão sendo atualizados", () => {
