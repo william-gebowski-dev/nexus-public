@@ -14,20 +14,21 @@ import {
   Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { ROUTES } from "@/lib/routes";
 
 const NAV = [
-  { to: "/", label: "Visão geral", icon: LayoutDashboard, end: true },
-  { to: "/routine", label: "Rotina 12×4", icon: CalendarClock },
-  { to: "/executions", label: "Execuções", icon: ListChecks },
-  { to: "/infrastructure", label: "Infraestrutura", icon: Server },
-  { to: "/agents", label: "Agentes", icon: Bot },
-  { to: "/mcps", label: "MCPs", icon: Plug },
-  { to: "/skills", label: "Skills", icon: Sparkles },
-  { to: "/automations", label: "Automações", icon: Workflow },
-  { to: "/projects", label: "Projetos", icon: FolderKanban },
-  { to: "/activities", label: "Atividades", icon: Activity },
-  { to: "/knowledge", label: "Conhecimento", icon: BookOpen },
-  { to: "/configs", label: "Configurações", icon: Settings },
+  { to: ROUTES.home, label: "Visão geral", icon: LayoutDashboard, end: true },
+  { to: ROUTES.routine, label: "Rotina 12×4", icon: CalendarClock },
+  { to: ROUTES.executions, label: "Execuções", icon: ListChecks },
+  { to: ROUTES.infrastructure, label: "Infraestrutura", icon: Server },
+  { to: ROUTES.agents, label: "Agentes", icon: Bot },
+  { to: ROUTES.mcps, label: "MCPs", icon: Plug },
+  { to: ROUTES.skills, label: "Skills", icon: Sparkles },
+  { to: ROUTES.automations, label: "Automações", icon: Workflow },
+  { to: ROUTES.projects, label: "Projetos", icon: FolderKanban },
+  { to: ROUTES.activities, label: "Atividades", icon: Activity },
+  { to: ROUTES.knowledge, label: "Conhecimento", icon: BookOpen },
+  { to: ROUTES.configs, label: "Configurações", icon: Settings },
 ];
 
 export function Sidebar({

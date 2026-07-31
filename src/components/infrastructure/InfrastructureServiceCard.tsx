@@ -4,6 +4,7 @@ import { formatDateTime, formatPercent } from "@/lib/format";
 import { AvailabilityStrip } from "@/components/availability/AvailabilityStrip";
 import { Pill } from "@/components/ui/Pill";
 import type { PillTone } from "@/lib/tones";
+import { ROUTES } from "@/lib/routes";
 
 const STATUS_COPY: Record<Service["status"], { label: string; tone: PillTone }> = {
   healthy: { label: "Operacional", tone: "green" },
@@ -56,7 +57,7 @@ export function InfrastructureServiceCard({ service }: { service: Infrastructure
         <span className="text-text-faint">
           Última falha: {service.lastFailureAt ? formatDateTime(service.lastFailureAt) : "sem registro recente"}
         </span>
-        <Link to={service.detailsHref ?? "/infraestrutura"} className="font-medium text-link hover:underline">
+        <Link to={service.detailsHref ?? ROUTES.infrastructure} className="font-medium text-link hover:underline">
           Detalhes
         </Link>
       </div>
