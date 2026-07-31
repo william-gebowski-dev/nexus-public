@@ -13,14 +13,30 @@ import type {
 } from "@/types";
 import { ROUTINE_BLOCKS, ROUTINE_TASKS } from "./routine-definition";
 
-const NOW = "2026-07-30T18:00:00-03:00";
-const NEXT_RUN = "2026-07-30T18:30:00-03:00";
-const LAST_RUN = "2026-07-30T18:00:00-03:00";
-const LAST_FAILURE = "2026-07-30T05:00:00-03:00";
+// "Hoje" dinâmico em BRT (-03:00) — antes era congelado em 2026-07-30, o
+// que fazia a tarefa 37 ficar permanentemente em execução e os relatórios
+// ficarem fora do relógio. Anchors derivados de mockNow() para que o
+// dashboard acompanhe o calendário real quando rodando em modo mock.
+function todayBRTDate(): string {
+  // Intl com timeZone fixo e en-CA (YYYY-MM-DD) para evitar deriva por locale.
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+}
+
+function nowBRTAt(hhmm: string): string {
+  return `${todayBRTDate()}T${hhmm}:00-03:00`;
+}
+
+// Fallback legacy: anchors congelados só se algo realmente exigir 30/07.
+// Mantidos por retrocompatibilidade com testes que possam depender deles.
+// (LEGACY_NOW removido por estar sem consumidores no momento.)
 
 export function mockNow(): string {
-  return NOW;
+  return nowBRTAt("18:00");
 }
+
+const NEXT_RUN = nowBRTAt("18:30");
+const LAST_RUN = mockNow();
+const LAST_FAILURE = nowBRTAt("05:00");
 
 interface TaskResultEntry {
   status: BlockExecutionState;
@@ -32,7 +48,7 @@ interface TaskResultEntry {
 }
 
 function isoTodayAt(time: string): string {
-  return `2026-07-30T${time}:00-03:00`;
+  return `${todayBRTDate()}T${time}:00-03:00`;
 }
 
 function isoTodayEnd(time: string): string {
@@ -40,7 +56,7 @@ function isoTodayEnd(time: string): string {
   const total = h * 60 + m + 30;
   const eh = String(Math.floor(total / 60) % 24).padStart(2, "0");
   const em = String(total % 60).padStart(2, "0");
-  return `2026-07-30T${eh}:${em}:00-03:00`;
+  return `${todayBRTDate()}T${eh}:${em}:00-03:00`;
 }
 
 function buildTaskResults(): Record<string, TaskResultEntry> {
@@ -208,7 +224,7 @@ export function applyResults(
   const failedJobs = flatTasks.filter((t) => t.status === "failed").length;
   const runningJobs = flatTasks.filter((t) => t.status === "running").length;
   return {
-    date: "2026-07-30",
+    date: todayBRTDate(),
     timezone: "America/Sao_Paulo",
     totalBlocks: 12,
     totalJobs: 48,

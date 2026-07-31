@@ -18,7 +18,6 @@ import { DailyRoutineTimeline } from "@/components/overview/DailyRoutineTimeline
 import { CronHealthSection } from "@/components/overview/CronHealthSection";
 import { DailyReportTeaser } from "@/components/overview/DailyReportTeaser";
 import { StaleBanner } from "@/components/overview/StaleBanner";
-import { MockDataBadge } from "@/components/overview/MockDataBadge";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 
@@ -82,7 +81,11 @@ export function Overview() {
         }
       />
 
-      <SystemStateBanner cron={cron.data} />
+      <SystemStateBanner
+        cron={cron.data}
+        isLoading={cron.isLoading}
+        recentFailures={routine.data?.failedJobs}
+      />
 
       <KpiRow cron={cron.data} routine={routine.data} status={status.data} />
 
@@ -134,7 +137,6 @@ export function Overview() {
       <DailyReportTeaser daily={daily.data} />
 
       <StaleBanner lastUpdate={cron.data?.lastRunAt ?? null} />
-      <MockDataBadge />
     </div>
   );
 }

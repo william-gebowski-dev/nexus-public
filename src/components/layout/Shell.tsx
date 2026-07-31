@@ -5,6 +5,7 @@ import { Topbar } from "./Topbar";
 import { MobileDrawer } from "./MobileDrawer";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { REFRESH_LABEL } from "@/lib/queryClient";
+import { MockDataBadge } from "@/components/overview/MockDataBadge";
 
 export function Shell() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -56,6 +57,7 @@ export function Shell() {
       </div>
 
       <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <MockDataBadge />
     </div>
   );
 }
