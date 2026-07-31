@@ -39,12 +39,22 @@ import {
   MOCK_GENERATED_ARTIFACTS,
   MOCK_INFRASTRUCTURE,
 } from "../src/data/mock-routine";
+import {
+  MOCK_AI_SUMMARY,
+  MOCK_AI_TOPOLOGY,
+} from "../src/data/mock-ai-infrastructure";
+import {
+  AiUsageSummarySchema,
+  AiTopologySchema,
+} from "../src/lib/schemas";
 
 type Case = { name: string; result: { success: boolean; error?: unknown } };
 
 const cases: Case[] = [
   { name: "MOCK_CRON_STATUS", result: CronStatusSchema.safeParse(MOCK_CRON_STATUS) },
   { name: "MOCK_ROUTINE_TODAY", result: RoutineDaySchema.safeParse(MOCK_ROUTINE_TODAY) },
+  { name: "MOCK_AI_SUMMARY", result: AiUsageSummarySchema.safeParse(MOCK_AI_SUMMARY) },
+  { name: "MOCK_AI_TOPOLOGY", result: AiTopologySchema.safeParse(MOCK_AI_TOPOLOGY) },
 ];
 
 for (const [i, exec] of MOCK_RECENT_EXECUTIONS.entries()) {

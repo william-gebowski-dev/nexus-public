@@ -12,6 +12,10 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "check:mocks": "node scripts/check-mocks.js",
+    "check:ai-contracts": "npx tsx scripts/check-ai-contracts.ts",
+    "ai:collect": "npx tsx scripts/ai-collector.ts --once",
+    "ai:collect:dry": "npx tsx scripts/ai-collector.ts --once --dry-run",
+    "ai:collect:watch": "npx tsx scripts/ai-collector.ts --watch",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },

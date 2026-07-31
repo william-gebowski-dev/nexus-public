@@ -1,0 +1,19 @@
+[Unit]
+Description=Nexus Local AI & 9Router Observability Collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=william
+WorkingDirectory=/home/william/Área de trabalho/dev/nexus-public
+Environment=ROUTER_BASE_URL=http://127.0.0.1:20128
+Environment=NEXUS_INGEST_URL=https://nexus-public-mu.vercel.app/api/ai/ingest
+Environment=NEXUS_INGEST_SECRET=SEU_SEGREDO_HMAC_AQUI
+Environment=COLLECTOR_INTERVAL_SECONDS=300
+ExecStart=/usr/bin/npx tsx scripts/ai-collector.ts --watch
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

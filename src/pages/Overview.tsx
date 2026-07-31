@@ -12,6 +12,7 @@ import type { Project } from "@/types";
 import { OverviewHeader } from "@/components/overview/OverviewHeader";
 import { SystemStateBanner } from "@/components/overview/SystemStateBanner";
 import { KpiRow } from "@/components/overview/KpiRow";
+import { AiInfrastructureTeaser } from "@/components/overview/AiInfrastructureTeaser";
 import { NowCard } from "@/components/overview/NowCard";
 import { NextExecutionCard } from "@/components/overview/NextExecutionCard";
 import { DailyRoutineTimeline } from "@/components/overview/DailyRoutineTimeline";
@@ -82,6 +83,8 @@ export function Overview() {
       />
 
       <KpiRow cron={cron.data} routine={routine.data} status={status.data} />
+
+      <AiInfrastructureTeaser />
 
       <section className="grid gap-3 lg:grid-cols-2">
         {!routine.data ? <CardSkeleton /> : <NowCard routine={routine.data} />}

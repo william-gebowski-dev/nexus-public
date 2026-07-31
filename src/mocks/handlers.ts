@@ -13,6 +13,16 @@ import {
   MOCK_ROUTINE_TODAY,
 } from "@/data/mock-routine";
 
+import {
+  MOCK_AI_INCIDENTS,
+  MOCK_AI_MODELS,
+  MOCK_AI_PROVIDERS,
+  MOCK_AI_QUOTAS,
+  MOCK_AI_REQUESTS,
+  MOCK_AI_SUMMARY,
+  MOCK_AI_TOPOLOGY,
+} from "@/data/mock-ai-infrastructure";
+
 import status from "./data/status.json";
 import services from "./data/services.json";
 import agents from "./data/agents.json";
@@ -187,4 +197,47 @@ export const handlers = [
 
   http.get("/api/availability", () =>
     jsonResponse(sanitizePayload(MOCK_AVAILABILITY))),
+
+  // === AI Infrastructure MSW Handlers ===
+  http.get("/api/ai/summary", ({ request }) => {
+    const url = new URL(request.url);
+    const period = url.searchParams.get("period") ?? "today";
+    return jsonResponse(sanitizePayload({ ...MOCK_AI_SUMMARY, period }));
+  }),
+
+  http.get("/api/ai/timeseries", ({ request }) => {
+    const url = new URL(request.url);
+    const metric = url.searchParams.get("metric") ?? "tokens";
+    const period = url.searchParams.get("period") ?? "today";
+    const points = Array.from({ length: 12 }, (_, i) => ({
+      bucket: `${String(i * 2).padStart(2, "0")}:00`,
+      value: metric === "tokens" ? Math.floor(10000000 + Math.random() * 15000000) : Math.floor(1 + Math.random() * 8),
+    }));
+    return jsonResponse(sanitizePayload({ metric, period, points, source: "simulated" }));
+  }),
+
+  http.get("/api/ai/models", () =>
+    jsonResponse(sanitizePayload(MOCK_AI_MODELS))),
+
+  http.get("/api/ai/providers", () =>
+    jsonResponse(sanitizePayload(MOCK_AI_PROVIDERS))),
+
+  http.get("/api/ai/quotas", () =>
+    jsonResponse(sanitizePayload(MOCK_AI_QUOTAS))),
+
+  http.get("/api/ai/requests", ({ request }) => {
+    const url = new URL(request.url);
+    const limit = Number(url.searchParams.get("limit") ?? 10);
+    const cursorRaw = url.searchParams.get("cursor");
+    const cursor = cursorRaw ? Number(cursorRaw) : 0;
+    const page = MOCK_AI_REQUESTS.slice(cursor, cursor + limit);
+    const nextCursor = cursor + limit < MOCK_AI_REQUESTS.length ? cursor + limit : null;
+    return jsonResponse(sanitizePayload({ items: page, nextCursor }));
+  }),
+
+  http.get("/api/ai/incidents", () =>
+    jsonResponse(sanitizePayload(MOCK_AI_INCIDENTS))),
+
+  http.get("/api/ai/topology", () =>
+    jsonResponse(sanitizePayload(MOCK_AI_TOPOLOGY))),
 ];
