@@ -6,6 +6,7 @@ import { Shell } from "@/components/layout/Shell";
 import { Overview } from "@/pages/Overview";
 import { Routine } from "@/pages/Routine";
 import { Executions } from "@/pages/Executions";
+import { ExecutionDetail } from "@/pages/ExecutionDetail";
 import { Infrastructure } from "@/pages/Infrastructure";
 import { Agents } from "@/pages/Agents";
 import { Mcps } from "@/pages/Mcps";
@@ -40,6 +41,7 @@ export function App() {
             <Route index element={<Overview />} />
             <Route path="routine" element={<Routine />} />
             <Route path="executions" element={<Executions />} />
+            <Route path="executions/:id" element={<ExecutionDetail />} />
             <Route path="infrastructure" element={<Infrastructure />} />
             <Route path="agents" element={<Agents />} />
             <Route path="mcps" element={<Mcps />} />

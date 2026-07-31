@@ -1,84 +1,64 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
-import { ExecutionRow } from "@/components/ui/ExecutionRow";
-import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { useMemo, useState } from "react";
+import { useRecentExecutions } from "@/hooks/useRecentExecutions";
+import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { ExecutionsFilters } from "@/components/executions/ExecutionsFilters";
+import { applyExecutionFilters, type ExecutionFilters } from "@/components/executions/filters";
+import { ExecutionTable } from "@/components/executions/ExecutionTable";
+import { ExecutionCardList } from "@/components/executions/ExecutionCardList";
+import { PaginationBar } from "@/components/executions/PaginationBar";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 25;
 
 export function Executions() {
-  const [cursor, setCursor] = useState<number | null>(null);
-  const q = useQuery({
-    queryKey: ["executions", PAGE_SIZE, cursor],
-    queryFn: () => api.executions(PAGE_SIZE, cursor),
-  });
+  const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<ExecutionFilters>({});
+  const cursor = page === 0 ? null : page;     // mock aceita Number | null
+  const recent = useRecentExecutions(PAGE_SIZE, cursor);
+
+  const filtered = useMemo(() => {
+    if (!recent.data) return [];
+    return applyExecutionFilters(recent.data.items, filters);
+  }, [recent.data, filters]);
+
+  if (recent.isLoading) return <CardSkeleton />;
+  if (recent.isError)
+    return <ErrorState error={recent.error} onRetry={() => void recent.refetch()} />;
+
+  const total = recent.data?.items.length ?? 0;
 
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="font-mono text-2xl font-semibold tracking-tight">Execuções</h1>
-        <p className="mt-1 text-sm text-text-dim">
-          Histórico paginado de execuções dos agentes e automações.
-        </p>
-      </header>
+      <PageHeader
+        title="Execuções"
+        subtitle="Histórico operacional das 48 tarefas diárias do Hermes"
+      />
 
-      <div className="nx-card overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-border text-[11px] uppercase tracking-wider text-text-faint">
-              <th className="py-2 pr-4">Execução</th>
-              <th className="py-2 pr-4">Runner</th>
-              <th className="py-2 pr-4">Início</th>
-              <th className="py-2 pr-4">Duração</th>
-              <th className="py-2">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {q.isLoading ? (
-              <tr>
-                <td colSpan={5} className="py-6">
-                  <LoadingSkeleton rows={3} />
-                </td>
-              </tr>
-            ) : q.isError ? (
-              <tr>
-                <td colSpan={5} className="py-6">
-                  <ErrorState onRetry={() => q.refetch()} />
-                </td>
-              </tr>
-            ) : !q.data || q.data.items.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="py-6">
-                  <EmptyState title="Nenhuma execução encontrada" />
-                </td>
-              </tr>
-            ) : (
-              q.data.items.map((e) => <ExecutionRow key={e.id} execution={e} />)
-            )}
-          </tbody>
-        </table>
-      </div>
+      <ExecutionsFilters initial={filters} onChange={setFilters} />
 
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setCursor((curr) => (curr === null ? PAGE_SIZE : curr - PAGE_SIZE))}
-          disabled={cursor === null}
-          className="nx-btn disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          ← Mais recentes
-        </button>
-        <button
-          type="button"
-          onClick={() => setCursor(() => q.data?.nextCursor ?? null)}
-          disabled={!q.data?.nextCursor}
-          className="nx-btn disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Mais antigas →
-        </button>
-      </div>
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="Nenhuma execução encontrada"
+          description="Tente ajustar os filtros acima ou aguarde a próxima janela de refresh (15 min)."
+        />
+      ) : (
+        <>
+          <div className="hidden md:block">
+            <ExecutionTable items={filtered} />
+          </div>
+          <div className="md:hidden">
+            <ExecutionCardList items={filtered} />
+          </div>
+          <PaginationBar
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={total}
+            onChange={setPage}
+          />
+        </>
+      )}
     </div>
   );
 }
