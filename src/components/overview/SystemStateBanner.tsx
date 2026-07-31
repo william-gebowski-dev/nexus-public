@@ -15,7 +15,7 @@ export function SystemStateBanner({
   recentFailures?: number;
 }) {
   let message: string;
-  let tone: "green" | "amber" | "red" = "green";
+  let tone: "green" | "amber" | "red";
   if (!cron?.gatewayRunning) {
     message = "O gateway não respondeu à última verificação";
     tone = "red";
