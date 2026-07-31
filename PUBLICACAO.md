@@ -35,21 +35,9 @@ npm run preview
 # Abre em http://localhost:4173 (porta padrão do vite preview)
 ```
 
-Verificações funcionais (com MSW ativo):
-
-- `/` (Overview): contagens batem com os JSONs (`servicesUp = soma dos healthy`,
-  `servicesAttention = soma dos attention`, etc.).
-- `/infraestrutura`: filtros mostram `IA`, `APIs`, `Web` — sem `VPS`, `Bancos`,
-  `Bots`, `Docker`, `Rede privada`.
-- `/ia`: 4 agentes, 2 MCPs, 7 skills (5 ativas), 5 modelos.
-- `/projetos`: 7 projetos; `router-local` e `central de agentes` refletem v2.
-- `/roadmap`: nenhum item cita `VPS`, `Uptime Kuma`, `Telegram`, `LiteLLM`,
-  `Postgres`, `Redis`; os itens `done` são milestones v2 (roteador local,
-  verificação do Combo, dashboard público).
-- `/atividades`: existe entrada do cutover para o roteador local (28/07).
-- `/alertas`: existe alerta sobre o roteador local sem unidade de inicialização.
-- `/docs`: snapshot congelado aparece com o aviso "Snapshot congelado de
-  28/07/2026".
+`npm run preview` sobe no modo padrão `mock` (MSW ativo). Para validar
+contra um backend local real, use `?mock=0` na URL ou exporte
+`VITE_DATA_MODE=api` antes do `npm run build`.
 
 ## 3. Verificação de privacidade
 
@@ -63,34 +51,72 @@ grep -E "(100\.1\d\d\.|hermes-nexus-os|\bhermes\b|\btailscale\b|srv\d{5,}|/opt/|
 npm run check:mocks
 ```
 
-## 4. Pendências fora do escopo local
+## 4. Configuração do projeto na Vercel
+
+O deploy depende da configuração correta do projeto **antes** do push:
+
+| Item                | Valor                                              |
+|---------------------|----------------------------------------------------|
+| Repositório         | `william-gebowski-dev/nexus-public`                |
+| Branch de produção  | `main`                                             |
+| Framework Preset    | Vite                                               |
+| Build Command       | `npm run build`                                    |
+| Install Command     | `npm ci`                                           |
+| Output Directory    | `dist`                                             |
+| Root Directory      | `./`                                               |
+
+Domínio esperado em **Domains** do projeto:
+
+- `nexus-public-mu.vercel.app` (produção)
+
+Se o domínio aparecer em outro projeto, movê-lo no painel da Vercel —
+o domínio é propriedade do **projeto**, não do deployment.
+
+Variáveis de ambiente (Production):
+
+| Variável             | Quando definir                              |
+|----------------------|---------------------------------------------|
+| `VITE_DATA_MODE`     | `api` quando o backend `/api/*` estiver no ar; caso contrário deixe `mock` |
+| `VITE_SUPABASE_URL`  | antes de habilitar `/admin` para mutação real |
+| `VITE_SUPABASE_ANON_KEY` | idem                                    |
+
+## 5. Após o push na `main`
+
+- A Vercel dispara deploy automático. Conferir o log em
+  `https://vercel.com/william-gebowski-dev/nexus-public`.
+- O deployment válido expõe a nova versão em
+  `https://nexus-public-mu.vercel.app` com cache invalidado em ~30 s.
+- Smoke-test em produção:
+
+  ```bash
+  curl -s https://nexus-public-mu.vercel.app/ | grep -c 'Nexus'   # ≥1
+  curl -sI https://nexus-public-mu.vercel.app/routine | head -1   # 200 OK
+  ```
+
+- Se o `vercel.json` retornar erro de "invalid route destination segment",
+  conferir se há alguma regra com `/:N` ou capturas de regex malformadas
+  (Vercel usa `$1`, `$2`... para regex, não `:1`).
+
+## 6. Pendências fora do escopo local
 
 Itens que **não** podem ser resolvidos daqui — precisam do William em outro
 terminal (com 2FA) ou na Vercel:
 
-1. **`gh auth login -h github.com`** — token atual está inválido; sem isso,
+1. **`gh auth login -h github.com`** — se o token `gh` expirar,
    `git push` falha. Re-autorizar e então:
    ```bash
-   git push -u origin redesign/dashboard-react-2026-07-28
+   git push -u origin main
    ```
-2. **Vercel — variáveis de ambiente** — quando `/admin` for habilitado, definir
-   `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` no painel do projeto
-   `nexus-public-mu`.
-3. **Desativar `status-page-publish.timer`** em `archive/vps-era/` — a
-   automação legada continua armada no monorepo. Mitigação atual é por
-   construção (Vercel serve `dist/index.html`, não a raiz), mas a limpeza
-   formal elimina o ruído.
+2. **Associação do domínio `nexus-public-mu.vercel.app`** — se o push
+   republica com sucesso mas o domínio continua no deployment antigo,
+   conferir a aba "Domains" do projeto `nexus-public` na Vercel. O
+   domínio precisa estar listado lá, não em outro projeto.
+3. **Backend `/api/*` real** — enquanto não existir, o front opera em
+   modo `mock` (MSW ativo, badge "Dados de demonstração" visível). O
+   coletor sanitizado do Hermes ainda precisa ser publicado como API
+   pública somente-leitura antes de mudar `VITE_DATA_MODE=api`.
 
-## 5. Após o push
-
-- A Vercel dispara deploy automático no push para `main` (ou no branch se
-  configurado). Conferir em `https://vercel.com/william-gebowski-dev/nexus-public`.
-- O deploy expõe a nova versão em `https://nexus-public-mu.vercel.app` com
-  cache invalidado em ~30 s.
-- Smoke-test em produção: `curl -s https://nexus-public-mu.vercel.app/ | grep -c 'Nexus'`
-  (deve retornar ≥1).
-
-## 6. Rollback
+## 7. Rollback
 
 Vercel mantém o histórico de deploys; o rollback é um clique no painel.
 Localmente, basta `git revert` do commit problemático e `git push`.

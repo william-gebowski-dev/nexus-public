@@ -2,23 +2,24 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@/styles/globals.css";
 import { App } from "@/App";
+import { DATA_MODE } from "@/services/nexus-api";
 
 /**
  * Define se o MSW deve interceptar as chamadas `/api/*`.
  *
- * - Em `vite dev` (import.meta.env.DEV): sempre liga — o app fica navegável
- *   sem backend.
- * - Em produção: só liga se `VITE_USE_MOCKS=true` (deploy de preview/demo).
- *   No deploy público de verdade, o front busca os endpoints reais em
- *   `/api/*`; enquanto não existirem, cada página mostra seu `ErrorState`
- *   em vez de publicar dados simulados como se fossem reais.
+ * A decisão fica centralizada em `DATA_MODE` (ver `nexus-api.ts`):
+ *   - `mock` (default): MSW ligado — app navegável sem backend.
+ *   - `api`: MSW desligado — cada página mostra seu `ErrorState` se o
+ *     endpoint real ainda não respondeu.
+ *
+ * Em dev (`npm run dev`) o override `?mock=0` na URL desliga os mocks
+ * para teste contra um backend local.
  *
  * Renderiza o app imediatamente — não bloqueia o paint esperando o SW.
  */
 async function maybeStartMocks(): Promise<void> {
   if (typeof window === "undefined") return;
-  const useMocks = import.meta.env.DEV || import.meta.env.VITE_USE_MOCKS === "true";
-  if (!useMocks) return;
+  if (DATA_MODE !== "mock") return;
   const { worker } = await import("@/mocks/browser");
   await worker.start({
     onUnhandledRequest: "bypass",

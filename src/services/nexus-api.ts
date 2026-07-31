@@ -29,12 +29,37 @@ import {
   MOCK_ROUTINE_TODAY,
 } from "@/data/mock-routine";
 
-/** Ativa/desativa dados mockados sem trocar o chamador. Use ?mock=1 na URL
- *  ou VITE_USE_MOCK_DATA=true para forçar. */
-export const USE_MOCK_DATA: boolean =
-  (typeof location !== "undefined" &&
-    new URLSearchParams(location.search).get("mock") === "1") ||
-  import.meta.env.VITE_USE_MOCK_DATA === "true";
+/**
+ * Fonte única do modo de dados do front.
+ *
+ * Aceita:
+ *   - `?mock=1` na URL (override de demo/debug)
+ *   - `VITE_DATA_MODE=mock` ou `=api` (env de build/deploy)
+ *
+ * Qualquer outro valor cai em `mock` enquanto não houver backend real,
+ * para que o dashboard continue navegável em preview/dev. Quando o
+ * `/api/*` estiver implementado, defina `VITE_DATA_MODE=api` na Vercel.
+ *
+ * MSW (service worker) e o badge "Dados de demonstração" consomem
+ * `USE_MOCK_DATA`, derivado daqui — nunca ler `import.meta.env`
+ * direto fora deste arquivo.
+ */
+export type DataMode = "mock" | "api";
+
+function resolveDataMode(): DataMode {
+  if (typeof location !== "undefined") {
+    const override = new URLSearchParams(location.search).get("mock");
+    if (override === "1") return "mock";
+    if (override === "0") return "api";
+  }
+  const env = import.meta.env.VITE_DATA_MODE;
+  return env === "api" ? "api" : "mock";
+}
+
+export const DATA_MODE: DataMode = resolveDataMode();
+
+/** Mantido por compatibilidade — novos consumidores devem importar `DATA_MODE`. */
+export const USE_MOCK_DATA: boolean = DATA_MODE === "mock";
 
 export const isMockDataEnabled = (): boolean => USE_MOCK_DATA;
 

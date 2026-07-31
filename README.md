@@ -7,15 +7,12 @@ em [`nexus-public-mu.vercel.app`](https://nexus-public-mu.vercel.app).
 - **Cache/sincronização:** TanStack Query com refresh automático (constante
   `REFRESH_MS` em `src/lib/queryClient.ts` — fonte única).
 - **Mock API:** MSW (Mock Service Worker) — endpoints `/api/*` servidos pelo
-  navegador em dev/produção. Gateado por `DEV || VITE_USE_MOCKS` em
-  `src/main.tsx`; quando o backend real estiver pronto, basta desligar o MSW
-  e os mesmos paths respondem.
-- **Roteamento:** React Router — `/`, `/infraestrutura`, `/ia`, `/projetos`,
-  `/roadmap`, `/atividades`, `/execucoes`, `/documentacao`, `/configuracoes`,
-  `/admin`, `/docs`.
-- **Documento legado:** `/docs` embute `public/legacy/index.html` (o "Registro
-  mestre do ecossistema de IA", snapshot congelado de 28/07/2026, com e-mails
-  removidos). Servido via `vercel.json` (`/legacy/:path*`).
+  navegador em dev/preview. Gateado por `DATA_MODE` em
+  `src/services/nexus-api.ts`; quando o backend real estiver pronto, basta
+  desligar os mocks e os mesmos paths respondem.
+- **Roteamento:** React Router — `/`, `/routine`, `/executions`,
+  `/infrastructure`, `/agents`, `/mcps`, `/skills`, `/automations`,
+  `/projects`, `/activities`, `/knowledge`, `/configs`, `/admin`.
 
 ## Arquitetura refletida (v2, local)
 
@@ -49,17 +46,20 @@ espelha esse gate para rodar offline antes do commit.
 
 | Path | Descrição |
 |---|---|
-| `/` | Visão geral: estado do ecossistema, contadores, top-10 atividades e execuções |
-| `/infraestrutura` | Serviços monitorados (IA, APIs, Web) com latência, disponibilidade e uptime 7d |
-| `/ia` | Agentes, MCPs, skills e modelos |
-| `/projetos` | Cards com filtros (estado, prioridade, categoria, tecnologia) |
-| `/roadmap` | Visualização por fases (Agora / Próximo / Futuro / Concluído) |
-| `/atividades` | Feed cronológico paginado com filtros por escopo |
-| `/execucoes` | Tabela paginada de execuções |
-| `/documentacao` | Documentos sanitizados e alertas |
-| `/configuracoes` | Tema, frequência de refresh, fontes de dados |
+| `/` | Visão geral: estado do ecossistema, execuções recentes, próxima execução e timeline 12×4 |
+| `/routine` | Rotina 12×4 do dia (48 jobs, blocos × tarefas) |
+| `/executions` | Tabela paginada de execuções |
+| `/executions/:id` | Detalhe de uma execução específica |
+| `/infrastructure` | Serviços monitorados (IA, APIs, Web) com latência, disponibilidade e uptime 7d |
+| `/agents` | Agentes ativos e estado de cada um |
+| `/mcps` | MCPs registrados e saúde |
+| `/skills` | Skills do catálogo |
+| `/automations` | Automações em execução e cronograma |
+| `/projects` | Cards com filtros (estado, prioridade, categoria, tecnologia) |
+| `/activities` | Feed cronológico paginado com filtros por escopo |
+| `/knowledge` | Documentos e base de conhecimento (sanitizados) |
+| `/configs` | Tema, frequência de refresh, fontes de dados |
 | `/admin` | Autenticação Supabase + edição (em construção) |
-| `/docs` | Documento legado "Registro mestre do ecossistema" (snapshot congelado) |
 
 ## Comandos
 
@@ -74,13 +74,35 @@ npm run preview      # preview do build
 npx msw init public/ # (apenas uma vez) gera o service worker do MSW
 ```
 
+## Modo de dados
+
+O front opera em dois modos, definidos por `VITE_DATA_MODE`:
+
+| Modo  | `VITE_DATA_MODE` | MSW | API real |
+|-------|------------------|-----|----------|
+| mock  | `mock` (default) | sim | não       |
+| api   | `api`            | não | sim      |
+
+Override por URL (útil para teste pontual):
+
+- `?mock=1` força modo mock mesmo se `VITE_DATA_MODE=api`
+- `?mock=0` força modo api mesmo se `VITE_DATA_MODE=mock`
+
+A leitura fica centralizada em `src/services/nexus-api.ts` —
+`main.tsx`, o badge "Dados de demonstração" e todos os métodos
+do `nexusApi` consomem o mesmo `DATA_MODE`. Não ler
+`import.meta.env` direto em outros lugares.
+
+> Quando o backend `/api/*` estiver publicado, defina
+> `VITE_DATA_MODE=api` no painel do projeto `nexus-public` na Vercel
+> (ambiente "Production") e os mocks somem automaticamente.
+
 ## Estrutura
 
 ```
 nexus-public/
 ├── index.html              # entry do Vite
 ├── public/
-│   ├── legacy/             # documento antigo (Registro mestre, snapshot)
 │   └── mockServiceWorker.js
 ├── scripts/
 │   └── check-mocks.js      # validador offline do gate de sanitização
@@ -89,12 +111,13 @@ nexus-public/
 │   ├── hooks/              # useDataFreshness, useCountdownRefresh, useDebounce, useTheme, useScrollRestoration
 │   ├── lib/                # api, queryClient, sanitize, supabase, format, cn, tones, focus
 │   ├── mocks/              # handlers MSW + serializers + JSONs seed
-│   ├── pages/              # 11 páginas + LegacyDocs
+│   ├── pages/              # 14 páginas (Overview, Routine, Executions, ExecutionDetail, Infrastructure, Agents, Mcps, Skills, Automations, Projects, Activities, Knowledge, Configs, Admin)
+│   ├── services/           # nexus-api.ts (fonte única de DATA_MODE)
 │   ├── styles/             # tokens.css + globals.css
 │   ├── types/              # tipos TS das entidades
 │   ├── App.tsx             # roteador + provider
 │   └── main.tsx            # bootstrap React + MSW
-├── vercel.json             # outputDirectory=dist + rewrites SPA + /legacy/*
+├── vercel.json             # outputDirectory=dist + rewrite SPA catch-all
 ├── tailwind.config.ts
 ├── vite.config.ts
 └── package.json
@@ -102,21 +125,27 @@ nexus-public/
 
 ## Deploy
 
-- `vercel.json` aponta `outputDirectory: "dist"` e rewrite SPA fallback
-  para `/index.html`. Paths `/legacy/*` são servidos diretos.
+- `vercel.json` aponta `outputDirectory: "dist"` e um único rewrite
+  catch-all `/(.*) → /index.html` para suportar rotas SPA
+  (`/routine`, `/executions`, etc.). Arquivos estáticos em
+  `dist/assets/*` são servidos diretos pela Vercel.
+- **Projeto Vercel:** `nexus-public` (id `prj_6iNJQVonHUO7RcBQM6t9JtKdD0TD`).
+- **Domínio:** `nexus-public-mu.vercel.app` — deve estar associado a esse
+  projeto. Se o domínio aparecer apontando para um deployment antigo,
+  conferir a aba "Domains" do projeto.
+- **Branch de produção:** `main`.
 - Vercel faz o build e o deploy a cada `git push` em `main`.
-- A Vercel serve o `dist/index.html` (a raiz do build do Vite). O legacy fica
-  em `/legacy/index.html`, também servido pela Vercel via rewrite.
 
-## Riscos abertos (registrados em `hermes-nexus-os/.agent/PROJECT_STATE.md`)
+### Pendências registradas
 
-- **Push bloqueado**: o token `gh auth` está inválido no desktop atual;
-  `gh auth login -h github.com` precisa ser refeito antes de subir este branch.
-- **Supabase**: `/admin` exige `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`
+- **Backend `/api/*` real ainda não existe neste repositório.** Os
+  endpoints consumidos pelo front (`/api/system/status`,
+  `/api/routine/today`, `/api/executions`, etc.) são atendidos pelo MSW
+  enquanto o coletor sanitizado do Hermes não é publicado. Por isso o
+  build público entra em modo `mock` por padrão.
+- **Supabase:** `/admin` exige `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`
   no painel da Vercel antes de qualquer mutação real.
-- **Timer legado**: a automação antiga de publicação de status
-  (`status-page-publish.timer` no monorepo) continua armada; se a VPS voltar
-  a rodar, ela pode tentar sobrescrever o `index.html` da raiz. **Mitigação
-  por construção**: o que a Vercel serve é `dist/index.html` (gerado pelo
-  Vite), não o `index.html` na raiz do repo. O legacy em `public/legacy/`
-  é servido apenas pela Vercel via rewrite.
+- **Domínio/projeto:** se o push para `main` republica mas o domínio
+  público continua no deployment antigo, conferir a associação
+  `nexus-public-mu.vercel.app` → projeto `nexus-public` na Vercel
+  (a aba Domains do projeto errado deixa o domínio órfão).
