@@ -492,7 +492,16 @@ export const AvailabilitySchema = z.record(z.string(), z.array(AvailabilityCheck
 
 export const AiUsagePeriodSchema = z.enum(["today", "24h", "7d", "30d", "60d"]);
 
-const AiDataSourceSchema = z.enum(["live", "periodic", "simulated"]);
+/**
+ * `live`     — todos os campos vieram do 9Router.
+ * `partial`  — parte dos dados é real; outra está ausente.
+ * `periodic` — snapshot real coletado em intervalo.
+ * `simulated`— dados de demonstração, sem origem no 9Router.
+ *
+ * Nunca inventar campo ausente: o normalizador deve virar o campo em
+ * `null` (e o tipo Zod aceita `null`) ou em "Sem dados" na UI.
+ */
+const AiDataSourceSchema = z.enum(["live", "partial", "periodic", "simulated"]);
 
 const AiProviderStatusSchema = z.enum([
   "operational",
