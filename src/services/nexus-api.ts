@@ -26,13 +26,10 @@ import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 /**
  * Fonte única do modo de dados do front.
  *
- * Aceita:
- *   - `?mock=1` na URL (override de demo/debug)
- *   - `VITE_DATA_MODE=mock` ou `=api` (env de build/deploy)
+ * Aceita apenas `VITE_DATA_MODE=mock|api`.
  *
- * Qualquer outro valor cai em `mock` enquanto não houver backend real,
- * para que o dashboard continue navegável em preview/dev. Quando o
- * `/api/*` estiver implementado, defina `VITE_DATA_MODE=api` na Vercel.
+ * Produção exige `VITE_DATA_MODE=api`; query string pública nunca pode
+ * trocar a fonte de dados do site publicado.
  *
  * MSW (service worker) e o badge "Dados de demonstração" consomem
  * `USE_MOCK_DATA`, derivado daqui — nunca ler `import.meta.env`
@@ -41,12 +38,10 @@ import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 export type DataMode = "mock" | "api";
 
 function resolveDataMode(): DataMode {
-  if (typeof location !== "undefined") {
-    const override = new URLSearchParams(location.search).get("mock");
-    if (override === "1") return "mock";
-    if (override === "0") return "api";
-  }
   const env = import.meta.env.VITE_DATA_MODE;
+  if (import.meta.env.PROD && env !== "api") {
+    throw new Error("Produção exige VITE_DATA_MODE=api.");
+  }
   return env === "api" ? "api" : "mock";
 }
 
@@ -64,21 +59,66 @@ export interface Page<T> {
   totalItems?: number;
 }
 
+export class ApiResponseError extends Error {
+  public readonly status: number;
+  public readonly path: string;
+  public readonly contentType: string | null;
+  public readonly requestId: string | null;
+
+  constructor(message: string, details: { status: number; path: string; contentType: string | null; requestId: string | null }) {
+    super(message);
+    this.name = "ApiResponseError";
+    this.status = details.status;
+    this.path = details.path;
+    this.contentType = details.contentType;
+    this.requestId = details.requestId;
+  }
+}
+
 async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
     method: "GET",
     headers: { accept: "application/json" },
     ...init,
   });
+  const contentType = res.headers.get("content-type");
+  const requestId = res.headers.get("x-request-id") ?? res.headers.get("x-vercel-id");
+  const raw = await res.text();
 
-  if (!res.ok) {
-    if (path.includes("/api/system/status") || path.includes("/api/status")) {
-      throw new Error("Não foi possível atualizar os dados do sistema.");
-    }
-    throw new Error("Não foi possível carregar os dados.");
+  if (!contentType || !contentType.includes("application/json")) {
+    console.warn("[nexus-api] invalid content-type", { path, status: res.status, contentType, requestId });
+    throw new ApiResponseError("A API não retornou uma resposta válida.", {
+      status: res.status,
+      path,
+      contentType,
+      requestId,
+    });
   }
 
-  return res.json() as Promise<T>;
+  let body: unknown;
+  try {
+    body = raw ? JSON.parse(raw) : null;
+  } catch {
+    console.warn("[nexus-api] invalid json", { path, status: res.status, contentType, requestId });
+    throw new ApiResponseError("A API não retornou uma resposta válida.", {
+      status: res.status,
+      path,
+      contentType,
+      requestId,
+    });
+  }
+
+  if (!res.ok) {
+    const fallback = path.includes("/api/system/status") || path.includes("/api/status")
+      ? "Não foi possível atualizar os dados do sistema."
+      : "Não foi possível carregar os dados.";
+    const message = body && typeof body === "object" && "error" in body && typeof body.error === "string"
+      ? body.error
+      : fallback;
+    throw new ApiResponseError(message, { status: res.status, path, contentType, requestId });
+  }
+
+  return body as T;
 }
 
 /**
@@ -246,17 +286,17 @@ export const nexusApi = {
 
   aiModels: async (period: AiUsagePeriod = "today") =>
     USE_MOCK_DATA
-      ? MOCK_AI_MODELS
+      ? { items: MOCK_AI_MODELS, snapshotId: null, capturedAt: null, source: "simulated" as const }
       : jsonGetSafe("aiModels", NEXUS_API_SCHEMAS.aiModels, `/api/ai/models?period=${period}`),
 
   aiProviders: async (period: AiUsagePeriod = "today") =>
     USE_MOCK_DATA
-      ? MOCK_AI_PROVIDERS
+      ? { items: MOCK_AI_PROVIDERS, snapshotId: null, capturedAt: null, source: "simulated" as const }
       : jsonGetSafe("aiProviders", NEXUS_API_SCHEMAS.aiProviders, `/api/ai/providers?period=${period}`),
 
   aiQuotas: async () =>
     USE_MOCK_DATA
-      ? MOCK_AI_QUOTAS
+      ? { items: MOCK_AI_QUOTAS, generatedAt: null, source: "simulated" as const }
       : jsonGetSafe("aiQuotas", NEXUS_API_SCHEMAS.aiQuotas, "/api/ai/quotas"),
 
   aiRequests: async (limit = 10, cursor: number | null = null) => {
@@ -275,7 +315,7 @@ export const nexusApi = {
 
   aiIncidents: async () =>
     USE_MOCK_DATA
-      ? MOCK_AI_INCIDENTS
+      ? { items: MOCK_AI_INCIDENTS, generatedAt: null, source: "simulated" as const }
       : jsonGetSafe("aiIncidents", NEXUS_API_SCHEMAS.aiIncidents, "/api/ai/incidents"),
 
   aiTopology: async () =>

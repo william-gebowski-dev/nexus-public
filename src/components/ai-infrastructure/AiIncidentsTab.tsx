@@ -22,6 +22,8 @@ export function AiIncidentsTab() {
     );
   }
 
+  const incidentRows = incidents.items;
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs font-mono text-amber-300">
@@ -29,10 +31,10 @@ export function AiIncidentsTab() {
       </div>
 
       <div className="space-y-3">
-        {incidents.length === 0 && (
+        {incidentRows.length === 0 && (
           <EmptyState title="Sem incidentes" description="Nenhum incidente foi reportado para a infraestrutura de IA." />
         )}
-        {incidents.map((inc) => (
+        {incidentRows.map((inc) => (
           <div key={inc.id} className="nx-card flex flex-col gap-3 p-5">
             <div className="flex items-start justify-between gap-3 border-b border-border/40 pb-3">
               <div className="flex items-center gap-2.5">

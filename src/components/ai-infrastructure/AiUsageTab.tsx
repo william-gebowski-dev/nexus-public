@@ -23,8 +23,8 @@ export function AiUsageTab({ period }: { period: AiUsagePeriod }) {
     );
   }
 
-  const providerRows = providers.data ?? [];
-  const modelRows = models.data ?? [];
+  const providerRows = providers.data?.items ?? [];
+  const modelRows = models.data?.items ?? [];
   const totalProviderCost = providerRows.reduce((sum, p) => sum + (p.estimatedCostUsd ?? 0), 0);
   const maxModelTokens = Math.max(0, ...modelRows.map((m) => m.inputTokens + m.outputTokens));
 

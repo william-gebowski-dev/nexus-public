@@ -69,3 +69,22 @@ export function pickNumber(
   const n = Number(raw);
   return Number.isFinite(n) ? n : null;
 }
+
+export function json(res: ApiResponse, statusCode: number, body: unknown) {
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(statusCode).json(body);
+}
+
+export function methodNotAllowed(res: ApiResponse, allow = "GET") {
+  res.setHeader("Allow", allow);
+  return json(res, 405, { error: "Método não permitido" });
+}
+
+export function unavailableSource(message = "Fonte operacional indisponível") {
+  return {
+    error: message,
+    source: "unavailable",
+    generatedAt: null,
+  };
+}

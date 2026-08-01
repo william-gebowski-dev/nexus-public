@@ -7,6 +7,7 @@ import {
   AiRequestRecordSchema,
   AiTopologySchema,
   AiUsageSummarySchema,
+  NEXUS_API_SCHEMAS,
 } from "../src/lib/schemas";
 import {
   MOCK_AI_INCIDENTS,
@@ -67,6 +68,10 @@ const cases: ContractCase[] = [
   { name: "EDGE_AI_REQUEST(queued/null)", res: AiRequestRecordSchema.safeParse(EDGE_AI_REQUEST) },
   { name: "EDGE_AI_QUOTA(near_limit/null)", res: AiProviderQuotaSchema.safeParse(EDGE_AI_QUOTA) },
   { name: "EDGE_AI_INCIDENT(null)", res: AiIncidentSchema.safeParse(EDGE_AI_INCIDENT) },
+  { name: "AI_MODEL_PAGE", res: NEXUS_API_SCHEMAS.aiModels.safeParse({ items: MOCK_AI_MODELS, snapshotId: null, capturedAt: null, source: "simulated" }) },
+  { name: "AI_PROVIDER_PAGE", res: NEXUS_API_SCHEMAS.aiProviders.safeParse({ items: MOCK_AI_PROVIDERS, snapshotId: null, capturedAt: null, source: "simulated" }) },
+  { name: "AI_QUOTA_PAGE", res: NEXUS_API_SCHEMAS.aiQuotas.safeParse({ items: MOCK_AI_QUOTAS, generatedAt: null, source: "simulated" }) },
+  { name: "AI_INCIDENT_PAGE", res: NEXUS_API_SCHEMAS.aiIncidents.safeParse({ items: MOCK_AI_INCIDENTS, generatedAt: null, source: "simulated" }) },
 ];
 
 for (const [i, m] of MOCK_AI_MODELS.entries()) {

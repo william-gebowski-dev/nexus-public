@@ -658,6 +658,26 @@ export const AiRequestPageSchema = z.object({
   nextCursor: z.number().int().nonnegative().nullable(),
 });
 
+export const AiModelPageSchema = z.object({
+  items: z.array(AiModelUsageSchema),
+  snapshotId: z.string().uuid().nullable(),
+  capturedAt: z.string().datetime({ offset: true }).nullable(),
+  source: AiDataSourceSchema,
+});
+
+export const AiProviderPageSchema = z.object({
+  items: z.array(AiProviderUsageSchema),
+  snapshotId: z.string().uuid().nullable(),
+  capturedAt: z.string().datetime({ offset: true }).nullable(),
+  source: AiDataSourceSchema,
+});
+
+export const AiQuotaPageSchema = z.object({
+  items: z.array(AiProviderQuotaSchema),
+  generatedAt: z.string().datetime({ offset: true }).nullable(),
+  source: AiDataSourceSchema,
+});
+
 export const AiIncidentSchema = z.object({
   id: z.string().min(1),
   type: z.string().min(1),
@@ -674,6 +694,12 @@ export const AiIncidentSchema = z.object({
   title: z.string().min(1),
   summary: z.string(),
   suggestedAction: nullableStringAsOptional,
+});
+
+export const AiIncidentPageSchema = z.object({
+  items: z.array(AiIncidentSchema),
+  generatedAt: z.string().datetime({ offset: true }).nullable(),
+  source: AiDataSourceSchema,
 });
 
 export const AiTopologyNodeSchema = z.object({
@@ -774,11 +800,11 @@ export const NEXUS_API_SCHEMAS = {
   // === AI Infrastructure Observability ===
   aiSummary: AiUsageSummarySchema,
   aiTimeseries: AiTimeseriesSchema,
-  aiModels: z.array(AiModelUsageSchema),
-  aiProviders: z.array(AiProviderUsageSchema),
-  aiQuotas: z.array(AiProviderQuotaSchema),
+  aiModels: AiModelPageSchema,
+  aiProviders: AiProviderPageSchema,
+  aiQuotas: AiQuotaPageSchema,
   aiRequests: AiRequestPageSchema,
-  aiIncidents: z.array(AiIncidentSchema),
+  aiIncidents: AiIncidentPageSchema,
   aiTopology: AiTopologySchema,
 } as const;
 

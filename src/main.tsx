@@ -12,13 +12,11 @@ import { DATA_MODE } from "@/services/nexus-api";
  *   - `api`: MSW desligado — cada página mostra seu `ErrorState` se o
  *     endpoint real ainda não respondeu.
  *
- * Em dev (`npm run dev`) o override `?mock=0` na URL desliga os mocks
- * para teste contra um backend local.
- *
  * Renderiza o app imediatamente — não bloqueia o paint esperando o SW.
  */
 async function maybeStartMocks(): Promise<void> {
   if (typeof window === "undefined") return;
+  if (import.meta.env.PROD) return;
   if (DATA_MODE !== "mock") return;
   const { worker } = await import("@/mocks/browser");
   await worker.start({

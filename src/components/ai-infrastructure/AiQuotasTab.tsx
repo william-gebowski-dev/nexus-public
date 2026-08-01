@@ -22,13 +22,14 @@ export function AiQuotasTab() {
     );
   }
 
-  if (quotas.length === 0) {
+  const quotaRows = quotas.items;
+  if (quotaRows.length === 0) {
     return <EmptyState title="Sem cotas" description="Nenhuma cota foi reportada pelos provedores." />;
   }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {quotas?.map((q) => {
+      {quotaRows.map((q) => {
         const remaining = q.remainingPct;
         const used = q.usedPct ?? (remaining !== null ? 100 - remaining : null);
         const tone =

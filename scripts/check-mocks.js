@@ -246,7 +246,7 @@ function checkShapes() {
 
 const shapesOk = checkShapes();
 
-if (fails > 0 || !shapeOk || !mocksOk || !shapesOk) {
+if (fails > 0 || !shapeOk || !mocksOk || !literalsOk || !shapesOk) {
   console.error(`\n❌ Mocks FALHARAM — ver saída acima.`);
   process.exit(1);
 }

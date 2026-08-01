@@ -27,7 +27,8 @@ export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
     );
   }
 
-  const filtered = (models ?? []).filter(
+  const modelRows = models.items;
+  const filtered = modelRows.filter(
     (m) =>
       m.publicName.toLowerCase().includes(search.toLowerCase()) ||
       m.providerName.toLowerCase().includes(search.toLowerCase()),

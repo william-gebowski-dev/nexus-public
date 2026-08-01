@@ -27,6 +27,11 @@ const PERIODS: { id: AiUsagePeriod; label: string }[] = [
   { id: "30d", label: "30 dias" },
   { id: "60d", label: "60 dias" },
 ];
+const PERIOD_IDS = new Set<AiUsagePeriod>(PERIODS.map((p) => p.id));
+
+function parsePeriod(value: string | null): AiUsagePeriod {
+  return value && PERIOD_IDS.has(value as AiUsagePeriod) ? (value as AiUsagePeriod) : "today";
+}
 
 /**
  * Página principal de Infraestrutura de IA. A aba ativa é derivada do
@@ -46,8 +51,7 @@ export function AiInfrastructure() {
     return found?.id ?? "usage";
   }, [location.pathname]);
 
-  const activePeriod: AiUsagePeriod =
-    (searchParams.get("period") as AiUsagePeriod) || "today";
+  const activePeriod = parsePeriod(searchParams.get("period"));
 
   const setTab = (tabId: TabId) => {
     const tab = TABS.find((t) => t.id === tabId);

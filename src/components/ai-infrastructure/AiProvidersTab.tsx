@@ -24,13 +24,14 @@ export function AiProvidersTab({ period }: { period: AiUsagePeriod }) {
     );
   }
 
-  if (providers.length === 0) {
+  const providerRows = providers.items;
+  if (providerRows.length === 0) {
     return <EmptyState title="Sem provedores" description="Nenhum provedor reportou uso para este período." />;
   }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      {providers?.map((p) => (
+      {providerRows.map((p) => (
         <div key={p.providerId} className="nx-card flex flex-col gap-3 p-5">
           <div className="flex items-center justify-between border-b border-border/40 pb-3">
             <div className="flex items-center gap-2">
