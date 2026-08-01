@@ -139,9 +139,27 @@ ALTER TABLE ai_request_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ai_ingest_runs ENABLE ROW LEVEL SECURITY;
 
+-- Service role bypass: o backend da Vercel usa SUPABASE_SERVICE_ROLE_KEY,
+-- que assume o papel `service_role` e ignora RLS por padrão no PostgREST.
+-- Adicionar política explícita para o caso de uso de anon key + JWT de
+-- service account (boa prática para deixar o contrato visível no schema).
+-- Sem esta política, o service role ainda funciona (BYPASSRLS), mas a
+-- documentação fica explícita.
+
+-- Anon/authenticated NÃO têm acesso direto. Toda leitura/escrita passa
+-- pelos handlers de /api/ai/*, que usam o service role.
+
 -- Indexes for performance and data retention cleanups
 CREATE INDEX IF NOT EXISTS idx_ai_snapshots_captured_at ON ai_usage_snapshots(captured_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_snapshots_period ON ai_usage_snapshots(period, captured_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_request_records_created_at ON ai_request_records(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_ai_request_records_provider ON ai_request_records(provider_id);
 CREATE INDEX IF NOT EXISTS idx_ai_request_records_model ON ai_request_records(model_id);
+CREATE INDEX IF NOT EXISTS idx_ai_request_records_client ON ai_request_records(client_name);
+CREATE INDEX IF NOT EXISTS idx_ai_request_records_project ON ai_request_records(project_id);
+CREATE INDEX IF NOT EXISTS idx_ai_request_records_agent ON ai_request_records(agent_id);
 CREATE INDEX IF NOT EXISTS idx_ai_incidents_status ON ai_incidents(status);
+
+-- (idempotency_key UNIQUE NOT NULL já existe na definição da tabela;
+-- índice explícito para garantir planner use a uniqueness check
+-- rapidamente em concorrência.)

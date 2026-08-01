@@ -35,6 +35,9 @@ jobs:
       - name: Validate mock contracts
         run: npm run check:mocks
 
+      - name: Validate AI contracts
+        run: npm run check:ai-contracts
+
       - name: Typecheck
         run: npm run typecheck
 
@@ -46,3 +49,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Audit (informational)
+        # Não falha o CI — vulnerabilidades são listadas para triagem.
+        # `npm audit fix --force` é desencorajado; atualizações seguras
+        # são feitas em commits separados após análise.
+        run: npm audit --json || true
