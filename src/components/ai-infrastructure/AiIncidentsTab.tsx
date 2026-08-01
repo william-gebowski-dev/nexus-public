@@ -1,12 +1,26 @@
 import { useAiIncidents } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { AlertTriangle, Info, ShieldAlert } from "lucide-react";
 
 export function AiIncidentsTab() {
-  const { data: incidents, isLoading } = useAiIncidents();
+  const { data: incidents, isLoading, isError, error, refetch } = useAiIncidents();
 
   if (isLoading) return <CardSkeleton />;
+
+  if (isError || !incidents) {
+    return (
+      <ErrorState
+        title="Não foi possível carregar os incidentes de IA."
+        error={error}
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -15,7 +29,10 @@ export function AiIncidentsTab() {
       </div>
 
       <div className="space-y-3">
-        {incidents?.map((inc) => (
+        {incidents.length === 0 && (
+          <EmptyState title="Sem incidentes" description="Nenhum incidente foi reportado para a infraestrutura de IA." />
+        )}
+        {incidents.map((inc) => (
           <div key={inc.id} className="nx-card flex flex-col gap-3 p-5">
             <div className="flex items-start justify-between gap-3 border-b border-border/40 pb-3">
               <div className="flex items-center gap-2.5">

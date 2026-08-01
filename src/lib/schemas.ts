@@ -528,7 +528,7 @@ const AiQuotaStatusSchema = z.enum([
   "unknown",
 ]);
 
-const AiRequestStatusSchema = z.enum(["success", "running", "failed", "cancelled"]);
+const AiRequestStatusSchema = z.enum(["success", "running", "failed", "cancelled", "queued"]);
 
 const AiIncidentStatusSchema = z.enum(["open", "acknowledged", "resolved", "ignored"]);
 
@@ -558,9 +558,9 @@ export const AiUsageSummarySchema = z.object({
   activeProviders: z.number().int().nonnegative(),
   activeModels: z.number().int().nonnegative(),
 
-  mostUsedProvider: z.string().optional(),
-  mostUsedModel: z.string().optional(),
-  lastRequestAt: z.string().datetime({ offset: true }).optional(),
+  mostUsedProvider: z.string().nullable().optional(),
+  mostUsedModel: z.string().nullable().optional(),
+  lastRequestAt: z.string().datetime({ offset: true }).nullable().optional(),
 });
 
 export const AiModelUsageSchema = z.object({
@@ -606,6 +606,11 @@ export const AiProviderUsageSchema = z.object({
   source: AiDataSourceSchema,
 });
 
+const nullableStringAsOptional = z.preprocess(
+  (value) => value === null ? undefined : value,
+  z.string().optional(),
+);
+
 export const AiProviderQuotaSchema = z.object({
   id: z.string().min(1),
   providerId: z.string().min(1),
@@ -617,7 +622,7 @@ export const AiProviderQuotaSchema = z.object({
   remainingPct: z.number().min(0).max(100).nullable(),
   resetsAt: z.string().datetime({ offset: true }).nullable(),
   checkedAt: z.string().datetime({ offset: true }),
-  message: z.string().optional(),
+  message: nullableStringAsOptional,
 });
 
 export const AiRequestRecordSchema = z.object({
@@ -629,11 +634,11 @@ export const AiRequestRecordSchema = z.object({
   modelId: z.string().min(1),
   modelName: z.string().min(1),
 
-  clientName: z.string().optional(),
-  projectId: z.string().optional(),
-  projectName: z.string().optional(),
-  agentId: z.string().optional(),
-  agentName: z.string().optional(),
+  clientName: nullableStringAsOptional,
+  projectId: nullableStringAsOptional,
+  projectName: nullableStringAsOptional,
+  agentId: nullableStringAsOptional,
+  agentName: nullableStringAsOptional,
 
   inputTokens: z.number().int().nonnegative(),
   cachedTokens: z.number().int().nonnegative(),
@@ -659,8 +664,8 @@ export const AiIncidentSchema = z.object({
   severity: AiIncidentSeveritySchema,
   status: AiIncidentStatusSchema,
 
-  providerId: z.string().optional(),
-  modelId: z.string().optional(),
+  providerId: nullableStringAsOptional,
+  modelId: nullableStringAsOptional,
 
   firstSeenAt: z.string().datetime({ offset: true }),
   lastSeenAt: z.string().datetime({ offset: true }),
@@ -668,7 +673,7 @@ export const AiIncidentSchema = z.object({
 
   title: z.string().min(1),
   summary: z.string(),
-  suggestedAction: z.string().optional(),
+  suggestedAction: nullableStringAsOptional,
 });
 
 export const AiTopologyNodeSchema = z.object({

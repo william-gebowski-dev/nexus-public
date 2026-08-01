@@ -214,7 +214,7 @@ export function normalizeRouterRequest(
     durationMs: raw.durationMs ?? null,
     estimatedCostUsd: raw.costUsd ?? null,
     status,
-    errorCategory: status === "failed" ? category : null,
+    errorCategory: status === "success" ? null : category,
     source: "live",
   };
 }
@@ -288,7 +288,7 @@ export interface RouterQuotaRaw {
   providerId?: string;
   providerName?: string;
   quotaType?: string;
-  status?: "available" | "low" | "exhausted" | "unknown";
+  status?: "available" | "low" | "near_limit" | "exhausted" | "unknown";
   usedPct?: number;
   remainingPct?: number;
   resetsAt?: string;
@@ -300,7 +300,7 @@ export interface NormalizedQuota {
   providerId: string;
   providerName: string;
   quotaType: string;
-  status: "available" | "low" | "exhausted" | "unknown";
+  status: "available" | "near_limit" | "exhausted" | "unknown";
   usedPct: number | null;
   remainingPct: number | null;
   resetsAt: string | null;
@@ -315,7 +315,7 @@ export function normalizeRouterQuota(raw: RouterQuotaRaw, now: Date): Normalized
     providerId: raw.providerId ?? "unknown",
     providerName: raw.providerName ?? mapProvider(raw.providerId ?? ""),
     quotaType: raw.quotaType ?? "default",
-    status: raw.status ?? "unknown",
+    status: raw.status === "low" ? "near_limit" : raw.status ?? "unknown",
     usedPct: typeof raw.usedPct === "number" ? raw.usedPct : null,
     remainingPct: typeof raw.remainingPct === "number" ? raw.remainingPct : null,
     resetsAt: raw.resetsAt ?? null,
@@ -351,10 +351,10 @@ export function detectIncident(
   if (!previous) {
     return {
       id: `inc-${req.id.slice(0, 8)}`,
-      type: req.status === "failed" && req.errorCategory?.includes("429")
+      type: req.errorCategory?.includes("429")
         ? "rate_limit_exceeded"
         : "auth_error",
-      severity: req.status === "failed" ? "warning" : "info",
+      severity: req.status === "failed" || req.errorCategory?.includes("429") ? "warning" : "info",
       status: "open",
       providerId: req.providerId,
       modelId: req.modelId,
@@ -406,7 +406,7 @@ export function aggregateSnapshot(
 ): NormalizedSnapshot {
   const total = requests.length;
   const failed = requests.filter((r) => r.status === "failed").length;
-  const successful = total - failed;
+  const successful = requests.filter((r) => r.status === "success").length;
   const input = requests.reduce((s, r) => s + r.inputTokens, 0);
   const cached = requests.reduce((s, r) => s + r.cachedTokens, 0);
   const output = requests.reduce((s, r) => s + r.outputTokens, 0);

@@ -1,23 +1,21 @@
-import { useSearchParams } from "react-router-dom";
+import { useMemo } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { AiOverviewTab } from "@/components/ai-infrastructure/AiOverviewTab";
 import { AiUsageTab } from "@/components/ai-infrastructure/AiUsageTab";
 import { AiModelsTab } from "@/components/ai-infrastructure/AiModelsTab";
 import { AiProvidersTab } from "@/components/ai-infrastructure/AiProvidersTab";
 import { AiQuotasTab } from "@/components/ai-infrastructure/AiQuotasTab";
 import { AiRequestsTab } from "@/components/ai-infrastructure/AiRequestsTab";
 import { AiIncidentsTab } from "@/components/ai-infrastructure/AiIncidentsTab";
-import { MockDataBadge } from "@/components/overview/MockDataBadge";
 
 const TABS = [
-  { id: "overview", label: "Visão geral" },
-  { id: "usage", label: "Uso e custos" },
-  { id: "models", label: "Modelos" },
-  { id: "providers", label: "Provedores" },
-  { id: "quotas", label: "Cotas" },
-  { id: "requests", label: "Requisições" },
-  { id: "incidents", label: "Incidentes" },
+  { id: "usage", path: "/ai-infrastructure/usage", label: "Uso e custos" },
+  { id: "models", path: "/ai-infrastructure/models", label: "Modelos" },
+  { id: "providers", path: "/ai-infrastructure/providers", label: "Provedores" },
+  { id: "quotas", path: "/ai-infrastructure/quotas", label: "Cotas" },
+  { id: "requests", path: "/ai-infrastructure/requests", label: "Requisições" },
+  { id: "incidents", path: "/ai-infrastructure/incidents", label: "Incidentes" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -30,23 +28,38 @@ const PERIODS: { id: AiUsagePeriod; label: string }[] = [
   { id: "60d", label: "60 dias" },
 ];
 
+/**
+ * Página principal de Infraestrutura de IA. A aba ativa é derivada do
+ * `pathname`; o período fica em `?period=`. Refresh direto em
+ * `/ai-infrastructure/models` preserva a aba.
+ *
+ * NOTA: o `MockDataBadge` é renderizado uma única vez no `Shell` para
+ * toda a aplicação. Esta página não deve duplicar o aviso.
+ */
 export function AiInfrastructure() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab: TabId = (searchParams.get("tab") as TabId) || "overview";
-  const activePeriod: AiUsagePeriod = (searchParams.get("period") as AiUsagePeriod) || "today";
+  const activeTab: TabId = useMemo(() => {
+    const found = TABS.find((t) => t.path === location.pathname);
+    return found?.id ?? "usage";
+  }, [location.pathname]);
 
-  const setTab = (tab: TabId) => {
-    setSearchParams((prev) => {
-      prev.set("tab", tab);
-      return prev;
-    });
+  const activePeriod: AiUsagePeriod =
+    (searchParams.get("period") as AiUsagePeriod) || "today";
+
+  const setTab = (tabId: TabId) => {
+    const tab = TABS.find((t) => t.id === tabId);
+    if (!tab) return;
+    navigate({ pathname: tab.path, search: location.search });
   };
 
   const setPeriod = (period: AiUsagePeriod) => {
     setSearchParams((prev) => {
-      prev.set("period", period);
-      return prev;
+      const updated = new URLSearchParams(prev);
+      updated.set("period", period);
+      return updated;
     });
   };
 
@@ -56,7 +69,6 @@ export function AiInfrastructure() {
         title="Infraestrutura de IA"
         subtitle="Observabilidade de modelos, provedores, consumo, cotas e incidentes da engine 9Router."
         actions={
-          /* Period Selector */
           <div className="flex items-center gap-1 bg-surface p-1 rounded-xl border border-border">
             {PERIODS.map((p) => (
               <button
@@ -76,7 +88,6 @@ export function AiInfrastructure() {
         }
       />
 
-      {/* Tabs Navigation */}
       <div className="flex overflow-x-auto border-b border-border/50 pb-px gap-2 scrollbar-none">
         {TABS.map((t) => (
           <button
@@ -94,9 +105,7 @@ export function AiInfrastructure() {
         ))}
       </div>
 
-      {/* Tab Content */}
       <main className="space-y-6">
-        {activeTab === "overview" && <AiOverviewTab period={activePeriod} />}
         {activeTab === "usage" && <AiUsageTab period={activePeriod} />}
         {activeTab === "models" && <AiModelsTab period={activePeriod} />}
         {activeTab === "providers" && <AiProvidersTab period={activePeriod} />}
@@ -104,8 +113,6 @@ export function AiInfrastructure() {
         {activeTab === "requests" && <AiRequestsTab />}
         {activeTab === "incidents" && <AiIncidentsTab />}
       </main>
-
-      <MockDataBadge />
     </div>
   );
 }

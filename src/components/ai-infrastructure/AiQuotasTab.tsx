@@ -1,17 +1,36 @@
 import { useAiQuotas } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { Gauge } from "lucide-react";
 
 export function AiQuotasTab() {
-  const { data: quotas, isLoading } = useAiQuotas();
+  const { data: quotas, isLoading, isError, error, refetch } = useAiQuotas();
 
   if (isLoading) return <CardSkeleton />;
+
+  if (isError || !quotas) {
+    return (
+      <ErrorState
+        title="Não foi possível carregar as cotas de IA."
+        error={error}
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
+
+  if (quotas.length === 0) {
+    return <EmptyState title="Sem cotas" description="Nenhuma cota foi reportada pelos provedores." />;
+  }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {quotas?.map((q) => {
         const remaining = q.remainingPct;
+        const used = q.usedPct ?? (remaining !== null ? 100 - remaining : null);
         const tone =
           remaining === null
             ? "neutral"
@@ -42,7 +61,7 @@ export function AiQuotasTab() {
             {remaining !== null ? (
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono text-text-dim">
-                  <span>Utilizado: {q.usedPct}%</span>
+                  <span>Utilizado: {used}%</span>
                   <span>Restante: {remaining}%</span>
                 </div>
                 <div className="h-2.5 w-full rounded-full bg-surface-hover overflow-hidden">
@@ -56,7 +75,7 @@ export function AiQuotasTab() {
                         ? "bg-amber-500"
                         : "bg-red-500"
                     }`}
-                    style={{ width: `${q.usedPct}%` }}
+                    style={{ width: `${used ?? 0}%` }}
                   />
                 </div>
               </div>

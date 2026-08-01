@@ -35,9 +35,9 @@ export interface AiUsageSummary {
   activeProviders: number;
   activeModels: number;
 
-  mostUsedProvider?: string;
-  mostUsedModel?: string;
-  lastRequestAt?: string;
+  mostUsedProvider?: string | null;
+  mostUsedModel?: string | null;
+  lastRequestAt?: string | null;
 }
 
 export interface AiModelUsage {
@@ -129,7 +129,7 @@ export interface AiRequestRecord {
   durationMs: number | null;
   estimatedCostUsd: number | null;
 
-  status: "success" | "running" | "failed" | "cancelled";
+  status: "success" | "running" | "failed" | "cancelled" | "queued";
   errorCategory?: string | null;
   source: "live" | "partial" | "periodic" | "simulated";
 }

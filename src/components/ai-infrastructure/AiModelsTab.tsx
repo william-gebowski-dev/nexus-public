@@ -1,16 +1,31 @@
 import { useState } from "react";
-import type { AiUsagePeriod } from "@/types/ai-infrastructure";
+import type { AiModelUsage, AiUsagePeriod } from "@/types/ai-infrastructure";
+import type { PillTone } from "@/lib/tones";
 import { useAiModels } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { Search } from "lucide-react";
 
 export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
-  const { data: models, isLoading } = useAiModels(period);
+  const { data: models, isLoading, isError, error, refetch } = useAiModels(period);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<"requests" | "cost" | "tokens" | "errors" | "latency">("requests");
 
   if (isLoading) return <CardSkeleton />;
+
+  if (isError || !models) {
+    return (
+      <ErrorState
+        title="Não foi possível carregar os modelos de IA."
+        error={error}
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
 
   const filtered = (models ?? []).filter(
     (m) =>
@@ -57,8 +72,13 @@ export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="nx-card overflow-x-auto">
+      {sorted.length === 0 ? (
+        <EmptyState
+          title="Nenhum modelo encontrado"
+          description="Ajuste a busca ou selecione outro período de uso."
+        />
+      ) : (
+        <div className="nx-card overflow-x-auto">
         <table className="w-full text-left text-xs font-mono">
           <thead className="border-b border-border/50 bg-surface/40 text-text-faint uppercase tracking-wider text-[10px]">
             <tr>
@@ -89,15 +109,36 @@ export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
                 </td>
                 <td className="p-3 text-right">{m.averageLatencyMs ?? 0} ms</td>
                 <td className="p-3 text-center">
-                  <Pill tone={m.status === "operational" ? "green" : m.status === "attention" ? "amber" : "neutral"}>
-                    {m.status === "operational" ? "Disponível" : m.status === "attention" ? "Atenção" : "Indisponível"}
+                  <Pill tone={modelStatusTone(m.status)}>
+                    {modelStatusLabel(m.status)}
                   </Pill>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function modelStatusTone(status: AiModelUsage["status"]): PillTone {
+  if (status === "operational") return "green";
+  if (status === "attention") return "amber";
+  if (status === "unavailable") return "red";
+  return "neutral";
+}
+
+function modelStatusLabel(status: AiModelUsage["status"]): string {
+  switch (status) {
+    case "operational":
+      return "Disponível";
+    case "attention":
+      return "Atenção";
+    case "unavailable":
+      return "Indisponível";
+    default:
+      return "Sem dados";
+  }
 }
