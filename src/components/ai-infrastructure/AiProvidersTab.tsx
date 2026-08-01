@@ -1,13 +1,32 @@
 import type { AiProviderStatus, AiUsagePeriod } from "@/types/ai-infrastructure";
+import type { PillTone } from "@/lib/tones";
 import { useAiProviders } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { ShieldCheck } from "lucide-react";
 
 export function AiProvidersTab({ period }: { period: AiUsagePeriod }) {
-  const { data: providers, isLoading } = useAiProviders(period);
+  const { data: providers, isLoading, isError, error, refetch } = useAiProviders(period);
 
   if (isLoading) return <CardSkeleton />;
+
+  if (isError || !providers) {
+    return (
+      <ErrorState
+        title="Não foi possível carregar os provedores de IA."
+        error={error}
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
+
+  if (providers.length === 0) {
+    return <EmptyState title="Sem provedores" description="Nenhum provedor reportou uso para este período." />;
+  }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -18,7 +37,7 @@ export function AiProvidersTab({ period }: { period: AiUsagePeriod }) {
               <ShieldCheck className="h-5 w-5 text-primary" />
               <h3 className="font-mono text-base font-semibold">{p.publicName}</h3>
             </div>
-            <Pill tone={p.status === "operational" ? "green" : p.status === "near_limit" ? "amber" : "neutral"}>
+            <Pill tone={providerStatusTone(p.status)}>
               {translateProviderStatus(p.status)}
             </Pill>
           </div>
@@ -56,6 +75,21 @@ export function AiProvidersTab({ period }: { period: AiUsagePeriod }) {
       ))}
     </div>
   );
+}
+
+function providerStatusTone(status: AiProviderStatus): PillTone {
+  if (status === "operational") return "green";
+  if (status === "attention" || status === "near_limit") return "amber";
+  if (
+    status === "exhausted" ||
+    status === "authentication_error" ||
+    status === "payment_required" ||
+    status === "no_access" ||
+    status === "unavailable"
+  ) {
+    return "red";
+  }
+  return "neutral";
 }
 
 function translateProviderStatus(status: AiProviderStatus): string {
