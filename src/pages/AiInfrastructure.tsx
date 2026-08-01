@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { AiOverviewTab } from "@/components/ai-infrastructure/AiOverviewTab";
 import { AiUsageTab } from "@/components/ai-infrastructure/AiUsageTab";
 import { AiModelsTab } from "@/components/ai-infrastructure/AiModelsTab";
 import { AiProvidersTab } from "@/components/ai-infrastructure/AiProvidersTab";
