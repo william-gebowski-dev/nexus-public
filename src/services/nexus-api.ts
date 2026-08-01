@@ -12,6 +12,16 @@ import {
   MOCK_RECENT_EXECUTIONS,
   MOCK_ROUTINE_TODAY,
 } from "@/data/mock-routine";
+import {
+  MOCK_AI_INCIDENTS,
+  MOCK_AI_MODELS,
+  MOCK_AI_PROVIDERS,
+  MOCK_AI_QUOTAS,
+  MOCK_AI_REQUESTS,
+  MOCK_AI_SUMMARY,
+  MOCK_AI_TOPOLOGY,
+} from "@/data/mock-ai-infrastructure";
+import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 
 /**
  * Fonte única do modo de dados do front.
@@ -216,6 +226,62 @@ export const nexusApi = {
     USE_MOCK_DATA
       ? MOCK_AVAILABILITY
       : jsonGetSafe("availability", NEXUS_API_SCHEMAS.availability, "/api/availability"),
+
+  // === AI Infrastructure Observability Endpoints ===
+  aiSummary: async (period: AiUsagePeriod = "today") =>
+    USE_MOCK_DATA
+      ? { ...MOCK_AI_SUMMARY, period }
+      : jsonGetSafe("aiSummary", NEXUS_API_SCHEMAS.aiSummary, `/api/ai/summary?period=${period}`),
+
+  aiTimeseries: async (metric = "tokens", period: AiUsagePeriod = "today") => {
+    if (USE_MOCK_DATA) {
+      const points = Array.from({ length: 12 }, (_, i) => ({
+        bucket: `${String(i * 2).padStart(2, "0")}:00`,
+        value: metric === "tokens" ? Math.floor(10000000 + Math.random() * 15000000) : Math.floor(1 + Math.random() * 8),
+      }));
+      return { metric, period, points, source: "simulated" as const };
+    }
+    return jsonGetSafe("aiTimeseries", NEXUS_API_SCHEMAS.aiTimeseries, `/api/ai/timeseries?metric=${metric}&period=${period}`);
+  },
+
+  aiModels: async (period: AiUsagePeriod = "today") =>
+    USE_MOCK_DATA
+      ? MOCK_AI_MODELS
+      : jsonGetSafe("aiModels", NEXUS_API_SCHEMAS.aiModels, `/api/ai/models?period=${period}`),
+
+  aiProviders: async (period: AiUsagePeriod = "today") =>
+    USE_MOCK_DATA
+      ? MOCK_AI_PROVIDERS
+      : jsonGetSafe("aiProviders", NEXUS_API_SCHEMAS.aiProviders, `/api/ai/providers?period=${period}`),
+
+  aiQuotas: async () =>
+    USE_MOCK_DATA
+      ? MOCK_AI_QUOTAS
+      : jsonGetSafe("aiQuotas", NEXUS_API_SCHEMAS.aiQuotas, "/api/ai/quotas"),
+
+  aiRequests: async (limit = 10, cursor: number | null = null) => {
+    if (USE_MOCK_DATA) {
+      const start = cursor ?? 0;
+      const end = start + limit;
+      return {
+        items: MOCK_AI_REQUESTS.slice(start, end),
+        nextCursor: end < MOCK_AI_REQUESTS.length ? end : null,
+      };
+    }
+    const qs = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) qs.set("cursor", String(cursor));
+    return jsonGetSafe("aiRequests", NEXUS_API_SCHEMAS.aiRequests, `/api/ai/requests?${qs}`);
+  },
+
+  aiIncidents: async () =>
+    USE_MOCK_DATA
+      ? MOCK_AI_INCIDENTS
+      : jsonGetSafe("aiIncidents", NEXUS_API_SCHEMAS.aiIncidents, "/api/ai/incidents"),
+
+  aiTopology: async () =>
+    USE_MOCK_DATA
+      ? MOCK_AI_TOPOLOGY
+      : jsonGetSafe("aiTopology", NEXUS_API_SCHEMAS.aiTopology, "/api/ai/topology"),
 };
 
 export const api = nexusApi;

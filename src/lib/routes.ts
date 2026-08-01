@@ -21,6 +21,14 @@ export const ROUTES = {
   configs: "/configs",
   admin: "/admin",
   dailyReport: (date: string) => `/reports/daily/${encodeURIComponent(date)}`,
+  // === AI Infrastructure Module ===
+  aiInfrastructure: "/ai-infrastructure",
+  aiUsage: "/ai-infrastructure/usage",
+  aiModels: "/ai-infrastructure/models",
+  aiProviders: "/ai-infrastructure/providers",
+  aiQuotas: "/ai-infrastructure/quotas",
+  aiRequests: "/ai-infrastructure/requests",
+  aiIncidents: "/ai-infrastructure/incidents",
 } as const;
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];

@@ -8,3 +8,4 @@ export * from "./alert";
 export * from "./summary";
 export * from "./nexus";
 export * from "./routine";
+export * from "./ai-infrastructure";

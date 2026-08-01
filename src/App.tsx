@@ -19,6 +19,9 @@ const ExecutionDetail = lazy(() =>
 const Infrastructure = lazy(() =>
   import("@/pages/Infrastructure").then((m) => ({ default: m.Infrastructure })),
 );
+const AiInfrastructure = lazy(() =>
+  import("@/pages/AiInfrastructure").then((m) => ({ default: m.AiInfrastructure })),
+);
 const Agents = lazy(() => import("@/pages/Agents").then((m) => ({ default: m.Agents })));
 const Mcps = lazy(() => import("@/pages/Mcps").then((m) => ({ default: m.Mcps })));
 const Skills = lazy(() => import("@/pages/Skills").then((m) => ({ default: m.Skills })));
@@ -59,6 +62,8 @@ export function App() {
               <Route path={ROUTES.routine.slice(1)} element={lazyRoute(<Routine />)} />
               <Route path={ROUTES.executions.slice(1)} element={lazyRoute(<Executions />)} />
               <Route path="executions/:id" element={lazyRoute(<ExecutionDetail />)} />
+              <Route path={ROUTES.aiInfrastructure.slice(1)} element={lazyRoute(<AiInfrastructure />)} />
+              <Route path="ai-infrastructure/*" element={lazyRoute(<AiInfrastructure />)} />
               <Route path={ROUTES.infrastructure.slice(1)} element={lazyRoute(<Infrastructure />)} />
               <Route path={ROUTES.agents.slice(1)} element={lazyRoute(<Agents />)} />
               <Route path={ROUTES.mcps.slice(1)} element={lazyRoute(<Mcps />)} />

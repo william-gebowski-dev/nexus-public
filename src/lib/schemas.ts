@@ -488,6 +488,235 @@ export const AvailabilityCheckSchema = z.object({
 });
 export const AvailabilitySchema = z.record(z.string(), z.array(AvailabilityCheckSchema));
 
+// === AI Infrastructure Observability =====================================
+
+export const AiUsagePeriodSchema = z.enum(["today", "24h", "7d", "30d", "60d"]);
+
+const AiDataSourceSchema = z.enum(["live", "periodic", "simulated"]);
+
+const AiProviderStatusSchema = z.enum([
+  "operational",
+  "attention",
+  "near_limit",
+  "exhausted",
+  "authentication_error",
+  "payment_required",
+  "no_access",
+  "unavailable",
+  "unknown",
+]);
+
+const AiModelStatusSchema = z.enum(["operational", "attention", "unavailable", "unknown"]);
+
+const AiQuotaStatusSchema = z.enum([
+  "available",
+  "attention",
+  "near_limit",
+  "exhausted",
+  "authentication_error",
+  "payment_required",
+  "no_access",
+  "unknown",
+]);
+
+const AiRequestStatusSchema = z.enum(["success", "running", "failed", "cancelled"]);
+
+const AiIncidentStatusSchema = z.enum(["open", "acknowledged", "resolved", "ignored"]);
+
+const AiIncidentSeveritySchema = z.enum(["info", "warning", "critical"]);
+
+export const AiUsageSummarySchema = z.object({
+  period: AiUsagePeriodSchema,
+  generatedAt: z.string().datetime({ offset: true }),
+  source: AiDataSourceSchema,
+
+  totalRequests: z.number().int().nonnegative(),
+  successfulRequests: z.number().int().nonnegative(),
+  failedRequests: z.number().int().nonnegative(),
+
+  inputTokens: z.number().int().nonnegative(),
+  cachedInputTokens: z.number().int().nonnegative(),
+  outputTokens: z.number().int().nonnegative(),
+  totalTokens: z.number().int().nonnegative(),
+
+  cacheRatePct: z.number().min(0).max(100),
+  errorRatePct: z.number().min(0).max(100),
+
+  estimatedCostUsd: z.number().nonnegative().nullable(),
+  averageLatencyMs: z.number().nonnegative().nullable(),
+  medianLatencyMs: z.number().nonnegative().nullable(),
+
+  activeProviders: z.number().int().nonnegative(),
+  activeModels: z.number().int().nonnegative(),
+
+  mostUsedProvider: z.string().optional(),
+  mostUsedModel: z.string().optional(),
+  lastRequestAt: z.string().datetime({ offset: true }).optional(),
+});
+
+export const AiModelUsageSchema = z.object({
+  modelId: z.string().min(1),
+  publicName: z.string().min(1),
+  providerId: z.string().min(1),
+  providerName: z.string().min(1),
+
+  requests: z.number().int().nonnegative(),
+  inputTokens: z.number().int().nonnegative(),
+  cachedTokens: z.number().int().nonnegative(),
+  outputTokens: z.number().int().nonnegative(),
+
+  estimatedCostUsd: z.number().nonnegative().nullable(),
+  averageLatencyMs: z.number().nonnegative().nullable(),
+  medianLatencyMs: z.number().nonnegative().nullable(),
+  errorCount: z.number().int().nonnegative(),
+
+  lastUsedAt: z.string().datetime({ offset: true }).nullable(),
+  status: AiModelStatusSchema,
+  source: AiDataSourceSchema,
+});
+
+export const AiProviderUsageSchema = z.object({
+  providerId: z.string().min(1),
+  publicName: z.string().min(1),
+  status: AiProviderStatusSchema,
+  activeModels: z.number().int().nonnegative(),
+
+  requests: z.number().int().nonnegative(),
+  inputTokens: z.number().int().nonnegative(),
+  cachedTokens: z.number().int().nonnegative(),
+  outputTokens: z.number().int().nonnegative(),
+  totalTokens: z.number().int().nonnegative(),
+
+  estimatedCostUsd: z.number().nonnegative().nullable(),
+  averageLatencyMs: z.number().nonnegative().nullable(),
+  errorCount: z.number().int().nonnegative(),
+
+  lastUsedAt: z.string().datetime({ offset: true }).nullable(),
+  authStatus: z.string(),
+  quotaStatus: z.string(),
+  source: AiDataSourceSchema,
+});
+
+export const AiProviderQuotaSchema = z.object({
+  id: z.string().min(1),
+  providerId: z.string().min(1),
+  providerName: z.string().min(1),
+  quotaType: z.string().min(1),
+
+  status: AiQuotaStatusSchema,
+  usedPct: z.number().min(0).max(100).nullable(),
+  remainingPct: z.number().min(0).max(100).nullable(),
+  resetsAt: z.string().datetime({ offset: true }).nullable(),
+  checkedAt: z.string().datetime({ offset: true }),
+  message: z.string().optional(),
+});
+
+export const AiRequestRecordSchema = z.object({
+  id: z.string().min(1),
+  createdAt: z.string().datetime({ offset: true }),
+
+  providerId: z.string().min(1),
+  providerName: z.string().min(1),
+  modelId: z.string().min(1),
+  modelName: z.string().min(1),
+
+  clientName: z.string().optional(),
+  projectId: z.string().optional(),
+  projectName: z.string().optional(),
+  agentId: z.string().optional(),
+  agentName: z.string().optional(),
+
+  inputTokens: z.number().int().nonnegative(),
+  cachedTokens: z.number().int().nonnegative(),
+  outputTokens: z.number().int().nonnegative(),
+  totalTokens: z.number().int().nonnegative(),
+
+  durationMs: z.number().nonnegative().nullable(),
+  estimatedCostUsd: z.number().nonnegative().nullable(),
+
+  status: AiRequestStatusSchema,
+  errorCategory: z.string().nullable().optional(),
+  source: AiDataSourceSchema,
+});
+
+export const AiRequestPageSchema = z.object({
+  items: z.array(AiRequestRecordSchema),
+  nextCursor: z.number().int().nonnegative().nullable(),
+});
+
+export const AiIncidentSchema = z.object({
+  id: z.string().min(1),
+  type: z.string().min(1),
+  severity: AiIncidentSeveritySchema,
+  status: AiIncidentStatusSchema,
+
+  providerId: z.string().optional(),
+  modelId: z.string().optional(),
+
+  firstSeenAt: z.string().datetime({ offset: true }),
+  lastSeenAt: z.string().datetime({ offset: true }),
+  occurrences: z.number().int().nonnegative(),
+
+  title: z.string().min(1),
+  summary: z.string(),
+  suggestedAction: z.string().optional(),
+});
+
+export const AiTopologyNodeSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  type: z.enum(["tool", "router", "provider", "model"]),
+  status: z.enum([
+    "operational",
+    "attention",
+    "near_limit",
+    "exhausted",
+    "authentication_error",
+    "payment_required",
+    "no_access",
+    "unavailable",
+    "unknown",
+  ]),
+  lastUsedAt: z.string().datetime({ offset: true }).optional(),
+  requestsCount: z.number().int().nonnegative().optional(),
+  latencyMs: z.number().nonnegative().optional(),
+  errorCount: z.number().int().nonnegative().optional(),
+});
+
+export const AiTopologyEdgeSchema = z.object({
+  from: z.string().min(1),
+  to: z.string().min(1),
+});
+
+export const AiTopologySchema = z.object({
+  nodes: z.array(AiTopologyNodeSchema),
+  edges: z.array(AiTopologyEdgeSchema),
+});
+
+export const AiTimeseriesPointSchema = z.object({
+  bucket: z.string(),
+  value: z.number().nonnegative(),
+});
+
+export const AiTimeseriesSchema = z.object({
+  metric: z.enum(["tokens", "cost", "requests", "latency", "errors", "cache"]),
+  period: AiUsagePeriodSchema,
+  points: z.array(AiTimeseriesPointSchema),
+  source: AiDataSourceSchema,
+});
+
+export const AiIngestPayloadSchema = z.object({
+  snapshot: AiUsageSummarySchema,
+  modelUsage: z.array(AiModelUsageSchema),
+  providerUsage: z.array(AiProviderUsageSchema),
+  providerQuotas: z.array(AiProviderQuotaSchema),
+  requestRecords: z.array(AiRequestRecordSchema),
+  incidents: z.array(AiIncidentSchema),
+  topology: AiTopologySchema,
+  payloadVersion: z.string(),
+  collectorVersion: z.string(),
+});
+
 // === Map de schemas por método do nexusApi ================================
 //
 // A chave é o nome do método em `nexusApi`. Usado tanto em runtime
@@ -528,6 +757,15 @@ export const NEXUS_API_SCHEMAS = {
   activities: ActivityPageSchema,
   search: SearchResultSchema,
   availability: AvailabilitySchema,
+  // === AI Infrastructure Observability ===
+  aiSummary: AiUsageSummarySchema,
+  aiTimeseries: AiTimeseriesSchema,
+  aiModels: z.array(AiModelUsageSchema),
+  aiProviders: z.array(AiProviderUsageSchema),
+  aiQuotas: z.array(AiProviderQuotaSchema),
+  aiRequests: AiRequestPageSchema,
+  aiIncidents: z.array(AiIncidentSchema),
+  aiTopology: AiTopologySchema,
 } as const;
 
 export type NexusApiMethod = keyof typeof NEXUS_API_SCHEMAS;
