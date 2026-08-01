@@ -20,9 +20,53 @@ import {
 
 console.log("=== Validando Contratos de Observabilidade de IA (Zod Schemas) ===");
 
-const cases = [
+type ContractCase = {
+  name: string;
+  res: { success: true } | { success: false; error: unknown };
+};
+
+const EDGE_AI_SUMMARY = {
+  ...MOCK_AI_SUMMARY,
+  source: "partial" as const,
+  mostUsedProvider: null,
+  mostUsedModel: null,
+  lastRequestAt: null,
+};
+
+const EDGE_AI_REQUEST = {
+  ...MOCK_AI_REQUESTS[0],
+  status: "queued" as const,
+  clientName: null,
+  projectId: null,
+  projectName: null,
+  agentId: null,
+  agentName: null,
+  errorCategory: "429 - Limite temporário atingido",
+};
+
+const EDGE_AI_QUOTA = {
+  ...MOCK_AI_QUOTAS[0],
+  status: "near_limit" as const,
+  usedPct: null,
+  remainingPct: null,
+  resetsAt: null,
+  message: null,
+};
+
+const EDGE_AI_INCIDENT = {
+  ...MOCK_AI_INCIDENTS[0],
+  providerId: null,
+  modelId: null,
+  suggestedAction: null,
+};
+
+const cases: ContractCase[] = [
   { name: "MOCK_AI_SUMMARY", res: AiUsageSummarySchema.safeParse(MOCK_AI_SUMMARY) },
   { name: "MOCK_AI_TOPOLOGY", res: AiTopologySchema.safeParse(MOCK_AI_TOPOLOGY) },
+  { name: "EDGE_AI_SUMMARY(partial/null)", res: AiUsageSummarySchema.safeParse(EDGE_AI_SUMMARY) },
+  { name: "EDGE_AI_REQUEST(queued/null)", res: AiRequestRecordSchema.safeParse(EDGE_AI_REQUEST) },
+  { name: "EDGE_AI_QUOTA(near_limit/null)", res: AiProviderQuotaSchema.safeParse(EDGE_AI_QUOTA) },
+  { name: "EDGE_AI_INCIDENT(null)", res: AiIncidentSchema.safeParse(EDGE_AI_INCIDENT) },
 ];
 
 for (const [i, m] of MOCK_AI_MODELS.entries()) {

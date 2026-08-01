@@ -14,7 +14,7 @@ export type AiProviderStatus =
 export interface AiUsageSummary {
   period: AiUsagePeriod;
   generatedAt: string;
-  source: "live" | "periodic" | "simulated";
+  source: "live" | "partial" | "periodic" | "simulated";
 
   totalRequests: number;
   successfulRequests: number;
@@ -35,9 +35,9 @@ export interface AiUsageSummary {
   activeProviders: number;
   activeModels: number;
 
-  mostUsedProvider?: string;
-  mostUsedModel?: string;
-  lastRequestAt?: string;
+  mostUsedProvider?: string | null;
+  mostUsedModel?: string | null;
+  lastRequestAt?: string | null;
 }
 
 export interface AiModelUsage {
@@ -58,7 +58,7 @@ export interface AiModelUsage {
 
   lastUsedAt: string | null;
   status: "operational" | "attention" | "unavailable" | "unknown";
-  source: "live" | "periodic" | "simulated";
+  source: "live" | "partial" | "periodic" | "simulated";
 }
 
 export interface AiProviderUsage {
@@ -80,7 +80,7 @@ export interface AiProviderUsage {
   lastUsedAt: string | null;
   authStatus: string;
   quotaStatus: string;
-  source: "live" | "periodic" | "simulated";
+  source: "live" | "partial" | "periodic" | "simulated";
 }
 
 export interface AiProviderQuota {
@@ -129,9 +129,9 @@ export interface AiRequestRecord {
   durationMs: number | null;
   estimatedCostUsd: number | null;
 
-  status: "success" | "running" | "failed" | "cancelled";
+  status: "success" | "running" | "failed" | "cancelled" | "queued";
   errorCategory?: string | null;
-  source: "live" | "periodic" | "simulated";
+  source: "live" | "partial" | "periodic" | "simulated";
 }
 
 export interface AiIncident {

@@ -21,6 +21,7 @@ export function AiInfrastructureTeaser() {
   }
 
   const isOperational = summary.failedRequests === 0 || summary.errorRatePct < 2;
+  const lastRequestLabel = formatLastRequest(summary.lastRequestAt);
 
   return (
     <section className="nx-card flex flex-col gap-4 p-5 transition-all hover:border-primary/40">
@@ -92,11 +93,29 @@ export function AiInfrastructureTeaser() {
         </div>
         <div className="flex items-center gap-1.5 text-text-faint text-[11px]">
           <Zap className="h-3 w-3 text-amber-400" />
-          <span>Última requisição: há 52 segundos</span>
+          <span>Última requisição: {lastRequestLabel}</span>
         </div>
       </div>
     </section>
   );
+}
+
+function formatLastRequest(lastRequestAt: string | null | undefined): string {
+  if (!lastRequestAt) return "sem dados";
+  const timestamp = new Date(lastRequestAt).getTime();
+  if (Number.isNaN(timestamp)) return "sem dados";
+
+  const diffSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+  if (diffSeconds < 60) return `há ${diffSeconds} segundo${diffSeconds === 1 ? "" : "s"}`;
+
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `há ${diffMinutes} minuto${diffMinutes === 1 ? "" : "s"}`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `há ${diffHours} hora${diffHours === 1 ? "" : "s"}`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  return `há ${diffDays} dia${diffDays === 1 ? "" : "s"}`;
 }
 
 function MetricTile({

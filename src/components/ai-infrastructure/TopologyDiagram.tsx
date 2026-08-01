@@ -1,12 +1,32 @@
+import type { AiTopologyNode } from "@/types/ai-infrastructure";
+import type { PillTone } from "@/lib/tones";
 import { useAiTopology } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+
+type TopologyStatus = AiTopologyNode["status"];
 
 export function TopologyDiagram() {
-  const { data: topology, isLoading, isError } = useAiTopology();
+  const { data: topology, isLoading, isError, error, refetch } = useAiTopology();
 
   if (isLoading) return <CardSkeleton />;
-  if (isError || !topology) return null;
+  if (isError || !topology) {
+    return (
+      <ErrorState
+        title="Não foi possível carregar a topologia de IA."
+        error={error}
+        onRetry={() => {
+          void refetch();
+        }}
+      />
+    );
+  }
+
+  if (topology.nodes.length === 0) {
+    return <EmptyState title="Sem topologia" description="Nenhum nó de roteamento foi reportado pelo coletor." />;
+  }
 
   const tools = topology.nodes.filter((n) => n.type === "tool");
   const router = topology.nodes.find((n) => n.type === "router");
@@ -27,7 +47,7 @@ export function TopologyDiagram() {
           {tools.map((t) => (
             <div key={t.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-surface/60 p-2.5 text-xs font-mono">
               <span>{t.name}</span>
-              <Pill tone="green">Ativo</Pill>
+              <Pill tone={statusTone(t.status)}>{statusLabel(t.status)}</Pill>
             </div>
           ))}
         </div>
@@ -39,7 +59,7 @@ export function TopologyDiagram() {
             <div className="flex flex-col gap-1 items-center justify-center rounded-xl border-2 border-primary/40 bg-primary/10 p-4 text-center">
               <span className="font-mono text-sm font-bold text-primary">{router.name}</span>
               <span className="text-[11px] text-text-dim font-mono">Porta 20128</span>
-              <Pill tone="green">Operacional</Pill>
+              <Pill tone={statusTone(router.status)}>{statusLabel(router.status)}</Pill>
             </div>
           )}
         </div>
@@ -50,8 +70,8 @@ export function TopologyDiagram() {
           {providers.map((p) => (
             <div key={p.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-surface/60 p-2.5 text-xs font-mono">
               <span>{p.name}</span>
-              <Pill tone={p.status === "operational" ? "green" : "amber"}>
-                {p.status === "operational" ? "Ativo" : "Atenção"}
+              <Pill tone={statusTone(p.status)}>
+                {statusLabel(p.status)}
               </Pill>
             </div>
           ))}
@@ -63,11 +83,49 @@ export function TopologyDiagram() {
           {models.map((m) => (
             <div key={m.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-surface/60 p-2.5 text-xs font-mono">
               <span className="truncate">{m.name}</span>
-              <Pill tone="neutral">OK</Pill>
+              <Pill tone={statusTone(m.status)}>{statusLabel(m.status)}</Pill>
             </div>
           ))}
         </div>
       </div>
     </div>
   );
+}
+
+function statusTone(status: TopologyStatus): PillTone {
+  if (status === "operational") return "green";
+  if (status === "attention" || status === "near_limit") return "amber";
+  if (
+    status === "exhausted" ||
+    status === "authentication_error" ||
+    status === "payment_required" ||
+    status === "no_access" ||
+    status === "unavailable"
+  ) {
+    return "red";
+  }
+  return "neutral";
+}
+
+function statusLabel(status: TopologyStatus): string {
+  switch (status) {
+    case "operational":
+      return "Operacional";
+    case "attention":
+      return "Atenção";
+    case "near_limit":
+      return "Limite próximo";
+    case "exhausted":
+      return "Esgotado";
+    case "authentication_error":
+      return "Auth inválida";
+    case "payment_required":
+      return "Pagamento";
+    case "no_access":
+      return "Sem acesso";
+    case "unavailable":
+      return "Indisponível";
+    default:
+      return "Sem dados";
+  }
 }

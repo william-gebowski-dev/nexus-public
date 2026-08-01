@@ -1,14 +1,13 @@
-import { MOCK_AI_QUOTAS } from "../../src/data/mock-ai-infrastructure";
+import { getSupabaseServer } from "../_shared/supabaseServer";
+import type { ApiRequest, ApiResponse } from "../_shared/http";
 
-type ApiRequest = {
-  method?: string;
-};
-
-type ApiResponse = {
-  setHeader: (name: string, value: string) => void;
-  status: (statusCode: number) => { json: (body: unknown) => void };
-};
-
+/**
+ * GET /api/ai/quotas
+ *
+ * Retorna a informação mais recente de cada cota (uma linha por
+ * provider/quota_type, ordenada por `checked_at` desc e deduplicada
+ * por `(provider_id, quota_type)`).
+ */
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
 
@@ -17,5 +16,46 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
-  return res.status(200).json(MOCK_AI_QUOTAS);
+  let supabase;
+  try {
+    supabase = getSupabaseServer();
+  } catch (err) {
+    console.error("[quotas] Supabase indisponível", (err as Error).message);
+    return res.status(500).json({ error: "Persistência indisponível" });
+  }
+
+  const { data, error } = await supabase
+    .from("ai_provider_quotas")
+    .select("id, provider_id, provider_name, quota_type, status, used_pct, remaining_pct, resets_at, checked_at, message")
+    .order("checked_at", { ascending: false });
+
+  if (error) {
+    console.error("[quotas] erro", error.message);
+    return res.status(500).json({ error: "Falha ao consultar cotas" });
+  }
+
+  // Deduplica: para cada (provider_id, quota_type), mantém apenas a
+  // primeira (mais recente).
+  const seen = new Set<string>();
+  const items = (data ?? []).filter((q) => {
+    const k = `${q.provider_id}::${q.quota_type}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  return res.status(200).json({
+    items: items.map((q) => ({
+      id: q.id,
+      providerId: q.provider_id,
+      providerName: q.provider_name,
+      quotaType: q.quota_type,
+      status: q.status,
+      usedPct: q.used_pct,
+      remainingPct: q.remaining_pct,
+      resetsAt: q.resets_at,
+      checkedAt: q.checked_at,
+      message: q.message,
+    })),
+  });
 }

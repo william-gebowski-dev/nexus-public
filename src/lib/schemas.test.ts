@@ -7,6 +7,10 @@ import {
   NexusSystemStatusSchema,
   InfrastructureServiceSchema,
   NEXUS_API_SCHEMAS,
+  AiIncidentSchema,
+  AiProviderQuotaSchema,
+  AiRequestRecordSchema,
+  AiUsageSummarySchema,
 } from "./schemas";
 import {
   MOCK_CRON_STATUS,
@@ -264,6 +268,99 @@ describe("NexusSystemStatusSchema", () => {
       source: "live",
     };
     expect(NexusSystemStatusSchema.safeParse(bad).success).toBe(false);
+  });
+});
+
+describe("AI observability schemas", () => {
+  it("aceita requests em fila e strings opcionais normalizadas como null", () => {
+    const payload = {
+      id: "req-queued",
+      createdAt: "2026-07-31T17:03:00-03:00",
+      providerId: "z-ai-nvidia",
+      providerName: "NVIDIA Cloud",
+      modelId: "glm-5-2",
+      modelName: "GLM 5.2",
+      clientName: null,
+      projectId: null,
+      projectName: null,
+      agentId: null,
+      agentName: null,
+      inputTokens: 100,
+      cachedTokens: 25,
+      outputTokens: 10,
+      totalTokens: 110,
+      durationMs: null,
+      estimatedCostUsd: null,
+      status: "queued",
+      errorCategory: null,
+      source: "live",
+    };
+
+    const parsed = AiRequestRecordSchema.safeParse(payload);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.status).toBe("queued");
+      expect(parsed.data.clientName).toBeUndefined();
+    }
+  });
+
+  it("aceita resumo parcial com top provider/model e lastRequestAt ausentes", () => {
+    const payload = {
+      period: "today",
+      generatedAt: "2026-07-31T17:03:00-03:00",
+      source: "partial",
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      inputTokens: 0,
+      cachedInputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      cacheRatePct: 0,
+      errorRatePct: 0,
+      estimatedCostUsd: null,
+      averageLatencyMs: null,
+      medianLatencyMs: null,
+      activeProviders: 0,
+      activeModels: 0,
+      mostUsedProvider: null,
+      mostUsedModel: null,
+      lastRequestAt: null,
+    };
+
+    expect(AiUsageSummarySchema.safeParse(payload).success).toBe(true);
+  });
+
+  it("aceita cota sem mensagem e incidente sem provider/model após normalização", () => {
+    const quota = {
+      id: "quota-unknown",
+      providerId: "unknown",
+      providerName: "Provedor desconhecido",
+      quotaType: "default",
+      status: "unknown",
+      usedPct: null,
+      remainingPct: null,
+      resetsAt: null,
+      checkedAt: "2026-07-31T17:03:00-03:00",
+      message: null,
+    };
+    const incident = {
+      id: "inc-info",
+      type: "unavailable",
+      severity: "info",
+      status: "open",
+      providerId: null,
+      modelId: null,
+      firstSeenAt: "2026-07-31T17:03:00-03:00",
+      lastSeenAt: "2026-07-31T17:03:00-03:00",
+      occurrences: 1,
+      title: "Sem provedor associado",
+      summary: "Incidente agregado sem provedor/modelo específico.",
+      suggestedAction: null,
+    };
+
+    expect(AiProviderQuotaSchema.safeParse(quota).success).toBe(true);
+    expect(AiIncidentSchema.safeParse(incident).success).toBe(true);
   });
 });
 
