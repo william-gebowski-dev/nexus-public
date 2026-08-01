@@ -95,8 +95,8 @@ export function Configs() {
         </h2>
         <p className="text-xs text-text-dim">
           {USE_MOCK_DATA
-            ? "O painel está rodando em modo demonstração (mocks). Para dados reais é necessário um backend e a variável VITE_USE_MOCKS desativada no build."
-            : "O painel está conectado ao backend real."}
+            ? "O painel está rodando em modo demonstração (mocks via MSW). Para dados reais é necessário um backend e a variável de build VITE_DATA_MODE=api configurada no painel da Vercel/CI."
+            : "Modo de build: VITE_DATA_MODE=api — chamadas vão para a API real. Isso significa apenas que o modo foi selecionado no build; o painel ainda pode exibir \"Sem dados\" se a API/Supabase não estiver respondendo."}
         </p>
       </section>
     </div>

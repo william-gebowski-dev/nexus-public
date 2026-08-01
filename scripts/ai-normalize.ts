@@ -373,12 +373,44 @@ export function detectIncident(
   };
 }
 
+// === Classificação de origem =============================================
+
+/**
+ * Calcula o `source` do snapshot baseado em cobertura de campos críticos.
+ *
+ * Antes desta função, a regra era `requests.length > 0 ? "live" : "partial"`
+ * — bastava uma única requisição real para o snapshot inteiro virar
+ * "live" mesmo com providers/quotas/topology/modelUsage ausentes. A
+ * análise anterior mostrou que isso transformava dados parciais em
+ * "estado completo" falso.
+ *
+ * Nova regra:
+ *   - `"unavailable"` — nenhum pedido chegou do 9Router.
+ *   - `"live"`        — pedidos chegaram E temos providers agregados.
+ *   - `"partial"`     — pedidos chegaram mas agregação de providers
+ *                       ficou vazia (dados incompletos).
+ *
+ * Modelos não entram na regra porque o coletor já deriva `modelUsage`
+ * de `requests`, então "tem requests" implica "tem modelos" para
+ * fins de cobertura. Providers exige rota dedicada (`/usage/providers`)
+ * ou extração dos `request-logs` — caso essa rota falhe mas
+ * `request-logs` funcione, ainda é partial.
+ */
+export function deriveSnapshotSource(input: {
+  requests: ReadonlyArray<{ providerId: string }>;
+  providers: ReadonlyArray<{ providerId: string }>;
+}): NormalizedSnapshot["source"] {
+  if (input.requests.length === 0) return "unavailable";
+  if (input.providers.length === 0) return "partial";
+  return "live";
+}
+
 // === Agregação de snapshot ===============================================
 
 export interface NormalizedSnapshot {
   period: AiUsagePeriod;
   generatedAt: string;
-  source: "live" | "partial" | "periodic" | "simulated";
+  source: "live" | "partial" | "periodic" | "simulated" | "unavailable";
   totalRequests: number;
   successfulRequests: number;
   failedRequests: number;
@@ -427,10 +459,12 @@ export function aggregateSnapshot(
   const topProvider = Array.from(providerCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
   const topModel = Array.from(modelCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
-  // source: live se todos os campos vieram do 9Router, partial se algum
-  // campo crítico está ausente.
-  const hasRequests = requests.length > 0;
-  const source: NormalizedSnapshot["source"] = hasRequests ? "live" : "partial";
+  // source: classificação por cobertura de campos críticos. A regra
+  // antiga (`requests.length > 0 → live`) era enganosa — bastava uma
+  // única requisição real para o snapshot inteiro virar "live" mesmo
+  // sem providers, quotas, topology ou modelUsage. Agora exigimos
+  // cobertura mínima: requests + providers + modelos agregados.
+  const source = deriveSnapshotSource({ requests, providers });
 
   return {
     period,

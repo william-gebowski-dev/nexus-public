@@ -7,6 +7,10 @@ import type { ApiRequest, ApiResponse } from "../_shared/http";
  * Retorna a informação mais recente de cada cota (uma linha por
  * provider/quota_type, ordenada por `checked_at` desc e deduplicada
  * por `(provider_id, quota_type)`).
+ *
+ * Envelope: `{ items, generatedAt, source }`. `generatedAt` é o
+ * `checked_at` mais recente; `source` é `"live"` quando há itens,
+ * `"partial"` quando a seleção veio vazia.
  */
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
@@ -44,18 +48,22 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return true;
   });
 
+  const mapped = items.map((q) => ({
+    id: q.id,
+    providerId: q.provider_id,
+    providerName: q.provider_name,
+    quotaType: q.quota_type,
+    status: q.status,
+    usedPct: q.used_pct,
+    remainingPct: q.remaining_pct,
+    resetsAt: q.resets_at,
+    checkedAt: q.checked_at,
+    message: q.message,
+  }));
+
   return res.status(200).json({
-    items: items.map((q) => ({
-      id: q.id,
-      providerId: q.provider_id,
-      providerName: q.provider_name,
-      quotaType: q.quota_type,
-      status: q.status,
-      usedPct: q.used_pct,
-      remainingPct: q.remaining_pct,
-      resetsAt: q.resets_at,
-      checkedAt: q.checked_at,
-      message: q.message,
-    })),
+    items: mapped,
+    generatedAt: mapped.length > 0 ? mapped[0].checkedAt : null,
+    source: mapped.length > 0 ? "live" : "partial",
   });
 }

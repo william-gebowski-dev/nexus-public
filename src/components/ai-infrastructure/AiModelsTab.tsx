@@ -6,6 +6,7 @@ import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { formatCostUsd, formatLatencyMs } from "@/lib/format";
 import { Search } from "lucide-react";
 
 export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
@@ -104,11 +105,11 @@ export function AiModelsTab({ period }: { period: AiUsagePeriod }) {
                 <td className="p-3 text-right">{(m.inputTokens / 1_000_000).toFixed(1)}M</td>
                 <td className="p-3 text-right text-emerald-400">{(m.cachedTokens / 1_000_000).toFixed(1)}M</td>
                 <td className="p-3 text-right">{(m.outputTokens / 1_000).toFixed(1)}k</td>
-                <td className="p-3 text-right">~US$ {m.estimatedCostUsd?.toFixed(2) ?? "0.00"}</td>
+                <td className="p-3 text-right">{formatCostUsd(m.estimatedCostUsd)}</td>
                 <td className={`p-3 text-right ${m.errorCount > 0 ? "text-amber-400 font-bold" : "text-text-faint"}`}>
                   {m.errorCount}
                 </td>
-                <td className="p-3 text-right">{m.averageLatencyMs ?? 0} ms</td>
+                <td className="p-3 text-right">{formatLatencyMs(m.averageLatencyMs)}</td>
                 <td className="p-3 text-center">
                   <Pill tone={modelStatusTone(m.status)}>
                     {modelStatusLabel(m.status)}

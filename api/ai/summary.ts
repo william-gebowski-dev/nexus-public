@@ -4,8 +4,11 @@ import { isPeriod, pickString, type ApiRequest, type ApiResponse } from "../_sha
 /**
  * GET /api/ai/summary?period=today|24h|7d|30d|60d
  *
- * Retorna o snapshot mais recente do período solicitado. Se não houver
- * snapshot para o período, retorna 404 com mensagem clara.
+ * Retorna o snapshot mais recente do período solicitado. Quando ainda
+ * não existe snapshot, devolve **200 parcial** com `source: "unavailable"`
+ * e todos os contadores zerados explicitamente — a UI mostra "Sem dados"
+ * em vez de ErrorState. Quando existe, `source` é o valor persistido
+ * pelo coletor (ver `scripts/ai-normalize.ts::deriveSnapshotSource`).
  */
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
@@ -34,7 +37,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const { data, error } = await supabase
     .from("ai_usage_snapshots")
     .select(
-      "id, period, captured_at, total_requests, successful_requests, failed_requests, input_tokens, cached_input_tokens, output_tokens, total_tokens, estimated_cost_usd, average_latency_ms, median_latency_ms, active_providers, active_models, most_used_provider, most_used_model, last_request_at, payload_version",
+      "id, period, captured_at, source, total_requests, successful_requests, failed_requests, input_tokens, cached_input_tokens, output_tokens, total_tokens, estimated_cost_usd, average_latency_ms, median_latency_ms, active_providers, active_models, most_used_provider, most_used_model, last_request_at, payload_version",
     )
     .eq("period", period)
     .order("captured_at", { ascending: false })
@@ -46,10 +49,31 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     return res.status(500).json({ error: "Falha ao consultar snapshot" });
   }
 
+  // Sem snapshot ainda — devolve 200 parcial com shape completo para que
+  // a UI possa renderizar o estado "Sem dados" sem ErrorState. `source`
+  // é `"unavailable"` (novo valor aceito pelo enum `AiDataSourceSchema`).
   if (!data) {
-    return res.status(404).json({
-      error: "Sem snapshot para o período",
+    return res.status(200).json({
       period,
+      generatedAt: null,
+      source: "unavailable",
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      inputTokens: 0,
+      cachedInputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      cacheRatePct: 0,
+      errorRatePct: 0,
+      estimatedCostUsd: null,
+      averageLatencyMs: null,
+      medianLatencyMs: null,
+      activeProviders: 0,
+      activeModels: 0,
+      mostUsedProvider: null,
+      mostUsedModel: null,
+      lastRequestAt: null,
     });
   }
 
@@ -61,7 +85,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   return res.status(200).json({
     period: data.period,
     generatedAt: data.captured_at,
-    source: "live",
+    // `data.source` veio do coletor (ver scripts/ai-normalize.ts). Fallback
+    // para "live" se a migration não tiver sido aplicada — legado.
+    source: data.source ?? "live",
     totalRequests: data.total_requests,
     successfulRequests: data.successful_requests,
     failedRequests: data.failed_requests,

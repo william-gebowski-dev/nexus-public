@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Quality gate
+    name: Quality gate (demo build)
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -32,6 +32,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Demo build (modo mock) — garante que o bundle com mocks ainda
+      # compila e que mocks estão isolados em `runtime-mocks`.
+      - name: Build (mock)
+        env:
+          VITE_DATA_MODE: mock
+        run: npm run build
+
       - name: Validate mock contracts
         run: npm run check:mocks
 
@@ -47,11 +54,39 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build
-        run: npm run build
-
       - name: Audit (informational)
         # Não falha o CI — vulnerabilidades são listadas para triagem.
         # `npm audit fix --force` é desencorajado; atualizações seguras
         # são feitas em commits separados após análise.
         run: npm audit --json || true
+
+  build-prod:
+    name: Production build (api mode)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Build prod-api verifica que:
+      # - VITE_DATA_MODE=api está configurado (gate em vite.config.ts)
+      # - mockServiceWorker.js não vaza para dist/ (mockSwStripPlugin)
+      # - bundle não inclui MOCK_* literais (dynamic import tree-shake)
+      - name: Build (api) + smoke checks
+        env:
+          VITE_DATA_MODE: api
+        run: |
+          npm run build
+          test ! -f dist/mockServiceWorker.js && echo "✓ mockServiceWorker.js ausente do dist"
+          ! grep -rq "MOCK_AI_\|MOCK_CRON_STATUS\|MOCK_INFRASTRUCTURE\|MOCK_ROUTINE_TODAY" dist/ && echo "✓ MOCK_* ausente do bundle prod"

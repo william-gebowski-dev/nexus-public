@@ -13,6 +13,7 @@ import { useAiSummary, useAiTimeseries } from "@/hooks/useAiInfrastructure";
 import { TopologyDiagram } from "./TopologyDiagram";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { formatCostUsd, formatLatencyMs } from "@/lib/format";
 
 export function AiOverviewTab({ period }: { period: AiUsagePeriod }) {
   const [metric, setMetric] = useState<"tokens" | "cost" | "requests" | "latency" | "errors" | "cache">("tokens");
@@ -43,9 +44,9 @@ export function AiOverviewTab({ period }: { period: AiUsagePeriod }) {
         <MetricCard label="Tokens em Cache" value={`${(s.cachedInputTokens / 1_000_000).toFixed(1)}M`} highlight />
         <MetricCard label="Tokens de Saída" value={`${(s.outputTokens / 1_000).toFixed(1)}k`} />
         <MetricCard label="Total de Tokens" value={`${(s.totalTokens / 1_000_000).toFixed(1)}M`} />
-        <MetricCard label="Custo Estimado" value={`~US$ ${s.estimatedCostUsd?.toFixed(2) ?? "0.00"}`} />
+        <MetricCard label="Custo Estimado" value={formatCostUsd(s.estimatedCostUsd)} />
         <MetricCard label="Taxa de Erro" value={`${s.errorRatePct.toFixed(2)}%`} tone={s.errorRatePct > 1 ? "warning" : "neutral"} />
-        <MetricCard label="Latência Média" value={`${s.averageLatencyMs ?? 0} ms`} />
+        <MetricCard label="Latência Média" value={formatLatencyMs(s.averageLatencyMs)} />
         <MetricCard label="Provedores Ativos" value={s.activeProviders.toString()} />
         <MetricCard label="Modelos Ativos" value={s.activeModels.toString()} />
       </div>

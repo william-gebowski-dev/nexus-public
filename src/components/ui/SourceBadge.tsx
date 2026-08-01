@@ -6,9 +6,11 @@ import { isMockDataEnabled } from "@/services/nexus-api";
 
 const COPY: Record<DataSource, { label: string; tone: PillTone }> = {
   live: { label: "Ao vivo", tone: "green" },
+  partial: { label: "Parcial", tone: "amber" },
   periodic: { label: `Atualizado a cada ${REFRESH_LABEL}`, tone: "accent" },
   manual: { label: "Manual", tone: "geb" },
   simulated: { label: "Simulado", tone: "amber" },
+  unavailable: { label: "Sem dados", tone: "neutral" },
 };
 
 /**

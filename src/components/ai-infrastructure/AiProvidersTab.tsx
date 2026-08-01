@@ -2,6 +2,7 @@ import type { AiProviderStatus, AiUsagePeriod } from "@/types/ai-infrastructure"
 import type { PillTone } from "@/lib/tones";
 import { useAiProviders } from "@/hooks/useAiInfrastructure";
 import { Pill } from "@/components/ui/Pill";
+import { formatCostUsd } from "@/lib/format";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -58,7 +59,7 @@ export function AiProvidersTab({ period }: { period: AiUsagePeriod }) {
             </div>
             <div className="rounded-lg bg-surface/50 p-2">
               <span className="text-[10px] text-text-faint uppercase block">Custo Estimado</span>
-              <span className="font-bold text-text">~US$ {p.estimatedCostUsd?.toFixed(2) ?? "0.00"}</span>
+              <span className="font-bold text-text">{formatCostUsd(p.estimatedCostUsd)}</span>
             </div>
           </div>
 

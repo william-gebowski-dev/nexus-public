@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Cpu, Zap } from "lucide-react";
 import { useAiSummary } from "@/hooks/useAiInfrastructure";
 import { ROUTES } from "@/lib/routes";
+import { operationalBadge } from "@/lib/tones";
+import { formatCostUsd, formatNullable, PLACEHOLDER } from "@/lib/format";
 import { Pill } from "@/components/ui/Pill";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 
@@ -20,7 +22,9 @@ export function AiInfrastructureTeaser() {
     );
   }
 
-  const isOperational = summary.failedRequests === 0 || summary.errorRatePct < 2;
+  // Regra única para o badge — ver src/lib/tones.ts::operationalBadge.
+  // Distingue 3 estados: Operacional, Atenção necessária, Sem dados.
+  const badge = operationalBadge(summary);
   const lastRequestLabel = formatLastRequest(summary.lastRequestAt);
 
   return (
@@ -38,9 +42,7 @@ export function AiInfrastructureTeaser() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Pill tone={isOperational ? "green" : "amber"}>
-            {isOperational ? "Operacional" : "Atenção necessária"}
-          </Pill>
+          <Pill tone={badge.tone}>{badge.label}</Pill>
           <Link
             to={ROUTES.aiInfrastructure}
             className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
@@ -72,7 +74,7 @@ export function AiInfrastructureTeaser() {
         />
         <MetricTile
           label="Custo estimado"
-          value={`~US$ ${summary.estimatedCostUsd?.toFixed(2) ?? "0.00"}`}
+          value={formatCostUsd(summary.estimatedCostUsd)}
         />
         <MetricTile
           label="Erros recentes"
@@ -85,10 +87,10 @@ export function AiInfrastructureTeaser() {
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface/60 px-3 py-2 text-xs text-text-dim border border-border/40 font-mono">
         <div className="flex flex-wrap items-center gap-4">
           <span>
-            Modelo mais usado: <strong className="text-text font-semibold">{summary.mostUsedModel ?? "N/A"}</strong>
+            Modelo mais usado: <strong className="text-text font-semibold">{formatNullable(summary.mostUsedModel)}</strong>
           </span>
           <span>
-            Provedor mais usado: <strong className="text-text font-semibold">{summary.mostUsedProvider ?? "N/A"}</strong>
+            Provedor mais usado: <strong className="text-text font-semibold">{formatNullable(summary.mostUsedProvider)}</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-text-faint text-[11px]">
@@ -101,7 +103,7 @@ export function AiInfrastructureTeaser() {
 }
 
 function formatLastRequest(lastRequestAt: string | null | undefined): string {
-  if (!lastRequestAt) return "sem dados";
+  if (!lastRequestAt) return PLACEHOLDER;
   const timestamp = new Date(lastRequestAt).getTime();
   if (Number.isNaN(timestamp)) return "sem dados";
 

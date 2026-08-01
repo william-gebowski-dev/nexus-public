@@ -122,10 +122,51 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   // 8. Persistência em transação (RPC atômica).
   // O Supabase JS não expõe transações multi-tabela diretamente; usamos
-  // uma RPC `ingest_ai_snapshot` que deve ser criada via migration
-  // adicional. Se a RPC não existir (PGRST202 ou função ausente), caímos
-  // para inserções sequenciais e marcamos o status como "partial" se algo
-  // falhar no meio.
+  // a RPC `ingest_ai_snapshot` criada em
+  // `supabase/migrations/20260801000002_ingest_rpc.sql`. Se a RPC ainda
+  // não existir no banco (deploy da migration pendente), caímos para o
+  // fallback sequencial abaixo. Erros reais da RPC (contrato quebrado,
+  // constraint, permissão) não são escondidos.
+  const { data: rpcRunId, error: rpcErr } = await supabase.rpc("ingest_ai_snapshot", {
+    p_snapshot: payload.snapshot,
+    p_model_usage: payload.modelUsage,
+    p_provider_usage: payload.providerUsage,
+    p_provider_quotas: payload.providerQuotas,
+    p_request_records: payload.requestRecords,
+    p_incidents: payload.incidents,
+    p_topology: payload.topology,
+    p_payload_version: payload.payloadVersion,
+    p_collector_version: payload.collectorVersion,
+    p_idempotency_key: idempotencyHeader,
+    p_timestamp: new Date(reqTime).toISOString(),
+  });
+
+  if (!rpcErr && rpcRunId) {
+    return res.status(200).json({
+      ok: true,
+      message: "Snapshot persistido com sucesso (RPC atômica)",
+      idempotencyKey: idempotencyHeader,
+      runId: rpcRunId,
+      snapshotId: null,
+      itemsProcessed,
+      receivedAt: new Date().toISOString(),
+    });
+  }
+
+  const missingRpc = rpcErr && (
+    rpcErr.code === "PGRST202" ||
+    rpcErr.message?.includes("Could not find the function") ||
+    rpcErr.message?.includes("function ingest_ai_snapshot")
+  );
+  if (rpcErr && !missingRpc) {
+    console.error("[ingest] RPC ingest_ai_snapshot falhou", rpcErr.message);
+    return res.status(500).json({ error: "Falha ao persistir snapshot via RPC" });
+  }
+
+  if (missingRpc) {
+    console.warn("[ingest] RPC ingest_ai_snapshot ausente; usando fallback sequencial.");
+  }
+
   const runId = crypto.randomUUID();
   const ingestRecord = {
     id: runId,
@@ -150,6 +191,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     .insert({
       period: snap.period,
       captured_at: snap.generatedAt,
+      source: snap.source,
       total_requests: snap.totalRequests,
       successful_requests: snap.successfulRequests,
       failed_requests: snap.failedRequests,

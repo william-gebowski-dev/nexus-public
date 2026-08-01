@@ -3,24 +3,6 @@ import type {
   SystemSummary,
 } from "@/types";
 import { NEXUS_API_SCHEMAS } from "@/lib/schemas";
-import {
-  MOCK_AVAILABILITY,
-  MOCK_CRON_STATUS,
-  MOCK_DAILY_REPORT,
-  MOCK_GENERATED_ARTIFACTS,
-  MOCK_INFRASTRUCTURE,
-  MOCK_RECENT_EXECUTIONS,
-  MOCK_ROUTINE_TODAY,
-} from "@/data/mock-routine";
-import {
-  MOCK_AI_INCIDENTS,
-  MOCK_AI_MODELS,
-  MOCK_AI_PROVIDERS,
-  MOCK_AI_QUOTAS,
-  MOCK_AI_REQUESTS,
-  MOCK_AI_SUMMARY,
-  MOCK_AI_TOPOLOGY,
-} from "@/data/mock-ai-infrastructure";
 import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 
 /**
@@ -28,12 +10,18 @@ import type { AiUsagePeriod } from "@/types/ai-infrastructure";
  *
  * Aceita apenas `VITE_DATA_MODE=mock|api`.
  *
- * Produção exige `VITE_DATA_MODE=api`; query string pública nunca pode
- * trocar a fonte de dados do site publicado.
+ * Produção exige `VITE_DATA_MODE=api` — `vite.config.ts::enforceDataModePlugin`
+ * já falha o build se env ausente. Este módulo mantém um check runtime
+ * como defesa em profundidade: dispara cedo no browser se alguém trocar
+ * a config sem rebuild.
  *
  * MSW (service worker) e o badge "Dados de demonstração" consomem
  * `USE_MOCK_DATA`, derivado daqui — nunca ler `import.meta.env`
  * direto fora deste arquivo.
+ *
+ * Mocks ficam em `src/mocks/runtime-mocks.ts` e são carregados via
+ * `import()` dinâmico apenas quando `DATA_MODE === "mock"`. Em
+ * produção api, o bundle não inclui `src/data/mock-*`.
  */
 export type DataMode = "mock" | "api";
 
@@ -143,7 +131,7 @@ export class ApiContractError extends Error {
  * Valida runtime a resposta JSON contra um schema Zod. Em falha de shape:
  *  - lança `ApiContractError`. O componente consumidor deve tratar via
  *    ErrorState do React Query.
- *  - em modo `mock`, o caminho bypassa este wrapper (usa MOCK_* direto),
+ *  - em modo `mock`, o caminho bypassa este wrapper (usa mocks direto),
  *    então a validação runtime fica a cargo de `check-shapes.ts` no build.
  *
  * Erro duro é intencional: dados inválidos chegando na UI causam bugs
@@ -183,6 +171,18 @@ export function systemStatusToSummary(status: NexusSystemStatus): SystemSummary 
   };
 }
 
+/**
+ * Helper único para carregar mocks no escopo dinâmico. Garante tree-shake
+ * robusto: o bundle prod-api não importa `src/data/mock-*` porque este
+ * `import()` só executa quando `USE_MOCK_DATA === true`.
+ */
+async function mockScope() {
+  if (!USE_MOCK_DATA) {
+    throw new Error("[nexus-api] mockScope chamado em modo api");
+  }
+  return await import("@/mocks/runtime-mocks");
+}
+
 export const nexusApi = {
   systemStatus: () => jsonGetSafe("systemStatus", NEXUS_API_SCHEMAS.systemStatus, "/api/system/status"),
   status: async () => systemStatusToSummary(await nexusApi.systemStatus()),
@@ -211,117 +211,95 @@ export const nexusApi = {
   search: (q: string) =>
     jsonGetSafe("search", NEXUS_API_SCHEMAS.search, `/api/search?q=${encodeURIComponent(q)}`),
 
-  cronStatus: async () =>
-    USE_MOCK_DATA
-      ? MOCK_CRON_STATUS
-      : jsonGetSafe("cronStatus", NEXUS_API_SCHEMAS.cronStatus, "/api/cron/status"),
+  cronStatus: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockCronStatus();
+    return jsonGetSafe("cronStatus", NEXUS_API_SCHEMAS.cronStatus, "/api/cron/status");
+  },
 
-  routineToday: async () =>
-    USE_MOCK_DATA
-      ? MOCK_ROUTINE_TODAY
-      : jsonGetSafe("routineToday", NEXUS_API_SCHEMAS.routineToday, "/api/routine/today"),
+  routineToday: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockRoutineToday();
+    return jsonGetSafe("routineToday", NEXUS_API_SCHEMAS.routineToday, "/api/routine/today");
+  },
 
-  routine: async (date: string) =>
-    USE_MOCK_DATA
-      ? { ...MOCK_ROUTINE_TODAY, date }
-      : jsonGetSafe("routine", NEXUS_API_SCHEMAS.routineToday, `/api/routine/${encodeURIComponent(date)}`),
+  routine: async (date: string) => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockRoutine(date);
+    return jsonGetSafe("routine", NEXUS_API_SCHEMAS.routineToday, `/api/routine/${encodeURIComponent(date)}`);
+  },
 
-  executionById: async (id: string) =>
-    USE_MOCK_DATA
-      ? MOCK_RECENT_EXECUTIONS.find((e) => e.id === id) ?? null
-      : jsonGetSafe("executionById", NEXUS_API_SCHEMAS.executionById, `/api/executions/${encodeURIComponent(id)}`),
+  executionById: async (id: string) => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockExecutionById(id);
+    return jsonGetSafe("executionById", NEXUS_API_SCHEMAS.executionById, `/api/executions/${encodeURIComponent(id)}`);
+  },
 
-  dailyReport: async (date: string) =>
-    USE_MOCK_DATA
-      ? (MOCK_DAILY_REPORT[date] ?? MOCK_DAILY_REPORT[Object.keys(MOCK_DAILY_REPORT)[0]])
-      : jsonGetSafe("dailyReport", NEXUS_API_SCHEMAS.dailyReport, `/api/reports/daily/${encodeURIComponent(date)}`),
+  dailyReport: async (date: string) => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockDailyReport(date);
+    return jsonGetSafe("dailyReport", NEXUS_API_SCHEMAS.dailyReport, `/api/reports/daily/${encodeURIComponent(date)}`);
+  },
 
   recentExecutions: async (limit = 10, cursor: number | null = null) => {
-    if (USE_MOCK_DATA) {
-      const start = cursor ?? 0;
-      const end = start + limit;
-      const page = MOCK_RECENT_EXECUTIONS.slice(start, end);
-      return {
-        items: page,
-        nextCursor: end < MOCK_RECENT_EXECUTIONS.length ? end : null,
-        totalItems: MOCK_RECENT_EXECUTIONS.length,
-      };
-    }
+    if (USE_MOCK_DATA) return (await mockScope()).getMockRecentExecutions(limit, cursor);
     const qs = new URLSearchParams({ limit: String(limit) });
     if (cursor !== null) qs.set("cursor", String(cursor));
     return jsonGetSafe("recentExecutions", NEXUS_API_SCHEMAS.recentExecutions, `/api/executions?${qs}`);
   },
 
-  artifacts: async () =>
-    USE_MOCK_DATA
-      ? MOCK_GENERATED_ARTIFACTS
-      : jsonGetSafe("artifacts", NEXUS_API_SCHEMAS.artifacts, "/api/artifacts"),
+  artifacts: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockArtifacts();
+    return jsonGetSafe("artifacts", NEXUS_API_SCHEMAS.artifacts, "/api/artifacts");
+  },
 
-  infrastructure: async () =>
-    USE_MOCK_DATA
-      ? MOCK_INFRASTRUCTURE
-      : jsonGetSafe("infrastructure", NEXUS_API_SCHEMAS.infrastructure, "/api/infrastructure"),
+  infrastructure: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockInfrastructure();
+    return jsonGetSafe("infrastructure", NEXUS_API_SCHEMAS.infrastructure, "/api/infrastructure");
+  },
 
-  availability: async () =>
-    USE_MOCK_DATA
-      ? MOCK_AVAILABILITY
-      : jsonGetSafe("availability", NEXUS_API_SCHEMAS.availability, "/api/availability"),
+  availability: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAvailability();
+    return jsonGetSafe("availability", NEXUS_API_SCHEMAS.availability, "/api/availability");
+  },
 
   // === AI Infrastructure Observability Endpoints ===
-  aiSummary: async (period: AiUsagePeriod = "today") =>
-    USE_MOCK_DATA
-      ? { ...MOCK_AI_SUMMARY, period }
-      : jsonGetSafe("aiSummary", NEXUS_API_SCHEMAS.aiSummary, `/api/ai/summary?period=${period}`),
+  aiSummary: async (period: AiUsagePeriod = "today") => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiSummary(period);
+    return jsonGetSafe("aiSummary", NEXUS_API_SCHEMAS.aiSummary, `/api/ai/summary?period=${period}`);
+  },
 
   aiTimeseries: async (metric = "tokens", period: AiUsagePeriod = "today") => {
-    if (USE_MOCK_DATA) {
-      const points = Array.from({ length: 12 }, (_, i) => ({
-        bucket: `${String(i * 2).padStart(2, "0")}:00`,
-        value: metric === "tokens" ? Math.floor(10000000 + Math.random() * 15000000) : Math.floor(1 + Math.random() * 8),
-      }));
-      return { metric, period, points, source: "simulated" as const };
-    }
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiTimeseries(metric, period);
     return jsonGetSafe("aiTimeseries", NEXUS_API_SCHEMAS.aiTimeseries, `/api/ai/timeseries?metric=${metric}&period=${period}`);
   },
 
-  aiModels: async (period: AiUsagePeriod = "today") =>
-    USE_MOCK_DATA
-      ? { items: MOCK_AI_MODELS, snapshotId: null, capturedAt: null, source: "simulated" as const }
-      : jsonGetSafe("aiModels", NEXUS_API_SCHEMAS.aiModels, `/api/ai/models?period=${period}`),
+  aiModels: async (period: AiUsagePeriod = "today") => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiModelsPage(period);
+    return jsonGetSafe("aiModels", NEXUS_API_SCHEMAS.aiModels, `/api/ai/models?period=${period}`);
+  },
 
-  aiProviders: async (period: AiUsagePeriod = "today") =>
-    USE_MOCK_DATA
-      ? { items: MOCK_AI_PROVIDERS, snapshotId: null, capturedAt: null, source: "simulated" as const }
-      : jsonGetSafe("aiProviders", NEXUS_API_SCHEMAS.aiProviders, `/api/ai/providers?period=${period}`),
+  aiProviders: async (period: AiUsagePeriod = "today") => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiProvidersPage(period);
+    return jsonGetSafe("aiProviders", NEXUS_API_SCHEMAS.aiProviders, `/api/ai/providers?period=${period}`);
+  },
 
-  aiQuotas: async () =>
-    USE_MOCK_DATA
-      ? { items: MOCK_AI_QUOTAS, generatedAt: null, source: "simulated" as const }
-      : jsonGetSafe("aiQuotas", NEXUS_API_SCHEMAS.aiQuotas, "/api/ai/quotas"),
+  aiQuotas: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiQuotasPage();
+    return jsonGetSafe("aiQuotas", NEXUS_API_SCHEMAS.aiQuotas, "/api/ai/quotas");
+  },
 
   aiRequests: async (limit = 10, cursor: number | null = null) => {
-    if (USE_MOCK_DATA) {
-      const start = cursor ?? 0;
-      const end = start + limit;
-      return {
-        items: MOCK_AI_REQUESTS.slice(start, end),
-        nextCursor: end < MOCK_AI_REQUESTS.length ? end : null,
-      };
-    }
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiRequestsPage(limit, cursor);
     const qs = new URLSearchParams({ limit: String(limit) });
     if (cursor !== null) qs.set("cursor", String(cursor));
     return jsonGetSafe("aiRequests", NEXUS_API_SCHEMAS.aiRequests, `/api/ai/requests?${qs}`);
   },
 
-  aiIncidents: async () =>
-    USE_MOCK_DATA
-      ? { items: MOCK_AI_INCIDENTS, generatedAt: null, source: "simulated" as const }
-      : jsonGetSafe("aiIncidents", NEXUS_API_SCHEMAS.aiIncidents, "/api/ai/incidents"),
+  aiIncidents: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiIncidentsPage();
+    return jsonGetSafe("aiIncidents", NEXUS_API_SCHEMAS.aiIncidents, "/api/ai/incidents");
+  },
 
-  aiTopology: async () =>
-    USE_MOCK_DATA
-      ? MOCK_AI_TOPOLOGY
-      : jsonGetSafe("aiTopology", NEXUS_API_SCHEMAS.aiTopology, "/api/ai/topology"),
+  aiTopology: async () => {
+    if (USE_MOCK_DATA) return (await mockScope()).getMockAiTopology();
+    return jsonGetSafe("aiTopology", NEXUS_API_SCHEMAS.aiTopology, "/api/ai/topology");
+  },
 };
 
 export const api = nexusApi;

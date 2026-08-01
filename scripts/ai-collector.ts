@@ -25,9 +25,9 @@ import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
  *   NEXUS_INGEST_URL    URL completa do endpoint /api/ai/ingest (obrigatória)
  *   NEXUS_INGEST_SECRET Segredo HMAC compartilhado com a Vercel (obrigatório)
  *   ROUTER_BASE_URL     Base do 9Router local (default http://127.0.0.1:20128)
+ *   ROUTER_API_TOKEN    Token Bearer para o 9Router (opcional mas recomendado)
  *
  * Variáveis opcionais:
- *   COLLECTOR_PERIOD          Período do snapshot (default today)
  *   COLLECTOR_INTERVAL_SECONDS Intervalo em modo --watch (default 300)
  *
  * Modos:
@@ -38,6 +38,11 @@ import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
  * Em --dry-run, NEXUS_INGEST_SECRET e NEXUS_INGEST_URL não são
  * exigidos — o coletor apenas consulta o 9Router e mostra o que
  * seria enviado.
+ *
+ * Período do snapshot é **derivado de `now`** (não configurável): se
+ * `now.getUTCHours() === hoje && dataUtc === hoje` → "today"; janelas
+ * 7d/30d/60d são calculadas a partir de `captured_at` no momento da
+ * leitura, não exigem snapshot pré-rotulado.
  */
 
 interface CollectorOptions {
@@ -88,9 +93,16 @@ async function fetchFromRouter(baseUrl: string, opts: CollectorOptions): Promise
   const out: RouterTelemetry = { requests: [], providers: [], quotas: [], topologyNodes: [], topologyEdges: [] };
   const TIMEOUT_MS = 3_000;
 
+  const routerToken = process.env.ROUTER_API_TOKEN;
+  if (!routerToken && opts.verbose) {
+    console.warn("[collector] ROUTER_API_TOKEN ausente — requisições ao 9Router sem Authorization.");
+  }
   const tryFetch = async (path: string): Promise<unknown> => {
     const res = await fetch(`${baseUrl}${path}`, {
-      headers: { accept: "application/json" },
+      headers: {
+        accept: "application/json",
+        ...(routerToken ? { authorization: `Bearer ${routerToken}` } : {}),
+      },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!res.ok) return [];
@@ -158,9 +170,15 @@ function buildPayload(
 
   const snapshot: NormalizedSnapshot = aggregateSnapshot(requests, providers, period, now);
 
+  // Agrega modelUsage a partir de `requests` (antes era hardcoded `[]`).
+  // Cada modelo vira uma linha: requests, tokens, latência média,
+  // errorCount, lastUsedAt. Esta derivação é a fonte de verdade para a
+  // aba Modelos do front — sem ela, `/api/ai/models` ficaria vazio.
+  const modelUsage = aggregateModelUsage(requests, providers, now);
+
   return AiIngestPayloadSchema.parse({
     snapshot,
-    modelUsage: [],
+    modelUsage,
     providerUsage: providers,
     providerQuotas: quotas,
     requestRecords: requests,
@@ -272,3 +290,98 @@ main().catch((err) => {
   console.error("Fatal:", (err as Error).message);
   process.exit(1);
 });
+
+// === Derivação de modelUsage ============================================
+
+import type { NormalizedProviderUsage, NormalizedRequest } from "./ai-normalize";
+
+/**
+ * Agrega linhas `modelUsage` a partir da lista de requisições.
+ *
+ * Cada modelo vira uma entrada com requests, tokens, latência média,
+ * errorCount, lastUsedAt, status. O source é `"live"` quando há
+ * requisições e providers; cai para `"partial"` se algum modelo
+ * tiver providers desconhecidos (model_id sem provider_id válido na
+ * agregação).
+ *
+ * Antes desta função, o coletor enviava `modelUsage: []` — o front
+ * mostrava tabela vazia mesmo com requests chegando. Esta é a
+ * função que destrava a aba Modelos.
+ */
+function aggregateModelUsage(
+  requests: NormalizedRequest[],
+  providers: NormalizedProviderUsage[],
+  now: Date,
+): Array<{
+  modelId: string;
+  publicName: string;
+  providerId: string;
+  providerName: string;
+  requests: number;
+  inputTokens: number;
+  cachedTokens: number;
+  outputTokens: number;
+  estimatedCostUsd: number | null;
+  averageLatencyMs: number | null;
+  medianLatencyMs: number | null;
+  errorCount: number;
+  lastUsedAt: string | null;
+  status: "operational" | "attention" | "unavailable" | "unknown";
+  source: "live" | "partial" | "periodic" | "simulated" | "unavailable";
+}> {
+  if (requests.length === 0) return [];
+
+  const providerById = new Map(providers.map((p) => [p.providerId, p] as const));
+  const byModel = new Map<string, NormalizedRequest[]>();
+  for (const r of requests) {
+    const arr = byModel.get(r.modelId);
+    if (arr) arr.push(r);
+    else byModel.set(r.modelId, [r]);
+  }
+
+  return Array.from(byModel.entries()).map(([modelId, rs]) => {
+    const provider = providerById.get(rs[0].providerId);
+    const publicName = rs[0].modelName || modelId;
+    const providerId = rs[0].providerId;
+    const providerName = provider?.publicName ?? rs[0].providerName ?? providerId;
+    const requests = rs.length;
+    const inputTokens = rs.reduce((s, r) => s + (r.inputTokens ?? 0), 0);
+    const cachedTokens = rs.reduce((s, r) => s + (r.cachedTokens ?? 0), 0);
+    const outputTokens = rs.reduce((s, r) => s + (r.outputTokens ?? 0), 0);
+    const cost = rs.reduce((s, r) => s + (r.estimatedCostUsd ?? 0), 0);
+    const latencies = rs
+      .map((r) => r.durationMs)
+      .filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+    const averageLatencyMs = latencies.length > 0
+      ? Math.round(latencies.reduce((s, n) => s + n, 0) / latencies.length)
+      : null;
+    const medianLatencyMs = latencies.length > 0
+      ? latencies.slice().sort((a, b) => a - b)[Math.floor(latencies.length / 2)]
+      : null;
+    const errorCount = rs.filter((r) => r.status === "failed").length;
+    const lastUsedAt = rs.length > 0
+      ? rs.map((r) => r.createdAt).sort().slice(-1)[0]
+      : null;
+    const source = provider ? "live" : "partial";
+    const status: "operational" | "attention" | "unavailable" | "unknown" =
+      errorCount > requests / 2 ? "attention" : "operational";
+
+    return {
+      modelId,
+      publicName,
+      providerId,
+      providerName,
+      requests,
+      inputTokens,
+      cachedTokens,
+      outputTokens,
+      estimatedCostUsd: cost > 0 ? Number(cost.toFixed(4)) : null,
+      averageLatencyMs,
+      medianLatencyMs,
+      errorCount,
+      lastUsedAt,
+      status,
+      source,
+    };
+  });
+}

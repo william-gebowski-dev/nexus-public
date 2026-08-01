@@ -33,3 +33,52 @@ export const TEXT_TONES: Record<PillTone, string> = {
   geb: "text-geb",
   neutral: "text-text-dim",
 };
+
+/**
+ * Regra única para o badge "Operacional" do resumo de IA.
+ *
+ * Antes (análise anterior): `summary.failedRequests === 0 ||
+ * summary.errorRatePct < 2` — bastava uma das condições ser verdadeira
+ * para exibir Operacional, mesmo com snapshot vazio ou sem providers.
+ *
+ * Agora exige:
+ *   - `source` não é `unavailable` (sem dados) nem `partial` (incompleto);
+ *   - `generatedAt` presente (snapshot realmente persistido);
+ *   - zero falhas nas requisições observadas;
+ *   - taxa de erro abaixo de 2%.
+ *
+ * Retorna `true` quando TODAS as condições são verdadeiras.
+ */
+export function isOperational(summary: {
+  source: string;
+  generatedAt: string | null;
+  failedRequests: number;
+  errorRatePct: number;
+}): boolean {
+  return (
+    summary.source !== "unavailable" &&
+    summary.source !== "partial" &&
+    Boolean(summary.generatedAt) &&
+    summary.failedRequests === 0 &&
+    summary.errorRatePct < 2
+  );
+}
+
+/**
+ * Badge do teaser: 3 estados visíveis — Operacional, Atenção, Sem dados.
+ * Retorna o par `tone` + `label` pronto para renderizar em `<Pill>`.
+ */
+export function operationalBadge(summary: {
+  source: string;
+  generatedAt: string | null;
+  failedRequests: number;
+  errorRatePct: number;
+}): { tone: PillTone; label: string } {
+  if (summary.source === "unavailable" || !summary.generatedAt) {
+    return { tone: "neutral", label: "Sem dados" };
+  }
+  if (isOperational(summary)) {
+    return { tone: "green", label: "Operacional" };
+  }
+  return { tone: "amber", label: "Atenção necessária" };
+}

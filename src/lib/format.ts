@@ -70,3 +70,37 @@ export function formatPercent(value: number, fractionDigits = 1): string {
 export function formatCompact(value: number): string {
   return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(value);
 }
+
+/**
+ * Helpers null-aware para a observabilidade de IA.
+ *
+ * Diferenciam explicitamente `null`/`undefined` (ausência de dado) de `0`
+ * (zero confirmado pela fonte). O frontend **não deve** renderizar
+ * ausência de dado como `0`, `~US$ 0.00`, `0 ms` ou `N/A`; usa `—`
+ * (em-dash). Mantemos `?? 0` apenas em aritmética legítima (sort,
+ * proporção, contagem agregada) — em labels de UI, sempre via helper.
+ */
+export const PLACEHOLDER = "—";
+
+export function formatNullable<T>(value: T | null | undefined, fallback: string = PLACEHOLDER): T | string {
+  if (value === null || value === undefined) return fallback;
+  return value;
+}
+
+/** `number | null | undefined` → "~US$ 12.34" ou "—". */
+export function formatCostUsd(value: number | null | undefined): string {
+  if (value === null || value === undefined) return PLACEHOLDER;
+  return `~US$ ${value.toFixed(2)}`;
+}
+
+/** `number | null | undefined` → "12.3 ms" ou "—". */
+export function formatLatencyMs(value: number | null | undefined): string {
+  if (value === null || value === undefined) return PLACEHOLDER;
+  return `${value.toLocaleString("pt-BR")} ms`;
+}
+
+/** `number | null | undefined` → "12.3%" ou "—". */
+export function formatPct(value: number | null | undefined, fractionDigits = 1): string {
+  if (value === null || value === undefined) return PLACEHOLDER;
+  return `${value.toFixed(fractionDigits)}%`;
+}

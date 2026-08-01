@@ -35,7 +35,7 @@ export type ServiceCategory =
 
 export type ServiceStatus = "healthy" | "attention" | "down";
 
-export type DataSource = "live" | "periodic" | "manual" | "simulated";
+export type DataSource = "live" | "partial" | "periodic" | "manual" | "simulated" | "unavailable";
 
 export interface Service {
   /** Identificador interno, kebab-case. Nunca exposto na UI pública. */

@@ -29,8 +29,10 @@ export interface NexusSystemStatus {
   status: NexusSystemState;
   overall?: NexusSystemState;
   message: string;
-  generatedAt: string;
-  lastUpdate: string;
+  // Nullable quando NEXUS_STATUS_ENDPOINT ausente ou upstream falhou
+  // (antes do hardening, 503 devolvia string nula e o schema quebrava).
+  generatedAt: string | null;
+  lastUpdate: string | null;
   uptimeSeconds: number | null;
   cpuUsage: number | null;
   memoryUsage: number | null;

@@ -19,8 +19,8 @@ export type OverallState =
 
 export interface SystemSummary {
   overall: OverallState;
-  /** ISO 8601 — geração. */
-  generatedAt: string;
+  /** ISO 8601 — geração. `null` quando sem fonte operacional. */
+  generatedAt: string | null;
   counts: {
     servicesUp: number;
     servicesAttention: number;
@@ -32,7 +32,8 @@ export interface SystemSummary {
     projectsActive: number;
     executionsLast24h: number;
   };
-  /** Próxima atualização automática prevista (ISO 8601). */
-  nextRefreshAt: string;
+  /** Próxima atualização automática prevista (ISO 8601) ou `null` se
+   *  sem fonte operacional configurada. */
+  nextRefreshAt: string | null;
   source: DataSource;
 }

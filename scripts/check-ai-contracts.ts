@@ -72,6 +72,12 @@ const cases: ContractCase[] = [
   { name: "AI_PROVIDER_PAGE", res: NEXUS_API_SCHEMAS.aiProviders.safeParse({ items: MOCK_AI_PROVIDERS, snapshotId: null, capturedAt: null, source: "simulated" }) },
   { name: "AI_QUOTA_PAGE", res: NEXUS_API_SCHEMAS.aiQuotas.safeParse({ items: MOCK_AI_QUOTAS, generatedAt: null, source: "simulated" }) },
   { name: "AI_INCIDENT_PAGE", res: NEXUS_API_SCHEMAS.aiIncidents.safeParse({ items: MOCK_AI_INCIDENTS, generatedAt: null, source: "simulated" }) },
+  // Envelope vazio explícito — garante que `api/ai/incidents` e
+  // `api/ai/quotas` continuam devolvendo `generatedAt`/`source` mesmo
+  // quando não há itens. Sem este caso, a remoção do envelope quebra
+  // o schema em runtime (ApiContractError) sem falhar o build.
+  { name: "EDGE_AI_INCIDENT_PAGE_EMPTY", res: NEXUS_API_SCHEMAS.aiIncidents.safeParse({ items: [], generatedAt: null, source: "partial" }) },
+  { name: "EDGE_AI_QUOTA_PAGE_EMPTY", res: NEXUS_API_SCHEMAS.aiQuotas.safeParse({ items: [], generatedAt: null, source: "partial" }) },
 ];
 
 for (const [i, m] of MOCK_AI_MODELS.entries()) {

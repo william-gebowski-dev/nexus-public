@@ -3,6 +3,7 @@ import { useAiModels, useAiProviders } from "@/hooks/useAiInfrastructure";
 import { CardSkeleton } from "@/components/ui/LoadingSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { formatCostUsd } from "@/lib/format";
 
 export function AiUsageTab({ period }: { period: AiUsagePeriod }) {
   const models = useAiModels(period);
@@ -42,7 +43,7 @@ export function AiUsageTab({ period }: { period: AiUsagePeriod }) {
               <div key={p.providerId} className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span>{p.publicName}</span>
-                  <span>~US$ {p.estimatedCostUsd?.toFixed(2) ?? "0.00"} ({(p.totalTokens / 1_000_000).toFixed(1)}M tokens)</span>
+                  <span>{formatCostUsd(p.estimatedCostUsd)} ({(p.totalTokens / 1_000_000).toFixed(1)}M tokens)</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-surface-hover overflow-hidden">
                   <div

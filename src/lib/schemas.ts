@@ -33,7 +33,7 @@ export type CronStatusParsed = z.infer<typeof CronStatusSchema>;
 // === NexusSystemStatus =====================================================
 
 const ServiceStatusEnum = z.enum(["healthy", "attention", "down"]);
-const DataSourceEnum = z.enum(["live", "periodic", "manual", "simulated"]);
+const DataSourceEnum = z.enum(["live", "partial", "periodic", "manual", "simulated", "unavailable"]);
 const NexusSystemStateEnum = z.enum([
   "operational",
   "attention_required",
@@ -62,8 +62,12 @@ export const NexusSystemStatusSchema = z.object({
   status: NexusSystemStateEnum,
   overall: NexusSystemStateEnum.optional(),
   message: z.string(),
-  generatedAt: z.string().datetime({ offset: true }),
-  lastUpdate: z.string().datetime({ offset: true }),
+  // Datas podem ser `null` quando não há fonte operacional configurada
+  // (NEXUS_STATUS_ENDPOINT ausente) ou a upstream falhou — antes da
+  // auditoria o endpoint 503 retornava strings nulas e o contrato
+  // quebrava; agora aceita null explicitamente.
+  generatedAt: z.string().datetime({ offset: true }).nullable(),
+  lastUpdate: z.string().datetime({ offset: true }).nullable(),
   uptimeSeconds: z.number().int().nonnegative().nullable(),
   cpuUsage: PercentageSchema.nullable(),
   memoryUsage: PercentageSchema.nullable(),
@@ -493,15 +497,17 @@ export const AvailabilitySchema = z.record(z.string(), z.array(AvailabilityCheck
 export const AiUsagePeriodSchema = z.enum(["today", "24h", "7d", "30d", "60d"]);
 
 /**
- * `live`     — todos os campos vieram do 9Router.
- * `partial`  — parte dos dados é real; outra está ausente.
- * `periodic` — snapshot real coletado em intervalo.
- * `simulated`— dados de demonstração, sem origem no 9Router.
+ * `live`        — todos os campos vieram do 9Router.
+ * `partial`     — parte dos dados é real; outra está ausente.
+ * `periodic`    — snapshot real coletado em intervalo.
+ * `simulated`   — dados de demonstração, sem origem no 9Router.
+ * `unavailable` — coletor não conseguiu falar com nenhuma fonte
+ *                  (estado vazio explícito, não erro de transporte).
  *
  * Nunca inventar campo ausente: o normalizador deve virar o campo em
  * `null` (e o tipo Zod aceita `null`) ou em "Sem dados" na UI.
  */
-const AiDataSourceSchema = z.enum(["live", "partial", "periodic", "simulated"]);
+const AiDataSourceSchema = z.enum(["live", "partial", "periodic", "simulated", "unavailable"]);
 
 const AiProviderStatusSchema = z.enum([
   "operational",
