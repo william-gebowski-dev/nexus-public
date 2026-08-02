@@ -13,6 +13,7 @@ import {
   type NormalizedRequest,
   type NormalizedSnapshot,
 } from "../src/lib/ai-normalize";
+import { FORBIDDEN_PATTERNS } from "../src/lib/sanitize";
 import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
 
 /**
@@ -62,21 +63,10 @@ function parseArgs(): CollectorOptions {
   };
 }
 
-const FORBIDDEN_PATTERNS = [
-  /100\.(?:6[4-9]|[7-9]\d|1[0-1]\d|12[0-7])\.\d{1,3}\.\d{1,3}/g, // Tailscale CGNAT
-  /\bsk-(?:ant-)?[A-Za-z0-9_-]{32,}/g,
-  /\bnvapi-[A-Za-z0-9_-]{16,}/g,
-  /\bghp_[A-Za-z0-9]{20,}/g,
-  /\bgithub_pat_[A-Za-z0-9_]{40,}/g,
-  /\/(?:opt|home)\//g,
-  /hermes-nexus-os/g,
-  /srv\d{5,}/g,
-];
-
 function sanitizeString(input: string): string {
   let clean = input;
-  for (const rx of FORBIDDEN_PATTERNS) {
-    clean = clean.replace(rx, "[REDACTED]");
+  for (const { regex } of FORBIDDEN_PATTERNS) {
+    clean = clean.replace(regex, "[REDACTED]");
   }
   return clean;
 }
@@ -293,7 +283,10 @@ main().catch((err) => {
 
 // === Derivação de modelUsage ============================================
 
-import type { NormalizedProviderUsage, NormalizedRequest } from "../src/lib/ai-normalize";
+// `NormalizedProvider` (não `NormalizedProviderUsage` — esse tipo não
+// existe em `ai-normalize.ts`). `NormalizedRequest` é consumido via
+// import de topo.
+type AggregatedRequest = NormalizedRequest;
 
 /**
  * Agrega linhas `modelUsage` a partir da lista de requisições.
@@ -309,8 +302,8 @@ import type { NormalizedProviderUsage, NormalizedRequest } from "../src/lib/ai-n
  * função que destrava a aba Modelos.
  */
 function aggregateModelUsage(
-  requests: NormalizedRequest[],
-  providers: NormalizedProviderUsage[],
+  requests: AggregatedRequest[],
+  providers: NormalizedProvider[],
   now: Date,
 ): Array<{
   modelId: string;

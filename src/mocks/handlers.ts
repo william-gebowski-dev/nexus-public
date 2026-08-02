@@ -199,6 +199,9 @@ export const handlers = [
     jsonResponse(sanitizePayload(MOCK_AVAILABILITY))),
 
   // === AI Infrastructure MSW Handlers ===
+  // Cada handler devolve o envelope exato que `api/ai/*.ts` devolve em
+  // modo api. Antes, handlers retornavam arrays cruas — `jsonGetSafe` no
+  // cliente rejeitava via `safeParse` e lançava `ApiContractError`.
   http.get("/api/ai/summary", ({ request }) => {
     const url = new URL(request.url);
     const period = url.searchParams.get("period") ?? "today";
@@ -211,19 +214,33 @@ export const handlers = [
     const period = url.searchParams.get("period") ?? "today";
     const points = Array.from({ length: 12 }, (_, i) => ({
       bucket: `${String(i * 2).padStart(2, "0")}:00`,
-      value: metric === "tokens" ? Math.floor(10000000 + Math.random() * 15000000) : Math.floor(1 + Math.random() * 8),
+      value: metric === "tokens" ? 10_000_000 + i * 1_500_000 : 1 + i,
     }));
     return jsonResponse(sanitizePayload({ metric, period, points, source: "simulated" }));
   }),
 
   http.get("/api/ai/models", () =>
-    jsonResponse(sanitizePayload(MOCK_AI_MODELS))),
+    jsonResponse(sanitizePayload({
+      items: MOCK_AI_MODELS,
+      snapshotId: null,
+      capturedAt: null,
+      source: "simulated",
+    }))),
 
   http.get("/api/ai/providers", () =>
-    jsonResponse(sanitizePayload(MOCK_AI_PROVIDERS))),
+    jsonResponse(sanitizePayload({
+      items: MOCK_AI_PROVIDERS,
+      snapshotId: null,
+      capturedAt: null,
+      source: "simulated",
+    }))),
 
   http.get("/api/ai/quotas", () =>
-    jsonResponse(sanitizePayload(MOCK_AI_QUOTAS))),
+    jsonResponse(sanitizePayload({
+      items: MOCK_AI_QUOTAS,
+      generatedAt: null,
+      source: "simulated",
+    }))),
 
   http.get("/api/ai/requests", ({ request }) => {
     const url = new URL(request.url);
@@ -236,8 +253,12 @@ export const handlers = [
   }),
 
   http.get("/api/ai/incidents", () =>
-    jsonResponse(sanitizePayload(MOCK_AI_INCIDENTS))),
+    jsonResponse(sanitizePayload({
+      items: MOCK_AI_INCIDENTS,
+      generatedAt: null,
+      source: "simulated",
+    }))),
 
   http.get("/api/ai/topology", () =>
-    jsonResponse(sanitizePayload(MOCK_AI_TOPOLOGY))),
+    jsonResponse(sanitizePayload({ ...MOCK_AI_TOPOLOGY, source: "simulated" }))),
 ];

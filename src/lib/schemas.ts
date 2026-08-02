@@ -542,7 +542,10 @@ const AiIncidentSeveritySchema = z.enum(["info", "warning", "critical"]);
 
 export const AiUsageSummarySchema = z.object({
   period: AiUsagePeriodSchema,
-  generatedAt: z.string().datetime({ offset: true }),
+  // `generatedAt: null` é o estado "Sem dados" — `api/ai/summary.ts` (path
+  // sem snapshot) envia null explicitamente. Antes do hardening, o schema
+  // rejeitava e o cliente mostrava ErrorState em vez de "Sem dados".
+  generatedAt: z.string().datetime({ offset: true }).nullable(),
   source: AiDataSourceSchema,
 
   totalRequests: z.number().int().nonnegative(),
@@ -737,6 +740,7 @@ export const AiTopologyEdgeSchema = z.object({
 export const AiTopologySchema = z.object({
   nodes: z.array(AiTopologyNodeSchema),
   edges: z.array(AiTopologyEdgeSchema),
+  source: AiDataSourceSchema.optional(),
 });
 
 export const AiTimeseriesPointSchema = z.object({

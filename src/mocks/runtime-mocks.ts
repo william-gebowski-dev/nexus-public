@@ -101,23 +101,24 @@ export async function getMockAiTimeseries(metric: string, period: AiUsagePeriod)
   return { metric, period, points, source: "simulated" as const };
 }
 
-export async function getMockAiModelsPage(period: AiUsagePeriod) {
+export async function getMockAiModelsPage(_period: AiUsagePeriod) {
+  // `period` é ignorado — `AiModelPageSchema` não aceita o campo. As
+  // tabs filtram por período no consumidor; o wrapper mock só precisa
+  // devolver o shape que o schema aceita.
   return {
     items: MOCK_AI_MODELS,
     snapshotId: null,
     capturedAt: null,
     source: "simulated" as const,
-    period,
   };
 }
 
-export async function getMockAiProvidersPage(period: AiUsagePeriod) {
+export async function getMockAiProvidersPage(_period: AiUsagePeriod) {
   return {
     items: MOCK_AI_PROVIDERS,
     snapshotId: null,
     capturedAt: null,
     source: "simulated" as const,
-    period,
   };
 }
 

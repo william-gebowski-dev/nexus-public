@@ -22,7 +22,13 @@
 // ou `sk-status-page` (skills do ecossistema). Chaves reais da
 // Anthropic/OpenAI têm 40+ caracteres após o prefixo; o limite de 32 dá
 // folga sem deixar vazar uma chave verdadeira.
-const FORBIDDEN_PATTERNS: { label: string; regex: RegExp }[] = [
+/**
+ * Lista canônica de padrões sensíveis. Exportada para que o coletor
+ * (`scripts/ai-collector.ts`) aplique o mesmo gate antes de enviar o
+ * payload ao ingest — sem sincronização, o coletor passaria IPv4/emails
+ * que o ingest rejeita com 400.
+ */
+export const FORBIDDEN_PATTERNS: { label: string; regex: RegExp }[] = [
   // Tailscale (100.64/16 CGNAT). A regex antiga só cobria 100.1xx; agora
   // pega a faixa inteira alocada ao Tailscale (100.64.0.0/10).
   { label: "Tailscale IP (100.64/10)", regex: /100\.(?:6[4-9]|[7-9]\d|1[0-1]\d|12[0-7])\.\d{1,3}\.\d{1,3}/g },

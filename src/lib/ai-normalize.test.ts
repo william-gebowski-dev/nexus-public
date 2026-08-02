@@ -108,4 +108,34 @@ describe("9Router → Nexus AI contracts", () => {
     expect(snapshot.totalTokens).toBe(15);
     expect(AiUsageSummarySchema.safeParse(snapshot).success).toBe(true);
   });
+
+  it("aceita envelope sem dados (source=unavailable, generatedAt=null)", () => {
+    // Confirma que schema aceita `generatedAt: null` sem ApiContractError.
+    // É o shape que `api/ai/summary.ts` devolve quando o banco está vazio.
+    // Sem esta proteção, a página AI inteira quebra no deploy limpo.
+    const unavailable = {
+      period: "today",
+      generatedAt: null,
+      source: "unavailable",
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      inputTokens: 0,
+      cachedInputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      cacheRatePct: 0,
+      errorRatePct: 0,
+      estimatedCostUsd: null,
+      averageLatencyMs: null,
+      medianLatencyMs: null,
+      activeProviders: 0,
+      activeModels: 0,
+      mostUsedProvider: null,
+      mostUsedModel: null,
+      lastRequestAt: null,
+    };
+
+    expect(AiUsageSummarySchema.safeParse(unavailable).success).toBe(true);
+  });
 });
