@@ -16,6 +16,9 @@
     "ai:collect": "npx tsx scripts/ai-collector.ts --once",
     "ai:collect:dry": "npx tsx scripts/ai-collector.ts --once --dry-run",
     "ai:collect:watch": "npx tsx scripts/ai-collector.ts --watch",
+    "status:collect": "npx tsx scripts/system-status-collector.ts --once",
+    "status:collect:dry": "npx tsx scripts/system-status-collector.ts --once --dry-run",
+    "status:collect:watch": "npx tsx scripts/system-status-collector.ts --watch",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
