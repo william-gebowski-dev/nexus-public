@@ -12,7 +12,7 @@
  */
 
 import { createHash } from "node:crypto";
-import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
+import type { AiUsagePeriod } from "../types/ai-infrastructure";
 
 // === Tabelas canônicas de mapeamento (interno → público) ==================
 //
