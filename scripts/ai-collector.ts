@@ -12,13 +12,13 @@ import {
   type NormalizedQuota,
   type NormalizedRequest,
   type NormalizedSnapshot,
-} from "./ai-normalize";
+} from "../src/lib/ai-normalize";
 import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
 
 /**
  * Coletor local Nexus para 9Router.
  *
- * Conecta no 9Router (porta 20128), normaliza via scripts/ai-normalize.ts,
+ * Conecta no 9Router (porta 20128), normaliza via src/lib/ai-normalize.ts,
  * assina com HMAC-SHA256 e envia para a API de Ingestão do Nexus.
  *
  * Variáveis de ambiente:
@@ -293,7 +293,7 @@ main().catch((err) => {
 
 // === Derivação de modelUsage ============================================
 
-import type { NormalizedProviderUsage, NormalizedRequest } from "./ai-normalize";
+import type { NormalizedProviderUsage, NormalizedRequest } from "../src/lib/ai-normalize";
 
 /**
  * Agrega linhas `modelUsage` a partir da lista de requisições.

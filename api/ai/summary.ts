@@ -8,7 +8,7 @@ import { isPeriod, pickString, type ApiRequest, type ApiResponse } from "../_sha
  * não existe snapshot, devolve **200 parcial** com `source: "unavailable"`
  * e todos os contadores zerados explicitamente — a UI mostra "Sem dados"
  * em vez de ErrorState. Quando existe, `source` é o valor persistido
- * pelo coletor (ver `scripts/ai-normalize.ts::deriveSnapshotSource`).
+ * pelo coletor (ver `src/lib/ai-normalize.ts::deriveSnapshotSource`).
  */
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
@@ -85,7 +85,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   return res.status(200).json({
     period: data.period,
     generatedAt: data.captured_at,
-    // `data.source` veio do coletor (ver scripts/ai-normalize.ts). Fallback
+    // `data.source` veio do coletor (ver src/lib/ai-normalize.ts). Fallback
     // para "live" se a migration não tiver sido aplicada — legado.
     source: data.source ?? "live",
     totalRequests: data.total_requests,
