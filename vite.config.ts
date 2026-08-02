@@ -1,4 +1,4 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig, loadEnv, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -33,13 +33,17 @@ function cspSupabasePlugin(): PluginOption {
 function enforceDataModePlugin(): PluginOption {
   return {
     name: "nexus-enforce-data-mode",
-    config(_config, env) {
+    config(config, env) {
       if (env.mode !== "production") return {};
-      const v = process.env.VITE_DATA_MODE;
+      // `process.env` no config do Vite não pega .env.production
+      // automaticamente — loadEnv() lê o arquivo de env do modo.
+      // Mantém process.env como prioridade (CI/Vercel env vars).
+      const loaded = loadEnv(env.mode, config.root ?? process.cwd(), "");
+      const v = process.env.VITE_DATA_MODE ?? loaded.VITE_DATA_MODE;
       if (v !== "api" && v !== "mock") {
         throw new Error(
           `[nexus] build prod exige VITE_DATA_MODE=api|mock. Atual: ${v === undefined ? "(vazio)" : v}. ` +
-            `Defina em .env, no CI ou no painel da Vercel.`,
+            `Defina em .env.production, no CI ou no painel da Vercel.`,
         );
       }
       return {};
@@ -57,10 +61,11 @@ function enforceDataModePlugin(): PluginOption {
 function mockSwStripPlugin(): PluginOption {
   return {
     name: "nexus-strip-mock-sw",
-    config(_config, env) {
-      if (env.mode === "production" && process.env.VITE_DATA_MODE === "api") {
-        return { publicDir: false };
-      }
+    config(config, env) {
+      if (env.mode !== "production") return {};
+      const loaded = loadEnv(env.mode, config.root ?? process.cwd(), "");
+      const v = process.env.VITE_DATA_MODE ?? loaded.VITE_DATA_MODE;
+      if (v === "api") return { publicDir: false };
       return {};
     },
   };
