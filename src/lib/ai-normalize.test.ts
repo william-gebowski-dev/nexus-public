@@ -10,7 +10,7 @@ import {
   AiProviderQuotaSchema,
   AiRequestRecordSchema,
   AiUsageSummarySchema,
-} from "../src/lib/schemas";
+} from "./schemas";
 
 const NOW = new Date("2026-07-31T17:03:00-03:00");
 
