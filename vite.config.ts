@@ -35,11 +35,16 @@ function enforceDataModePlugin(): PluginOption {
     name: "nexus-enforce-data-mode",
     config(config, env) {
       if (env.mode !== "production") return {};
-      // `process.env` no config do Vite não pega .env.production
-      // automaticamente — loadEnv() lê o arquivo de env do modo.
-      // Mantém process.env como prioridade (CI/Vercel env vars).
-      const loaded = loadEnv(env.mode, config.root ?? process.cwd(), "");
-      const v = process.env.VITE_DATA_MODE ?? loaded.VITE_DATA_MODE;
+      // CI/Vercel: process.env já tem VITE_DATA_MODE via env: YAML ou
+      // painel de env vars. loadEnv só é necessário quando process.env
+      // não tem (build local sem .env). Nunca chamar loadEnv se a env
+      // já existe para evitar que o Vite sobrescreva process.env.
+      const fromEnv = process.env.VITE_DATA_MODE;
+      let v = fromEnv;
+      if (v === undefined || v === "") {
+        const loaded = loadEnv(env.mode, config.root ?? process.cwd(), "");
+        v = loaded.VITE_DATA_MODE;
+      }
       if (v !== "api" && v !== "mock") {
         throw new Error(
           `[nexus] build prod exige VITE_DATA_MODE=api|mock. Atual: ${v === undefined ? "(vazio)" : v}. ` +
@@ -63,8 +68,10 @@ function mockSwStripPlugin(): PluginOption {
     name: "nexus-strip-mock-sw",
     config(config, env) {
       if (env.mode !== "production") return {};
-      const loaded = loadEnv(env.mode, config.root ?? process.cwd(), "");
-      const v = process.env.VITE_DATA_MODE ?? loaded.VITE_DATA_MODE;
+      const cwd = config.root ?? process.cwd();
+      const loaded = loadEnv(env.mode, cwd, "");
+      const fromEnv = process.env.VITE_DATA_MODE;
+      const v = fromEnv !== undefined && fromEnv !== "" ? fromEnv : loaded.VITE_DATA_MODE;
       if (v === "api") return { publicDir: false };
       return {};
     },
