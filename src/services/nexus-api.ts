@@ -97,7 +97,17 @@ async function jsonGet<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   if (!res.ok) {
-    const fallback = path.includes("/api/system/status") || path.includes("/api/status")
+    // O endpoint /api/system/status devolve 503 com o shape NO_DATA_STATUS
+    // (counts zerados, technicalSummary default) quando a fonte operacional
+    // não está configurada. Isso NÃO é erro de servidor — é o estado
+    // vazio conhecido. Devolvemos o body para que o React Query trate
+    // como `data` (mostra "Sem dados") em vez de `isError: true`
+    // (mostra ErrorState com "Não foi possível atualizar").
+    const isSystemStatus = path.includes("/api/system/status") || path.includes("/api/status");
+    if (isSystemStatus && res.status === 503 && body && typeof body === "object" && "status" in body) {
+      return body as T;
+    }
+    const fallback = isSystemStatus
       ? "Não foi possível atualizar os dados do sistema."
       : "Não foi possível carregar os dados.";
     const message = body && typeof body === "object" && "error" in body && typeof body.error === "string"
