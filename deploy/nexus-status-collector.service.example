@@ -1,0 +1,18 @@
+[Unit]
+Description=Nexus System Status Collector (Hermes → Vercel)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=william
+WorkingDirectory=/home/william/Área de trabalho/dev/nexus-public
+Environment=NEXUS_STATUS_URL=https://nexus-public-mu.vercel.app/api/system/status-write
+Environment=SYSTEM_STATUS_SECRET=SEU_SEGREDO_HMAC_AQUI
+Environment=STATUS_INTERVAL_SECONDS=300
+ExecStart=/usr/bin/npx tsx scripts/system-status-collector.ts --watch
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

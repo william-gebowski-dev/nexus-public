@@ -1,5 +1,8 @@
 #!/usr/bin/env tsx
 import crypto from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import { AiIngestPayloadSchema } from "../src/lib/schemas";
 import {
   aggregateSnapshot,
@@ -45,6 +48,18 @@ import type { AiUsagePeriod } from "../src/types/ai-infrastructure";
  * 7d/30d/60d são calculadas a partir de `captured_at` no momento da
  * leitura, não exigem snapshot pré-rotulado.
  */
+
+function readPackageVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const pkgPath = resolve(here, "..", "package.json");
+    const raw = readFileSync(pkgPath, "utf8");
+    const parsed = JSON.parse(raw) as { version?: unknown };
+    return typeof parsed.version === "string" ? parsed.version : "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
+}
 
 interface CollectorOptions {
   once: boolean;
@@ -205,7 +220,7 @@ async function collectOnce(opts: CollectorOptions): Promise<void> {
 
   const telemetry = await fetchFromRouter(routerBase, opts);
   const now = new Date();
-  const pkgVersion = "0.4.0";
+  const pkgVersion = readPackageVersion();
 
   let payload;
   try {
@@ -349,7 +364,13 @@ function aggregateModelUsage(
       ? Math.round(latencies.reduce((s, n) => s + n, 0) / latencies.length)
       : null;
     const medianLatencyMs = latencies.length > 0
-      ? latencies.slice().sort((a, b) => a - b)[Math.floor(latencies.length / 2)]
+      ? (() => {
+          const sorted = latencies.slice().sort((a, b) => a - b);
+          const mid = sorted.length / 2;
+          return sorted.length % 2 === 0
+            ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+            : sorted[Math.floor(mid)];
+        })()
       : null;
     const errorCount = rs.filter((r) => r.status === "failed").length;
     const lastUsedAt = rs.length > 0

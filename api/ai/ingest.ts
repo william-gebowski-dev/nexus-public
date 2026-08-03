@@ -164,7 +164,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   if (missingRpc) {
-    console.warn("[ingest] RPC ingest_ai_snapshot ausente; usando fallback sequencial.");
+    // DEPRECATION: fallback sequencial mantido como safety-net para
+    // migrações não-deployadas. Migrations `20260801000002_ingest_rpc.sql`
+    // e `20260802000003_fix_quota_checked_at.sql` (v2) devem estar
+    // aplicadas no Supabase alvo. Se este log aparece em produção,
+    // aplicar migration pendente e remover este bloco (linhas ~166-380).
+    console.warn(
+      "[ingest] DEPRECATION: RPC ingest_ai_snapshot ausente — usando fallback sequencial. " +
+        "Aplicar migration 20260802000003_fix_quota_checked_at.sql no Supabase alvo.",
+    );
   }
 
   const runId = crypto.randomUUID();

@@ -5,6 +5,10 @@
  *   importar o SDK para manter o bundle pequeno).
  * - Validação de período aceita apenas a união canônica.
  * - `getHeader` é case-insensitive.
+ *
+ * Os enums `AI_PERIODS` / `AI_METRICS` são re-exportados de
+ * `src/lib/ai-enums.ts` (single source of truth) — antes viviam
+ * duplicados aqui e em `src/lib/schemas.ts`, com risco de drift.
  */
 
 export type ApiRequest = {
@@ -19,18 +23,8 @@ export type ApiResponse = {
   status: (statusCode: number) => { json: (body: unknown) => void };
 };
 
-export const AI_PERIODS = ["today", "24h", "7d", "30d", "60d"] as const;
-export type AiUsagePeriod = (typeof AI_PERIODS)[number];
-
-export const AI_METRICS = [
-  "tokens",
-  "cost",
-  "requests",
-  "latency",
-  "errors",
-  "cache",
-] as const;
-export type AiMetric = (typeof AI_METRICS)[number];
+export { AI_METRICS, AI_PERIODS, isMetric, isPeriod } from "@/lib/ai-enums";
+export type { AiMetric, AiUsagePeriod } from "@/lib/ai-enums";
 
 export function getHeader(
   headers: Record<string, string | string[] | undefined>,
@@ -40,14 +34,6 @@ export function getHeader(
   const val = headers[target] ?? headers[name];
   if (Array.isArray(val)) return val[0] ?? null;
   return val ?? null;
-}
-
-export function isPeriod(value: unknown): value is AiUsagePeriod {
-  return typeof value === "string" && (AI_PERIODS as readonly string[]).includes(value);
-}
-
-export function isMetric(value: unknown): value is AiMetric {
-  return typeof value === "string" && (AI_METRICS as readonly string[]).includes(value);
 }
 
 export function pickString(

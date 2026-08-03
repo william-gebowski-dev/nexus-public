@@ -26,8 +26,11 @@ import type { AiUsagePeriod } from "@/types/ai-infrastructure";
 export type DataMode = "mock" | "api";
 
 function resolveDataMode(): DataMode {
-  const env = import.meta.env.VITE_DATA_MODE;
-  if (import.meta.env.PROD && env !== "api") {
+  // Em contextos onde import.meta.env não existe (ex.: vitest rodando
+  // módulos sem pipeline Vite), assume mock para não quebrar imports.
+  const meta = typeof import.meta !== "undefined" ? import.meta.env : undefined;
+  const env = meta?.VITE_DATA_MODE;
+  if (meta?.PROD && env !== "api") {
     throw new Error("Produção exige VITE_DATA_MODE=api.");
   }
   return env === "api" ? "api" : "mock";

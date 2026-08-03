@@ -60,20 +60,34 @@ function enforceDataModePlugin(): PluginOption {
  * Strip do service worker de mocks em produção api. Antes desta
  * mudança, `public/mockServiceWorker.js` (9666 bytes) era sempre
  * copiado para `dist/` mesmo quando o MSW não era iniciado. Em prod
- * com `VITE_DATA_MODE=api`, zerar `publicDir` impede o vazamento.
- * Em dev ou `mock`, mantém comportamento padrão.
+ * com `VITE_DATA_MODE=api`, zerar `publicDir` impedia o vazamento
+ * **mas também removia assets legítimos** como `favicon.svg` e
+ * `theme-init.js` — bug corrigido: o plugin agora remove apenas o
+ * mockServiceWorker.js após o build (closeBundle), preservando
+ * publicDir. Em dev ou `mock`, não age.
  */
 function mockSwStripPlugin(): PluginOption {
   return {
     name: "nexus-strip-mock-sw",
-    config(config, env) {
-      if (env.mode !== "production") return {};
-      const cwd = config.root ?? process.cwd();
-      const loaded = loadEnv(env.mode, cwd, "");
+    async closeBundle() {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const mode = process.env.NODE_ENV ?? "production";
+      if (mode !== "production") return;
+      const cwd = process.cwd();
+      const loaded = loadEnv(mode, cwd, "");
       const fromEnv = process.env.VITE_DATA_MODE;
       const v = fromEnv !== undefined && fromEnv !== "" ? fromEnv : loaded.VITE_DATA_MODE;
-      if (v === "api") return { publicDir: false };
-      return {};
+      if (v !== "api") return;
+      const distDir = path.resolve(cwd, "dist");
+      const PROD_API_EXCLUDES = ["mockServiceWorker.js"];
+      for (const file of PROD_API_EXCLUDES) {
+        const target = path.join(distDir, file);
+        if (fs.existsSync(target)) {
+          fs.unlinkSync(target);
+          console.log(`[nexus-strip-mock-sw] removed ${target}`);
+        }
+      }
     },
   };
 }

@@ -11,6 +11,7 @@
  *    internos (UI props, helpers) continuam em `src/types/`.
  */
 import { z } from "zod";
+import { AI_METRICS, AI_PERIODS } from "@/lib/ai-enums";
 
 // === CronStatus ============================================================
 
@@ -494,7 +495,7 @@ export const AvailabilitySchema = z.record(z.string(), z.array(AvailabilityCheck
 
 // === AI Infrastructure Observability =====================================
 
-export const AiUsagePeriodSchema = z.enum(["today", "24h", "7d", "30d", "60d"]);
+export const AiUsagePeriodSchema = z.enum(AI_PERIODS);
 
 /**
  * `live`        — todos os campos vieram do 9Router.
@@ -749,7 +750,7 @@ export const AiTimeseriesPointSchema = z.object({
 });
 
 export const AiTimeseriesSchema = z.object({
-  metric: z.enum(["tokens", "cost", "requests", "latency", "errors", "cache"]),
+  metric: z.enum(AI_METRICS),
   period: AiUsagePeriodSchema,
   points: z.array(AiTimeseriesPointSchema),
   source: AiDataSourceSchema,
