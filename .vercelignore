@@ -1,0 +1,4 @@
+# Ignora arquivos do deploy Vercel.
+# mockServiceWorker.js só é útil em dev/mock; vite.config.ts::mockSwStripPlugin
+# tenta remover pós-build, mas esta camada garante que nunca chegue ao deploy.
+public/mockServiceWorker.js
