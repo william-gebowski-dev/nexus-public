@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Force API mode so nexusApi routes through jsonGetSafe instead of MOCK_*.
 vi.stubEnv("VITE_DATA_MODE", "api");
 
-import { nexusApi, ApiContractError } from "./nexus-api";
+import { nexusApi, ApiContractError, shouldStartBrowserMocks } from "./nexus-api";
 
 const originalFetch = globalThis.fetch;
 
@@ -130,6 +130,13 @@ describe("nexusApi contrato (modo API)", () => {
       await expect(apiMode.nexusApi.availability()).rejects.toBeInstanceOf(
         apiMode.ApiContractError,
       );
+    });
+  });
+
+  describe("shouldStartBrowserMocks", () => {
+    it("starts browser mocks whenever data mode is mock", () => {
+      expect(shouldStartBrowserMocks("mock")).toBe(true);
+      expect(shouldStartBrowserMocks("api")).toBe(false);
     });
   });
 });

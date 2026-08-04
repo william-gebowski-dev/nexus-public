@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "@/styles/globals.css";
 import { App } from "@/App";
-import { DATA_MODE } from "@/services/nexus-api";
+import { DATA_MODE, shouldStartBrowserMocks } from "@/services/nexus-api";
 
 /**
  * Define se o MSW deve interceptar as chamadas `/api/*`.
@@ -15,9 +15,7 @@ import { DATA_MODE } from "@/services/nexus-api";
  * Renderiza o app imediatamente — não bloqueia o paint esperando o SW.
  */
 async function maybeStartMocks(): Promise<void> {
-  if (typeof window === "undefined") return;
-  if (import.meta.env.PROD) return;
-  if (DATA_MODE !== "mock") return;
+  if (!shouldStartBrowserMocks(DATA_MODE)) return;
   const { worker } = await import("@/mocks/browser");
   await worker.start({
     onUnhandledRequest: "bypass",
