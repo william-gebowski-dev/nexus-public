@@ -30,13 +30,23 @@ function resolveDataMode(): DataMode {
   // módulos sem pipeline Vite), assume mock para não quebrar imports.
   const meta = typeof import.meta !== "undefined" ? import.meta.env : undefined;
   const env = meta?.VITE_DATA_MODE;
-  if (meta?.PROD && env !== "api") {
-    throw new Error("Produção exige VITE_DATA_MODE=api.");
-  }
+  // A validação de build prod (api/mock) vive em
+  // `vite.config.ts::enforceDataModePlugin` — não duplica aqui para
+  // permitir prod-mock sem runtime throw ao importar.
   return env === "api" ? "api" : "mock";
 }
 
 export const DATA_MODE: DataMode = resolveDataMode();
+
+/**
+ * Decisão pura e testável: o MSW (service worker de mocks) deve ser
+ * iniciado sempre que o modo de dados for `mock`, inclusive em produção.
+ * `main.tsx` usa este helper para evitar depender de `import.meta.env.PROD`
+ * (que pararia o startup em build prod-mock).
+ */
+export function shouldStartBrowserMocks(dataMode: DataMode): boolean {
+  return dataMode === "mock";
+}
 
 /** Mantido por compatibilidade — novos consumidores devem importar `DATA_MODE`. */
 export const USE_MOCK_DATA: boolean = DATA_MODE === "mock";
