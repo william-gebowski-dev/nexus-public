@@ -61,8 +61,24 @@ function isoTodayEnd(time: string): string {
 
 function buildTaskResults(): Record<string, TaskResultEntry> {
   const results: Record<string, TaskResultEntry> = {};
+  const planningFailures = new Set([
+    "job-30m-01",
+    "job-30m-02",
+    "job-30m-03",
+    "job-30m-04",
+  ]);
   for (const task of ROUTINE_TASKS) {
     const t = task.scheduledTime;
+    if (planningFailures.has(task.id)) {
+      results[task.id] = {
+        status: "failed",
+        startedAt: isoTodayAt(t),
+        finishedAt: isoTodayEnd(t),
+        durationSeconds: 30,
+        resultSummary: "Falha HTTP 400 no painel juiz ao montar tool payload.",
+      };
+      continue;
+    }
     if (task.id === "job-30m-37") {
       results[task.id] = {
         status: "running",

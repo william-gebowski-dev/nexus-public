@@ -11,7 +11,7 @@
  *    internos (UI props, helpers) continuam em `src/types/`.
  */
 import { z } from "zod";
-import { AI_METRICS, AI_PERIODS } from "@/lib/ai-enums";
+import { AI_METRICS, AI_PERIODS } from "./ai-enums";
 
 // === CronStatus ============================================================
 
