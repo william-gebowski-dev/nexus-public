@@ -8,7 +8,7 @@ export function NotFound() {
     <div className="mx-auto max-w-2xl space-y-6">
       <PageHeader
         title="404 — Página não encontrada"
-        subtitle="Esta rota não existe no Nexus."
+        subtitle="Esta rota não existe no Nexus Dashboard."
       />
       <EmptyState
         title="Destino desconhecido"

@@ -35,7 +35,7 @@ export function RecentExecutionsPanel({
 
       <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface md:block">
         <table className="w-full text-left">
-          <caption className="sr-only">10 execuções mais recentes do Nexus</caption>
+          <caption className="sr-only">10 execuções mais recentes do Nexus Dashboard</caption>
           <thead>
             <tr className="border-b border-border text-[11px] uppercase tracking-wider text-text-faint">
               <th className="py-3 pl-4 pr-4">Execução</th>

@@ -37,7 +37,7 @@ export function OverviewHeader({
             <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
           </div>
           <div className="min-w-0">
-            <div className="font-mono text-sm font-semibold leading-none tracking-tight">Nexus</div>
+            <div className="font-mono text-sm font-semibold leading-none tracking-tight">Nexus Dashboard</div>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-text-dim">
               Centro operacional do ecossistema
             </p>

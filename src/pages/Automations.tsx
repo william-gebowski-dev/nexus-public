@@ -15,7 +15,7 @@ export function Automations() {
     <div className="space-y-6">
       <PageHeader
         title="Automações"
-        subtitle="Rotinas em execução, agendadas e observadas pelo Nexus."
+        subtitle="Rotinas em execução, agendadas e observadas pelo Nexus Dashboard."
         actions={<DataFreshnessBadge iso={q.dataUpdatedAt ? new Date(q.dataUpdatedAt).toISOString() : null} />}
       />
 

@@ -11,7 +11,7 @@
     "nextAction": "Publicar primeira versão com mock API",
     "updatedAt": "2026-07-28T19:00:00Z",
     "tech": ["React", "TypeScript", "Tailwind", "Vite", "TanStack Query"],
-    "publicUrl": "https://nexus-public-mu.vercel.app",
+    "publicUrl": "https://nexus-dashboard-dev.vercel.app",
     "source": "manual"
   },
   {
@@ -96,7 +96,7 @@
     "nextAction": "Sincronizar com o dashboard público",
     "updatedAt": "2026-07-28T19:30:00Z",
     "tech": ["Markdown"],
-    "publicUrl": "https://nexus-public-mu.vercel.app/docs",
+    "publicUrl": "https://nexus-dashboard-dev.vercel.app/docs",
     "source": "manual"
   }
 ]

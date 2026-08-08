@@ -1,7 +1,7 @@
-# Nexus — Painel operacional público
+# Nexus Dashboard — Painel operacional público
 
-Painel operacional vivo do ecossistema Nexus (William Gebowski Duda), publicado
-em [`nexus-public-mu.vercel.app`](https://nexus-public-mu.vercel.app).
+Painel operacional vivo do ecossistema Nexus Dashboard (William Gebowski Duda),
+publicado em [`nexus-dashboard-dev.vercel.app`](https://nexus-dashboard-dev.vercel.app).
 
 - **Stack:** Vite + React 18 + TypeScript + Tailwind CSS.
 - **Cache/sincronização:** TanStack Query com refresh automático (constante
@@ -94,13 +94,13 @@ do `nexusApi` consomem o mesmo `DATA_MODE`. Não ler
 `import.meta.env` direto em outros lugares.
 
 > Quando o backend `/api/*` estiver publicado, defina
-> `VITE_DATA_MODE=api` no painel do projeto `nexus-public` na Vercel
+> `VITE_DATA_MODE=api` no painel do projeto `nexus-dashboard` na Vercel
 > (ambiente "Production") e os mocks somem automaticamente.
 
 ## Estrutura
 
 ```
-nexus-public/
+nexus-dashboard/
 ├── index.html              # entry do Vite
 ├── public/
 │   └── mockServiceWorker.js
@@ -129,12 +129,19 @@ nexus-public/
   catch-all `/(.*) → /index.html` para suportar rotas SPA
   (`/routine`, `/executions`, etc.). Arquivos estáticos em
   `dist/assets/*` são servidos diretos pela Vercel.
-- **Projeto Vercel:** `nexus-public` (id `prj_6iNJQVonHUO7RcBQM6t9JtKdD0TD`).
-- **Domínio:** `nexus-public-mu.vercel.app` — deve estar associado a esse
+- **Projeto Vercel:** `nexus-dashboard` (id `prj_6iNJQVonHUO7RcBQM6t9JtKdD0TD`),
+  no escopo `william-gebowski` — painel em
+  [`vercel.com/william-gebowski/nexus-dashboard`](https://vercel.com/william-gebowski/nexus-dashboard).
+- **Domínio:** `nexus-dashboard-dev.vercel.app` — deve estar associado a esse
   projeto. Se o domínio aparecer apontando para um deployment antigo,
   conferir a aba "Domains" do projeto.
+- **Deployment Protection:** precisa ficar `Disabled` (ou `Only Preview
+  Deployments`). Com a proteção padrão ligada, produção responde `302` para
+  `vercel.com/sso-api` e o painel fica inacessível mesmo com o build verde.
 - **Branch de produção:** `main`.
 - Vercel faz o build e o deploy a cada `git push` em `main`.
+- `npm run smoke:prod` verifica que produção está acessível de fato; o
+  workflow `.github/workflows/uptime.yml` roda o mesmo check a cada 6h.
 
 ### Pendências registradas
 
@@ -147,5 +154,6 @@ nexus-public/
   no painel da Vercel antes de qualquer mutação real.
 - **Domínio/projeto:** se o push para `main` republica mas o domínio
   público continua no deployment antigo, conferir a associação
-  `nexus-public-mu.vercel.app` → projeto `nexus-public` na Vercel
-  (a aba Domains do projeto errado deixa o domínio órfão).
+  `nexus-dashboard-dev.vercel.app` → projeto `nexus-dashboard` na Vercel
+  (a aba Domains do projeto errado deixa o domínio órfão). Diagnóstico
+  dos modos de falha conhecidos em `PUBLICACAO.md` §7.

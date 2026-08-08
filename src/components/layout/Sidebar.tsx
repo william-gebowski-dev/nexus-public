@@ -49,7 +49,7 @@ export function Sidebar({
             <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
           </div>
           <div className={cn("min-w-0", collapsed && "sr-only")}>
-            <div className="font-mono text-sm font-semibold leading-none tracking-tight">Nexus</div>
+            <div className="font-mono text-sm font-semibold leading-none tracking-tight">Nexus Dashboard</div>
             <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-text-faint">
               Centro operacional
             </div>

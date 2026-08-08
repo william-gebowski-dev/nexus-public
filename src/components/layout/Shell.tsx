@@ -43,14 +43,14 @@ export function Shell() {
         </main>
         <footer className="border-t border-border bg-bg-elevated/70 px-6 py-4 text-[11px] text-text-faint">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
-            <span>Nexus — painel operacional vivo do ecossistema · dados sanitizados · refresh a cada {REFRESH_LABEL}</span>
+            <span>Nexus Dashboard — painel operacional vivo do ecossistema · dados sanitizados · refresh a cada {REFRESH_LABEL}</span>
             <a
-              href="https://github.com/william-gebowski-dev/nexus-public"
+              href="https://github.com/william-gebowski-dev/nexus-dashboard"
               target="_blank"
               rel="noreferrer noopener"
               className="text-text-dim hover:text-text"
             >
-              william-gebowski-dev/nexus-public ↗
+              william-gebowski-dev/nexus-dashboard ↗
             </a>
           </div>
         </footer>

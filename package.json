@@ -1,5 +1,5 @@
 {
-  "name": "nexus-public",
+  "name": "nexus-dashboard",
   "private": true,
   "version": "0.3.0",
   "type": "module",
@@ -12,6 +12,7 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "check:mocks": "node scripts/check-mocks.js",
+    "smoke:prod": "bash scripts/smoke-prod.sh",
     "check:ai-contracts": "npx tsx scripts/check-ai-contracts.ts",
     "ai:collect": "npx tsx scripts/ai-collector.ts --once",
     "ai:collect:dry": "npx tsx scripts/ai-collector.ts --once --dry-run",
@@ -19,6 +20,9 @@
     "status:collect": "npx tsx scripts/system-status-collector.ts --once",
     "status:collect:dry": "npx tsx scripts/system-status-collector.ts --once --dry-run",
     "status:collect:watch": "npx tsx scripts/system-status-collector.ts --watch",
+    "changelog:build": "BUILD_CHANGELOG_RUN_CLI=1 npx tsx scripts/build-changelog.ts",
+    "changelog:dry": "BUILD_CHANGELOG_RUN_CLI=1 npx tsx scripts/build-changelog.ts --dry-run",
+    "changelog:send": "BUILD_CHANGELOG_RUN_CLI=1 npx tsx scripts/build-changelog.ts --send",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test"
